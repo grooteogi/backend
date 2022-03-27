@@ -1,4 +1,4 @@
-package insaengseonbae.domain;
+package grooteogi.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

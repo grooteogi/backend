@@ -1,10 +1,10 @@
-package insaengseonbae;
+package grooteogi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InsaengSeonbaeApplicationTests {
+class ApplicationTests {
 
 	@Test
 	void contextLoads() {

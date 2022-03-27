@@ -1,7 +1,7 @@
-package insaengseonbae.controller;
+package grooteogi.controller;
 
-import insaengseonbae.domain.User;
-import insaengseonbae.service.UserService;
+import grooteogi.domain.User;
+import grooteogi.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
