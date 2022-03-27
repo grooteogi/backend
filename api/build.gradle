@@ -15,16 +15,16 @@ repositories {
 
 dependencies {
 	// spring-boot starter
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.5'
+	implementation 'org.springframework.boot:spring-boot-starter-test:2.6.5'
 
 	// restdocs
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	implementation 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.6.RELEASE'
+	implementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
 
 	// hibernate
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'mysql:mysql-connector-java'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.5'
+	implementation 'mysql:mysql-connector-java:8.0.28'
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok:1.18.22'
