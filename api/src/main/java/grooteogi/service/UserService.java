@@ -1,7 +1,7 @@
-package insaengseonbae.service;
+package grooteogi.service;
 
-import insaengseonbae.domain.User;
-import insaengseonbae.repository.UserRepository;
+import grooteogi.domain.User;
+import grooteogi.repository.UserRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

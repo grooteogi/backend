@@ -1,6 +1,6 @@
-package insaengseonbae.repository;
+package grooteogi.repository;
 
-import insaengseonbae.domain.User;
+import grooteogi.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
