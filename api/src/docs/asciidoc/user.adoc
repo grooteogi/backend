@@ -2,12 +2,10 @@
 
 ==== GET
 ===== Request
-Request 형식은 다음과 같다:
 include::{snippets}/user/http-request.adoc[]
 
 ====== Try with curl
 include::{snippets}/user/curl-request.adoc[]
 
 ===== Response
-성공할 경우 response 형식은 다음과 같다:
 include::{snippets}/user/http-response.adoc[]
