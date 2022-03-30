@@ -19,10 +19,10 @@ public class UserHashtag {
     private Timestamp registered;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "hashtagId")
+    @JoinColumn(name = "hashtag_id")
     private Hashtag hashTag;
 }
