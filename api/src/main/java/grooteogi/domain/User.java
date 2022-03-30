@@ -39,7 +39,7 @@ public class User {
   private Timestamp registered;
 
   @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "user_info_id")
   private UserInfo userInfo;
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})

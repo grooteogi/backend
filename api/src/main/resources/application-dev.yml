@@ -5,7 +5,7 @@ spring:
     password: test_pw
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
   redis:
     host: localhost
