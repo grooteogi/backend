@@ -1,4 +1,4 @@
-package grooteogi.domain;
+package grooteogi.dto;
 
 import lombok.Data;
 

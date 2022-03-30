@@ -1,15 +1,14 @@
 package grooteogi.controller;
 
-import grooteogi.domain.EmailCodeRequest;
-import grooteogi.domain.EmailRequest;
+import grooteogi.dto.EmailCodeRequest;
+import grooteogi.dto.EmailRequest;
 import grooteogi.domain.User;
-import grooteogi.domain.UserDto;
+import grooteogi.dto.UserDto;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

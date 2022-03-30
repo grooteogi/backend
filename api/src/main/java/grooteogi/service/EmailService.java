@@ -1,8 +1,7 @@
 package grooteogi.service;
 
-import grooteogi.domain.EmailCodeRequest;
-import grooteogi.domain.EmailRequest;
-import grooteogi.domain.User;
+import grooteogi.dto.EmailCodeRequest;
+import grooteogi.dto.EmailRequest;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.List;
 import java.util.Random;
 
 @Service
