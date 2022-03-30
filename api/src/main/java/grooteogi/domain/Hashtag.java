@@ -6,20 +6,19 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
-public class HashTag {
+public class Hashtag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Enumerated(EnumType.STRING)
-    private Concern concern;
-
-    @Enumerated(EnumType.STRING)
-    private Personality personality;
+    @Column(nullable = false)
+    private HashtagType hashtagType; //concern, personality
 
     @Column(length = 200, nullable = false)
     private String tag;
@@ -27,8 +26,7 @@ public class HashTag {
     @CreationTimestamp
     private Timestamp registered;
 
-    @OneToOne
-    @JoinColumn(name = "id")
-    private UserHashtag userHashtag;
+    @OneToMany(mappedBy = "hashTag")
+    private List<UserHashtag> userHashtag;
 
 }

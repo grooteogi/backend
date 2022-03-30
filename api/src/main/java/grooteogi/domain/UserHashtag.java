@@ -18,9 +18,11 @@ public class UserHashtag {
     @CreationTimestamp
     private Timestamp registered;
 
-    @OneToOne(mappedBy = "userHashtag")
+    @ManyToOne
+    @JoinColumn(name = "userId")
     private User user;
 
-    @OneToOne(mappedBy = "userHashtag")
-    private HashTag hashTag;
+    @ManyToOne
+    @JoinColumn(name = "hashtagId")
+    private Hashtag hashTag;
 }

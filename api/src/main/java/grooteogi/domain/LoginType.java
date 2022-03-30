@@ -1,6 +1,5 @@
 package grooteogi.domain;
 
-public enum Type {
-    //로그인 타입
+public enum LoginType {
     GENERAL, KAKAO, FACEBOOK
 }
