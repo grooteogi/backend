@@ -59,19 +59,19 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body("register success@@");
   }
 
-  @PostMapping("login")
+  @PostMapping("/login")
   public ResponseEntity login(@RequestBody LoginDto loginDto){
     Token token = userService.login(loginDto);
-    if ( token == null ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
+    if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
   }
 
-  @GetMapping("verify")
+  @GetMapping("/verify")
   public ResponseEntity verify(HttpServletRequest request){
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify( authorizationHeader );
 
-    if ( !(boolean)result.get( "result" ) ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
+    if (!(boolean)result.get( "result" )) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
     else return ResponseEntity.ok( result.get( "email" ).toString() );
   }
 }

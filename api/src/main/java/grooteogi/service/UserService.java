@@ -24,19 +24,19 @@ public class UserService {
   public Token login(LoginDto loginDto ){
 
     // 알아서 로그인 처리
-    return generateToken( 1, loginDto.getEmail() );
+    return generateToken(1, loginDto.getEmail());
   }
 
   private Token generateToken(int id, String email ){
     Token token = new Token();
-    token.setAccessToken(jwtProvider.generateAccessToken( id, email ));
-    token.setRefreshToken(jwtProvider.generateRefreshToken( id, email ));
+    token.setAccessToken(jwtProvider.generateAccessToken(id, email));
+    token.setRefreshToken(jwtProvider.generateRefreshToken(id, email));
 
     return token;
   }
 
   // 추후 private 으로 변경 필요
-  public Map verify( String authorizationHeader ) {
-    return jwtProvider.verifyToken( authorizationHeader );
+  public Map verify(String authorizationHeader) {
+    return jwtProvider.verifyToken(authorizationHeader);
   }
 }

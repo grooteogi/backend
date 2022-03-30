@@ -16,12 +16,12 @@ public class JwtProvider {
     @Value("${spring.jwt.secret}")
     private String SECRET_KEY;
     public String generateAccessToken( int id, String email ){
-        return doGenerateToken( id, email, ACCESS_TOKEN_EXPIRATION_TIME.getValue() );
+        return doGenerateToken(id, email, ACCESS_TOKEN_EXPIRATION_TIME.getValue());
     }
     public String generateRefreshToken( int id, String email ){
-        return doGenerateToken( id, email, REFRESH_TOKEN_EXPIRATION_TIME.getValue() );
+        return doGenerateToken(id, email, REFRESH_TOKEN_EXPIRATION_TIME.getValue());
     }
-    public String doGenerateToken( int id, String email, long expireTime ){
+    public String doGenerateToken(int id, String email, long expireTime){
         Claims claims = Jwts.claims();
         claims.put("ID", id);
         claims.put("email", email);
@@ -44,14 +44,14 @@ public class JwtProvider {
                     .setSigningKey(SECRET_KEY) // (3)
                     .parseClaimsJws(token) // (4)
                     .getBody();
-            result.put( "result", true );
-            result.put( "email", (String) claims.get("email") );
+            result.put("result", true);
+            result.put("email", (String) claims.get("email"));
         } catch (ExpiredJwtException e) {
-            result.put( "result", false );
-            result.put( "msg", e.getMessage() );
+            result.put("result", false);
+            result.put("msg", e.getMessage());
         } catch (JwtException e) {
-            result.put( "result", false );
-            result.put( "msg", e.getMessage() );
+            result.put("result", false );
+            result.put("msg", e.getMessage());
         }
 
         return result;
