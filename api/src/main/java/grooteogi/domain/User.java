@@ -41,6 +41,10 @@ public class User {
   @JoinColumn(name = "id")
   private UserInfo userInfo;
 
+  @OneToOne
+  @JoinColumn(name = "id")
+  private UserHashtag userHashtag;
+
 }
 
 
