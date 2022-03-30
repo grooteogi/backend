@@ -8,6 +8,7 @@ import grooteogi.dto.UserDto;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.jsonwebtoken.Claims;
@@ -75,8 +76,10 @@ public class UserController {
   @GetMapping("verify")
   public ResponseEntity verify(HttpServletRequest request){
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    String email = userService.verify( authorizationHeader );
-    return ResponseEntity.ok(email);
+    Map<String, Object> result = userService.verify( authorizationHeader );
+
+    if ( !(boolean)result.get( "result" ) ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
+    else return ResponseEntity.ok( result.get( "email" ).toString() );
   }
 
 }

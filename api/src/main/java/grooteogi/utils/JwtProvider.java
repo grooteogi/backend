@@ -1,12 +1,12 @@
 package grooteogi.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static grooteogi.config.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
 import static grooteogi.config.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
@@ -34,15 +34,27 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String verifyToken( String authorizationHeader ){
-        validationAuthorizationHeader(authorizationHeader); // (1)
-        String token = extractToken(authorizationHeader); // (2)
+    public Map verifyToken(String authorizationHeader ){
+        validationAuthorizationHeader(authorizationHeader);
+        String token = extractToken(authorizationHeader);
+        Map<String, Object> result = new HashMap<String, Object>();
 
-        Claims claims =  Jwts.parser()
-                .setSigningKey(SECRET_KEY) // (3)
-                .parseClaimsJws(token) // (4)
-                .getBody();
-        return (String) claims.get("email");
+        try {
+            Claims claims =  Jwts.parser()
+                    .setSigningKey(SECRET_KEY) // (3)
+                    .parseClaimsJws(token) // (4)
+                    .getBody();
+            result.put( "result", true );
+            result.put( "email", (String) claims.get("email") );
+        } catch (ExpiredJwtException e) {
+            result.put( "result", false );
+            result.put( "msg", e.getMessage() );
+        } catch (JwtException e) {
+            result.put( "result", false );
+            result.put( "msg", e.getMessage() );
+        }
+
+        return result;
     }
 
     private void validationAuthorizationHeader(String header) {

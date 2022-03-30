@@ -5,6 +5,7 @@ import grooteogi.domain.User;
 import grooteogi.dto.UserDto;
 import grooteogi.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
 
 import grooteogi.utils.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class UserService {
   }
 
   // 추후 private 으로 변경 필요
-  public String verify( String authorizationHeader ) {
+  public Map verify( String authorizationHeader ) {
     return jwtProvider.verifyToken( authorizationHeader );
   }
 }
