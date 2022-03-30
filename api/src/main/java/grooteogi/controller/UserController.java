@@ -10,12 +10,17 @@ import grooteogi.service.UserService;
 import java.util.List;
 import java.util.logging.Logger;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
@@ -62,10 +67,16 @@ public class UserController {
 
   @PostMapping("login")
   public ResponseEntity login(@RequestBody UserDto userDto){
-    System.out.println( "야야야야야" );
     TokenDto token = userService.login(userDto);
     if ( token == null ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
+  }
+
+  @GetMapping("verify")
+  public ResponseEntity verify(HttpServletRequest request){
+    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    String email = userService.verify( authorizationHeader );
+    return ResponseEntity.ok(email);
   }
 
 }

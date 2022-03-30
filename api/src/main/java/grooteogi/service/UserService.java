@@ -28,9 +28,14 @@ public class UserService {
 
   private TokenDto generateToken( int id, String email ){
     TokenDto token = new TokenDto();
-    token.setAccessToken(jwtProvider.generateToken( id, email ));
-    token.setRefreshToken(jwtProvider.generateToken( id, email ));
+    token.setAccessToken(jwtProvider.generateAccessToken( id, email ));
+    token.setRefreshToken(jwtProvider.generateRefreshToken( id, email ));
 
     return token;
+  }
+
+  // 추후 private 으로 변경 필요
+  public String verify( String authorizationHeader ) {
+    return jwtProvider.verifyToken( authorizationHeader );
   }
 }
