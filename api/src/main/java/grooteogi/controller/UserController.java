@@ -1,17 +1,12 @@
 package grooteogi.controller;
 
-import grooteogi.dto.TokenDto;
-import grooteogi.dto.EmailCodeRequest;
-import grooteogi.dto.EmailRequest;
+import grooteogi.dto.*;
 import grooteogi.domain.User;
-import grooteogi.dto.UserDto;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
@@ -67,8 +60,8 @@ public class UserController {
   }
 
   @PostMapping("login")
-  public ResponseEntity login(@RequestBody UserDto userDto){
-    TokenDto token = userService.login(userDto);
+  public ResponseEntity login(@RequestBody LoginDto loginDto){
+    Token token = userService.login(loginDto);
     if ( token == null ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
   }
@@ -81,5 +74,4 @@ public class UserController {
     if ( !(boolean)result.get( "result" ) ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
     else return ResponseEntity.ok( result.get( "email" ).toString() );
   }
-
 }
