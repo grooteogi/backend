@@ -1,5 +1,6 @@
 package grooteogi.controller;
 
+import grooteogi.dto.TokenDto;
 import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
 import grooteogi.domain.User;
@@ -7,6 +8,7 @@ import grooteogi.dto.UserDto;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.List;
+import java.util.logging.Logger;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,6 +58,14 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
     }
     return ResponseEntity.status(HttpStatus.OK).body("register success@@");
+  }
+
+  @PostMapping("login")
+  public ResponseEntity login(@RequestBody UserDto userDto){
+    System.out.println( "야야야야야" );
+    TokenDto token = userService.login(userDto);
+    if ( token == null ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
+    else return ResponseEntity.ok(token);
   }
 
 }
