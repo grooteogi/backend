@@ -4,10 +4,11 @@ import javax.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class User {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Type type; //일반:0 카카오:1 페북:2
+  private LoginType type; //일반:0 카카오:1 페북:2
 
   @Column(length = 40, nullable = false)
   private String nickname;
@@ -37,7 +38,10 @@ public class User {
   @CreationTimestamp
   private Timestamp registered;
 
-  @OneToOne
-  @JoinColumn(name = "id")
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @JoinColumn(name = "user_info_id")
   private UserInfo userInfo;
+
+  @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  private List<UserHashtag> userHashtag = new ArrayList<>();
 }
