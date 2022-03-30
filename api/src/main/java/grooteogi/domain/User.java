@@ -1,12 +1,13 @@
 package grooteogi.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -15,18 +16,28 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private int id;
 
-  @Column(length = 20, nullable = false)
-  private String name;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Type type; //일반:0 카카오:1 페북:2
 
-  @Column(length = 20, nullable = false)
-  private String userName;
+  @Column(length = 40, nullable = false)
+  private String nickname;
 
-  @Column(length = 20, nullable = false)
-  private String email;
-
-  @Column(length = 20, nullable = false)
+  @Column(length = 255, nullable = false)
   private String password;
 
+  @Column(length = 40, nullable = false)
+  private String email;
+
+  @CreationTimestamp
+  private Timestamp modified;
+
+  @CreationTimestamp
+  private Timestamp registered;
+
+  @OneToOne
+  @JoinColumn(name = "id")
+  private UserInfo userInfo;
 }

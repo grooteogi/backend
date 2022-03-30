@@ -20,7 +20,7 @@ spring:
             enable: true
   redis:
     host: localhost
-    port: 6379
+    port: 6378
   session:
     timeout: 300
     store-type : redis

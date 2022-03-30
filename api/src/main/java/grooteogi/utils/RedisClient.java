@@ -9,20 +9,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisClient {
 
-    private final RedisTemplate<String, String> redisTemplate;
+  private final RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    public RedisClient(RedisTemplate<String, String> redisTemplate){
-        this.redisTemplate = redisTemplate;
-    }
+  @Autowired
+  public RedisClient(RedisTemplate<String, String> redisTemplate){
+    this.redisTemplate = redisTemplate;
+  }
 
-    public void setValue(String key, String value, long timeOut){
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(key, value, Duration.ofMinutes(timeOut));
-    }
+  public void setValue(String key, String value, long timeOut){
+    ValueOperations<String, String> values = redisTemplate.opsForValue();
+    values.set(key, value, Duration.ofMinutes(timeOut));
+  }
 
-    public String getValue(String key){
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        return values.get(key);
-    }
+  public String getValue(String key){
+    ValueOperations<String, String> values = redisTemplate.opsForValue();
+    return values.get(key);
+  }
 }
