@@ -40,7 +40,4 @@ public class User {
   @OneToOne
   @JoinColumn(name = "id")
   private UserInfo userInfo;
-
 }
-
-
