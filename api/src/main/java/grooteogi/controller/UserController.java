@@ -4,8 +4,11 @@ import grooteogi.domain.EmailCodeRequest;
 import grooteogi.domain.EmailRequest;
 import grooteogi.domain.User;
 import grooteogi.domain.UserDto;
+import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@RequiredArgsConstructor
 @RestController
 public class UserController {
 
   private final UserService userService;
-
-  @Autowired
-  public UserController(UserService userService) {
-    this.userService = userService;
-  }
+  private final EmailService emailService;
 
   @GetMapping("/user")
   public List<User> getAllUser() {
@@ -36,14 +36,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
       }
     else{
-      if(userService.genarateEmailVerify(email)) return ResponseEntity.status(HttpStatus.OK).body("success!!");
+      if(emailService.genarateEmailVerify(email)) return ResponseEntity.status(HttpStatus.OK).body("success!!");
       else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("this email already exists");
     }
   }
    // 일반 회원가입 중 이메일 인증 버튼을 누를 경우 ( 인증 코드 확인 )
   @PostMapping("user/email/confirm")
   public ResponseEntity confirmEmailVerify(@RequestBody EmailCodeRequest emailCodeRequest){
-    if(userService.confirmEmailVerify(emailCodeRequest)){
+    if(emailService.confirmEmailVerify(emailCodeRequest)){
       return ResponseEntity.status(HttpStatus.OK).body("confirm success!!!");
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("time out @@@");
