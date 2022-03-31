@@ -44,11 +44,11 @@ public class UserService {
     User user = new User();
     BeanUtils.copyProperties(userDto, user);
 
-    User registerUser =  userRepository.save( user );
+    User registerUser =  userRepository.save(user);
     registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     return userRepository.save(registerUser);
   }
-  public Token login(LoginDto loginDto ){
+  public Token login(LoginDto loginDto){
     User user = userRepository.findByUserEmail(loginDto.getEmail());
 
     if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())){
@@ -57,7 +57,7 @@ public class UserService {
     else return null;
   }
 
-  private Token generateToken(int id, String email ){
+  private Token generateToken(int id, String email){
     Token token = new Token();
     token.setAccessToken(jwtProvider.generateAccessToken(id, email));
     token.setRefreshToken(jwtProvider.generateRefreshToken(id, email));

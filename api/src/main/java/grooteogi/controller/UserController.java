@@ -59,7 +59,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
     }
 
-    return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.register(userDto));
   }
 
   @PostMapping("/user/register/oauth")
@@ -68,7 +68,7 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
     }
 
-    return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.register(userDto));
   }
 
   @PostMapping("/user/login")
