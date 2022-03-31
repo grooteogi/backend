@@ -62,8 +62,8 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userService.register(userDto));
   }
 
-  @PostMapping("/user/register/oauth")
-  public ResponseEntity registerOAuth(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
+  @PostMapping("/user/oauth/register")
+  public ResponseEntity oauthRegister(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
     if(bindingResult.hasErrors()){
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
     }
@@ -77,8 +77,8 @@ public class UserController {
     if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
   }
-  @PostMapping("/user/login/oauth")
-  public ResponseEntity loginOAuth(@RequestBody LoginDto loginDto){
+  @PostMapping("/user/oauth/login")
+  public ResponseEntity oauthLogin(@RequestBody LoginDto loginDto){
     Token token = userService.login(loginDto);
     if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
