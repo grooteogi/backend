@@ -1,4 +1,4 @@
-package grooteogi.config;
+package grooteogi.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

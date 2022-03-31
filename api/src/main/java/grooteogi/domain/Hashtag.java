@@ -1,5 +1,6 @@
 package grooteogi.domain;
 
+import grooteogi.enums.HashtagType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;

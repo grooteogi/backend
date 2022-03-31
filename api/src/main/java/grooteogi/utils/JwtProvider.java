@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static grooteogi.config.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
-import static grooteogi.config.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
+import static grooteogi.enums.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
+import static grooteogi.enums.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
 
 @Configuration
 public class JwtProvider {

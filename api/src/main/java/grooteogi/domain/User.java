@@ -1,5 +1,6 @@
 package grooteogi.domain;
 
+import grooteogi.enums.LoginType;
 import javax.persistence.*;
 
 import lombok.Getter;
