@@ -25,6 +25,11 @@ public class HashtagController {
     return ResponseEntity.ok(this.hashtagService.getAllHashtag());
   }
 
+  @GetMapping({"/hashtag/getList"})
+  public ResponseEntity<List<Hashtag>> getTopByCountHashtag() {
+    return ResponseEntity.ok(this.hashtagService.getTopByCountHashtag());
+  }
+
   @PostMapping({"/hashtag/create"})
   public ResponseEntity<Hashtag> createHashtag(@RequestParam String tag) {
     Hashtag created = this.hashtagService.createHashtag(tag);

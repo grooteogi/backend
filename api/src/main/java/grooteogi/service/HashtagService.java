@@ -22,6 +22,12 @@ public class HashtagService {
     return this.hashtagRepository.findAll();
   }
 
+  public List<Hashtag> getTopByCountHashtag() {
+    //사용하는 사람이 많아졌을 때 사용하면 좋을 듯
+    //현재는 getAllHashtag로 받아올 것!
+    return this.hashtagRepository.getTopByCountHashtag();
+  }
+
   public Hashtag createHashtag(String tag) {
     Hashtag created = new Hashtag();
 
