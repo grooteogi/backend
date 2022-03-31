@@ -7,12 +7,15 @@ import grooteogi.dto.UserDto;
 import grooteogi.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import grooteogi.utils.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
 
 
 @Service
@@ -26,7 +29,11 @@ public class UserService {
     return userRepository.findAll();
   }
   public User getUser(int user_id){
-    return userRepository.getById(user_id);
+    Optional<User> user = userRepository.findById(user_id);
+    if(!user.isPresent()){
+      throw new EntityNotFoundException("User Not Found!!");
+    }
+      return user.get();
   }
 
   public User register(UserDto userDto){
@@ -49,8 +56,10 @@ public class UserService {
     return userRepository.save(registerUser);
   }
   public Token login(LoginDto loginDto){
-    User user = userRepository.findByUserEmail(loginDto.getEmail());
-
+    User user = userRepository.findByEmail(loginDto.getEmail());
+    if(loginDto.getPassword().isBlank()) {
+      return generateToken(user.getId(), loginDto.getEmail());
+    }
     if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())){
       return generateToken(user.getId(), loginDto.getEmail());
     }
