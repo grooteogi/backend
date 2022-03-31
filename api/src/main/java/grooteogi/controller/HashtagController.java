@@ -17,7 +17,6 @@ public class HashtagController {
   private final HashtagService hashtagService;
 
 
-
   @GetMapping("/hashtag")
   public ResponseEntity<List<Hashtag>> getAllHashtag() {
     return ResponseEntity.ok(this.hashtagService.getAllHashtag());
