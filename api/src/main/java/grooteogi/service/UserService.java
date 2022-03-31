@@ -22,8 +22,7 @@ public class UserService {
   }
 
   public Token login(LoginDto loginDto ){
-
-    // 알아서 로그인 처리
+    // login
     return generateToken(1, loginDto.getEmail());
   }
 
@@ -35,7 +34,7 @@ public class UserService {
     return token;
   }
 
-  // 추후 private 으로 변경 필요
+  // TODO change public to private
   public Map verify(String authorizationHeader) {
     return jwtProvider.verifyToken(authorizationHeader);
   }

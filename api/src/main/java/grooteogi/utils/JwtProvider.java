@@ -15,10 +15,10 @@ import static grooteogi.config.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
 public class JwtProvider {
     @Value("${spring.jwt.secret}")
     private String SECRET_KEY;
-    public String generateAccessToken( int id, String email ){
+    public String generateAccessToken(int id, String email){
         return doGenerateToken(id, email, ACCESS_TOKEN_EXPIRATION_TIME.getValue());
     }
-    public String generateRefreshToken( int id, String email ){
+    public String generateRefreshToken(int id, String email){
         return doGenerateToken(id, email, REFRESH_TOKEN_EXPIRATION_TIME.getValue());
     }
     public String doGenerateToken(int id, String email, long expireTime){
@@ -34,7 +34,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public Map verifyToken(String authorizationHeader ){
+    public Map verifyToken(String authorizationHeader){
         validationAuthorizationHeader(authorizationHeader);
         String token = extractToken(authorizationHeader);
         Map<String, Object> result = new HashMap<String, Object>();
@@ -50,7 +50,7 @@ public class JwtProvider {
             result.put("result", false);
             result.put("msg", e.getMessage());
         } catch (JwtException e) {
-            result.put("result", false );
+            result.put("result", false);
             result.put("msg", e.getMessage());
         }
 

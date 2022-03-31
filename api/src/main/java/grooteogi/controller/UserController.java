@@ -69,9 +69,9 @@ public class UserController {
   @GetMapping("/verify")
   public ResponseEntity verify(HttpServletRequest request){
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = userService.verify( authorizationHeader );
+    Map<String, Object> result = userService.verify(authorizationHeader);
 
-    if (!(boolean)result.get( "result" )) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
-    else return ResponseEntity.ok( result.get( "email" ).toString() );
+    if (!(boolean)result.get("result")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.get("msg").toString());
+    else return ResponseEntity.ok(result.get("email").toString());
   }
 }
