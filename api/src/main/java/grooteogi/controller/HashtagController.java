@@ -5,7 +5,6 @@ import grooteogi.service.HashtagService;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +17,14 @@ public class HashtagController {
   private final HashtagService hashtagService;
 
 
-
   @GetMapping("/hashtag")
   public ResponseEntity<List<Hashtag>> getAllHashtag() {
     return ResponseEntity.ok(this.hashtagService.getAllHashtag());
+  }
+
+  @GetMapping("/hashtag/getList")
+  public ResponseEntity<List<Hashtag>> getTopByCountHashtag() {
+    return ResponseEntity.ok(this.hashtagService.getTopByCountHashtag());
   }
 
   @PostMapping("/hashtag/create")
