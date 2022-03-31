@@ -27,6 +27,7 @@ public class HashtagService {
     return this.hashtagRepository.getTopByCountHashtag();
   }
 
+
   public Hashtag createHashtag(String tag) {
     Hashtag createdHashtag = new Hashtag();
 
