@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +57,17 @@ public class UserController {
     if(bindingResult.hasErrors()){
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
     }
-    return ResponseEntity.status(HttpStatus.OK).body("register success@@");
+
+    return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
+  }
+
+  @PostMapping("user/register/oauth")
+  public ResponseEntity registerOAuth(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
+    if(bindingResult.hasErrors()){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
+    }
+
+    return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
   }
 
   @PostMapping("/login")
