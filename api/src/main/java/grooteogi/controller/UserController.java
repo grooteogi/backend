@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +30,8 @@ public class UserController {
   }
 
   // 일반 회원가입 중 이메일 인증 버튼 누를 경우 ( 유효성 검사, 이메일 중복 검사 )
-  @PostMapping("/user/email/generate")
-  public ResponseEntity genarateEmailVerify(@Valid @RequestBody EmailRequest email, BindingResult bindingResult){
+  @PostMapping("/user/email-verification/create")
+  public ResponseEntity createEmailVerification(@Valid @RequestBody EmailRequest email, BindingResult bindingResult){
     if(bindingResult.hasErrors()){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
       }
@@ -42,14 +41,13 @@ public class UserController {
     }
   }
    // 일반 회원가입 중 이메일 인증 버튼을 누를 경우 ( 인증 코드 확인 )
-  @PostMapping("/user/email/confirm")
-  public ResponseEntity confirmEmailVerify(@RequestBody EmailCodeRequest emailCodeRequest){
-    if(emailService.confirmEmailVerify(emailCodeRequest)){
+  @PostMapping("/user/email-verification/confirm")
+  public ResponseEntity confirmEmailVerification(@RequestBody EmailCodeRequest emailCodeRequest) {
+    if (emailService.confirmEmailVerify(emailCodeRequest)) {
       return ResponseEntity.status(HttpStatus.OK).body("confirm success!!!");
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("time out @@@");
   }
-  
   
   // 일반 회원가입 중 가입 버튼을 누를 경우 ( 비밀번호 유효성 검사 )
   // TODO 일반 회원가입과 OAuth 회원가입의 dto를 다르게 할지 결정 필요. 다르게 할 시 api도 다르게
@@ -61,6 +59,12 @@ public class UserController {
 
     return ResponseEntity.status(HttpStatus.OK).body(userService.register(userDto));
   }
+  @PostMapping("/user/login")
+  public ResponseEntity login(@RequestBody LoginDto loginDto){
+    Token token = userService.login(loginDto);
+    if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
+    else return ResponseEntity.ok(token);
+  }
 
   @PostMapping("/user/oauth/register")
   public ResponseEntity oauthRegister(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
@@ -70,13 +74,6 @@ public class UserController {
 
     return ResponseEntity.status(HttpStatus.OK).body(userService.register(userDto));
   }
-
-  @PostMapping("/user/login")
-  public ResponseEntity login(@RequestBody LoginDto loginDto){
-    Token token = userService.login(loginDto);
-    if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
-    else return ResponseEntity.ok(token);
-  }
   @PostMapping("/user/oauth/login")
   public ResponseEntity oauthLogin(@RequestBody LoginDto loginDto){
     Token token = userService.login(loginDto);
@@ -84,7 +81,7 @@ public class UserController {
     else return ResponseEntity.ok(token);
   }
 
-  @GetMapping("/verify")
+  @GetMapping("/user/verify")
   public ResponseEntity verify(HttpServletRequest request){
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify(authorizationHeader);
