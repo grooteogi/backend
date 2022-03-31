@@ -1,6 +1,5 @@
 package grooteogi.service;
 
-import grooteogi.domain.LoginType;
 import grooteogi.dto.LoginDto;
 import grooteogi.dto.Token;
 import grooteogi.domain.User;
@@ -50,8 +49,12 @@ public class UserService {
     return userRepository.save(registerUser);
   }
   public Token login(LoginDto loginDto ){
-    // login
-    return generateToken(1, loginDto.getEmail());
+    User user = userRepository.findByUserEmail(loginDto.getEmail());
+
+    if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())){
+      return generateToken(user.getId(), loginDto.getEmail());
+    }
+    else return null;
   }
 
   private Token generateToken(int id, String email ){

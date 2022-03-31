@@ -42,7 +42,7 @@ public class UserController {
     }
   }
    // 일반 회원가입 중 이메일 인증 버튼을 누를 경우 ( 인증 코드 확인 )
-  @PostMapping("user/email/confirm")
+  @PostMapping("/user/email/confirm")
   public ResponseEntity confirmEmailVerify(@RequestBody EmailCodeRequest emailCodeRequest){
     if(emailService.confirmEmailVerify(emailCodeRequest)){
       return ResponseEntity.status(HttpStatus.OK).body("confirm success!!!");
@@ -52,7 +52,8 @@ public class UserController {
   
   
   // 일반 회원가입 중 가입 버튼을 누를 경우 ( 비밀번호 유효성 검사 )
-  @PostMapping("user/register")
+  // TODO 일반 회원가입과 OAuth 회원가입의 dto를 다르게 할지 결정 필요. 다르게 할 시 api도 다르게
+  @PostMapping("/user/register")
   public ResponseEntity register(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
     if(bindingResult.hasErrors()){
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
@@ -61,7 +62,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
   }
 
-  @PostMapping("user/register/oauth")
+  @PostMapping("/user/register/oauth")
   public ResponseEntity registerOAuth(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
     if(bindingResult.hasErrors()){
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
@@ -70,8 +71,14 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userService.register( userDto ));
   }
 
-  @PostMapping("/login")
+  @PostMapping("/user/login")
   public ResponseEntity login(@RequestBody LoginDto loginDto){
+    Token token = userService.login(loginDto);
+    if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
+    else return ResponseEntity.ok(token);
+  }
+  @PostMapping("/user/login/oauth")
+  public ResponseEntity loginOAuth(@RequestBody LoginDto loginDto){
     Token token = userService.login(loginDto);
     if (token == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류");
     else return ResponseEntity.ok(token);
