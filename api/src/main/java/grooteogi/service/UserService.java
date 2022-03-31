@@ -25,8 +25,8 @@ public class UserService {
   public List<User> getAllUser() {
     return userRepository.findAll();
   }
-  public User getUserOne(int id){
-    return userRepository.getById(id);
+  public User getUser(int user_id){
+    return userRepository.getById(user_id);
   }
 
   public User register(UserDto userDto){

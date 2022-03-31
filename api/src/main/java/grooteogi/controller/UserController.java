@@ -29,6 +29,21 @@ public class UserController {
     return userService.getAllUser();
   }
 
+  @GetMapping("/user/{user_id}")
+  public ResponseEntity getUser(@PathVariable Integer user_id){
+    return ResponseEntity.ok(userService.getUser(user_id));
+  }
+
+  @PatchMapping("/user/{user_id}")
+  public ResponseEntity patchUser(@PathVariable Integer user_id){
+    return ResponseEntity.ok(null);
+  }
+
+  @DeleteMapping("/user/{user_id}")
+  public ResponseEntity deleteUser(@PathVariable Integer user_id){
+    return ResponseEntity.ok(null);
+  }
+
   // 일반 회원가입 중 이메일 인증 버튼 누를 경우 ( 유효성 검사, 이메일 중복 검사 )
   @PostMapping("/user/email-verification/create")
   public ResponseEntity createEmailVerification(@Valid @RequestBody EmailRequest email, BindingResult bindingResult){
