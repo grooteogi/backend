@@ -17,35 +17,40 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailService {
     private final UserRepository userRepository;
-
     private final JavaMailSender javaMailSender;
     private final RedisClient redisClient;
 
+    private final String prefix = "email_verify";
 
-
-    private static String createcode() {
-        Random random = new Random();
-        String code = "";
-        for(int i =0; i< 3; i++){
-            int idx = random.nextInt(25)+65;
-            code+=(char)idx;
-        }
-        int numidx = random.nextInt(9999)+1000;
-
-        code+=numidx;
-        return code;
+    public boolean isExist(EmailRequest email) {
+        return userRepository.existsByEmail(email.getEmail());
     }
 
-    // duplicate email
-    public boolean genarateEmailVerify(EmailRequest email) {
-        if(userRepository.existsByEmail(email.getEmail())){ // 중복
-            return false;
-        }else {
-            // 이메일 인증코드 전송하기
-            String code = createcode();
-            sendMail(email.getEmail(),code);
-            return true;
+    public void createEmailVerification(EmailRequest email) {
+        String code = createCode();
+        sendMail(email.getEmail(), code);
+    }
+
+    public boolean confirmEmailVerification(EmailCodeRequest emailCodeRequest)  {
+        String key = prefix + emailCodeRequest.getEmail();
+        String value = redisClient.getValue(key);
+        if(value != null) {
+            return value.equals(emailCodeRequest.getCode());
+        } else return false;
+    }
+
+    private static String createCode() {
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+
+        for(int i =0; i< 3; i++){
+            int idx = random.nextInt(25)+65;
+            code.append((char) idx);
         }
+        int numIdx = random.nextInt(9999)+1000;
+        code.append(numIdx);
+
+        return code.toString();
     }
 
     public void sendMail(String email, String code){
@@ -63,17 +68,7 @@ public class EmailService {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-        String prefix = "email_verify";
         String key = prefix + email;
-        redisClient.setValue(key, code, 1L); // key(email), value(code), timeout
-    }
-    public boolean confirmEmailVerify(EmailCodeRequest emailCodeRequest)  {
-        // 보낸 인증코드와 맞는지 확인하기
-        String prefix = "email_verify";
-        String key = prefix + emailCodeRequest.getEmail();
-        String value = redisClient.getValue(key);
-        if(value != null) {
-            return value.equals(emailCodeRequest.getCode());
-        } else return false;
+        redisClient.setValue(key, code, 3L); // key(email), value(code), timeout
     }
 }

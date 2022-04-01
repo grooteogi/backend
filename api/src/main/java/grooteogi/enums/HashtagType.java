@@ -1,4 +1,4 @@
-package grooteogi.domain;
+package grooteogi.enums;
 
 public enum HashtagType {
     CONCERN,

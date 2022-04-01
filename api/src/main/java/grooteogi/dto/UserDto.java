@@ -1,6 +1,6 @@
 package grooteogi.dto;
 
-import grooteogi.domain.LoginType;
+import grooteogi.enums.LoginType;
 import lombok.Getter;
 import lombok.Setter;
 
