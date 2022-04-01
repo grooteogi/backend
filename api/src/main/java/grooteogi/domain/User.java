@@ -2,6 +2,7 @@ package grooteogi.domain;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -43,5 +44,6 @@ public class User {
   private UserInfo userInfo;
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @JsonBackReference
   private List<UserHashtag> userHashtag = new ArrayList<>();
 }

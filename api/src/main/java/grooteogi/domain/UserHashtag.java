@@ -1,5 +1,6 @@
 package grooteogi.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,10 +20,12 @@ public class UserHashtag {
     private Timestamp registered;
 
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "hashtag_id")
     private Hashtag hashTag;
 }
