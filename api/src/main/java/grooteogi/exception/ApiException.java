@@ -3,7 +3,8 @@ package grooteogi.exception;
 import lombok.Getter;
 
 @Getter
-public class ApiException extends RuntimeException{
+public class ApiException extends RuntimeException {
+
   private final ApiExceptionEnum error;
 
   public ApiException(ApiExceptionEnum e) {

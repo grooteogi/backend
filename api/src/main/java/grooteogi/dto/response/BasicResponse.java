@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasicResponse {
+
   private Integer status;
   private String message;
   private Integer count;
