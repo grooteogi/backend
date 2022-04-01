@@ -3,6 +3,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'checkstyle'
 }
 
 group = 'grooteogi'
@@ -11,6 +12,12 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+}
+
+checkstyle {
+	maxWarnings = 0
+	configFile = file("${rootDir}/config/google_checks.xml")
+	toolVersion = "10.1"
 }
 
 dependencies {
