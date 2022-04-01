@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response {
+public class BasicResponse {
   private Integer status;
   private String message;
   private Integer count;
