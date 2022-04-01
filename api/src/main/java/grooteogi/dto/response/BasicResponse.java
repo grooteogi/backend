@@ -1,4 +1,4 @@
-package grooteogi.utils.response;
+package grooteogi.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

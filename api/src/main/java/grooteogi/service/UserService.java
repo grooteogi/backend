@@ -4,6 +4,8 @@ import grooteogi.dto.LoginDto;
 import grooteogi.dto.Token;
 import grooteogi.domain.User;
 import grooteogi.dto.UserDto;
+import grooteogi.exception.ApiException;
+import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityNotFoundException;
 
 
 @Service
@@ -30,10 +30,10 @@ public class UserService {
   }
   public User getUser(int user_id){
     Optional<User> user = userRepository.findById(user_id);
-    if(!user.isPresent()){
-      throw new EntityNotFoundException("User Not Found!!");
+    if(user.isEmpty()){
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
-      return user.get();
+    return user.get();
   }
 
   public User register(UserDto userDto){
