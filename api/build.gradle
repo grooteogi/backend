@@ -16,7 +16,6 @@ repositories {
 
 checkstyle {
 	maxWarnings = 0
-	configFile = file("${rootDir}/config/google_checks.xml")
 	toolVersion = "10.1"
 }
 
