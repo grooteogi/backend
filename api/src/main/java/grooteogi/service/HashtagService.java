@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,10 +20,10 @@ public class HashtagService {
     return this.hashtagRepository.findAll();
   }
 
-  public List<Hashtag> getTopByCountHashtag() {
+  public List<Hashtag> getTopTenHashtag(String type) {
     //사용하는 사람이 많아졌을 때 사용하면 좋을 듯
     //현재는 getAllHashtag로 받아올 것!
-    return this.hashtagRepository.getTopByCountHashtag();
+    return this.hashtagRepository.getTopTenHashtag(type);
   }
 
 

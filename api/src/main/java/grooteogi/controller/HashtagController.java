@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 import grooteogi.domain.Hashtag;
+import grooteogi.domain.HashtagType;
 import grooteogi.service.HashtagService;
 import java.util.List;
 
@@ -22,12 +23,12 @@ public class HashtagController {
     return ResponseEntity.ok(this.hashtagService.getAllHashtag());
   }
 
-  @GetMapping("/hashtag/getList")
-  public ResponseEntity<List<Hashtag>> getTopByCountHashtag() {
-    return ResponseEntity.ok(this.hashtagService.getTopByCountHashtag());
+  @GetMapping("/hashtag/top10")
+  public ResponseEntity<List<Hashtag>> getTopTenHashtag(@RequestParam String type) {
+    return ResponseEntity.ok(this.hashtagService.getTopTenHashtag(type));
   }
 
-  @PostMapping("/hashtag/create")
+  @PostMapping("/hashtag")
   public ResponseEntity<Hashtag> createHashtag(@RequestParam String tag) {
     Hashtag createdHashtag = this.hashtagService.createHashtag(tag);
     return ResponseEntity.ok(createdHashtag);
