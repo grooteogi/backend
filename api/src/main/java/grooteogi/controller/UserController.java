@@ -1,24 +1,33 @@
 package grooteogi.controller;
 
-import grooteogi.dto.*;
+
 import grooteogi.domain.User;
+import grooteogi.dto.EmailCodeRequest;
+import grooteogi.dto.EmailRequest;
+import grooteogi.dto.LoginDto;
+import grooteogi.dto.Token;
+import grooteogi.dto.UserDto;
+import grooteogi.dto.response.BasicResponse;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
-import grooteogi.dto.response.BasicResponse;
 import java.util.List;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,8 +47,8 @@ public class UserController {
   }
 
   @GetMapping("/user/{user_id}")
-  public ResponseEntity<BasicResponse> getUser(@PathVariable Integer user_id){
-    User user = userService.getUser(user_id);
+  public ResponseEntity<BasicResponse> getUser(@PathVariable Integer userId) {
+    User user = userService.getUser(userId);
 
     return ResponseEntity.ok(
         BasicResponse.builder()
@@ -47,13 +56,13 @@ public class UserController {
             .data(user).build());
   }
 
-  @PatchMapping("/user/{user_id}")
-  public ResponseEntity patchUser(@PathVariable Integer user_id){
+  @PatchMapping("/user/{userId}")
+  public ResponseEntity patchUser(@PathVariable Integer userId) {
     return ResponseEntity.ok(null);
   }
 
-  @DeleteMapping("/user/{user_id}")
-  public ResponseEntity deleteUser(@PathVariable Integer user_id){
+  @DeleteMapping("/user/{userId}")
+  public ResponseEntity deleteUser(@PathVariable Integer userId) {
     return ResponseEntity.ok(null);
   }
 
@@ -62,13 +71,13 @@ public class UserController {
   */
   @PostMapping("/user/email-verification/create")
   public ResponseEntity<BasicResponse> createEmailVerification(
-      @Valid @RequestBody EmailRequest email, BindingResult bindingResult){
+      @Valid @RequestBody EmailRequest email, BindingResult bindingResult) {
 
-    if(bindingResult.hasErrors()){
+    if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    if(emailService.isExist(email)) {
+    if (emailService.isExist(email)) {
       throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
     }
 
@@ -102,9 +111,9 @@ public class UserController {
    */
   @PostMapping("/user/register")
   public ResponseEntity<BasicResponse> register(
-      @Valid @RequestBody UserDto userDto, BindingResult bindingResult){
+      @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
 
-    if(bindingResult.hasErrors()){
+    if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
@@ -117,7 +126,7 @@ public class UserController {
   }
 
   @PostMapping("/user/login")
-  public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto){
+  public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
 
     if (token == null) {
@@ -132,9 +141,9 @@ public class UserController {
 
   @PostMapping("/user/oauth/register")
   public ResponseEntity<BasicResponse> oauthRegister(
-      @Valid @RequestBody UserDto userDto, BindingResult bindingResult){
+      @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
 
-    if(bindingResult.hasErrors()){
+    if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
@@ -147,7 +156,7 @@ public class UserController {
   }
 
   @PostMapping("/user/oauth/login")
-  public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto){
+  public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
 
     if (token == null) {
@@ -161,11 +170,11 @@ public class UserController {
   }
 
   @GetMapping("/user/verify")
-  public ResponseEntity<BasicResponse> verify(HttpServletRequest request){
+  public ResponseEntity<BasicResponse> verify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify(authorizationHeader);
 
-    if (!(boolean)result.get("result")) {
+    if (!(boolean) result.get("result")) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
