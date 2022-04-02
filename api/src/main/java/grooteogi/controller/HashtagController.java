@@ -1,7 +1,6 @@
 package grooteogi.controller;
 
 import grooteogi.domain.Hashtag;
-import grooteogi.domain.HashtagType;
 import grooteogi.service.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
