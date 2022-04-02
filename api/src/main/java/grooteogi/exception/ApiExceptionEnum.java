@@ -21,7 +21,8 @@ public enum ApiExceptionEnum {
   USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
   EMAIL_DUPLICATION_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
   EXPIRED_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE, "만료된 토큰입니다."), //419
-  EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE, "만료된 토큰입니다. 회원가입을 다시 시도하십시오."), //419
+  EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE,
+      "만료된 토큰입니다. 회원가입을 다시 시도하십시오."), //419
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."); //
 
   private final HttpStatus httpStatus;
