@@ -12,6 +12,7 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -169,20 +171,40 @@ public class UserController {
         .build());
   }
 
-  @GetMapping("/user/verify")
+  @GetMapping("/user/token/verify")
   public ResponseEntity<BasicResponse> verify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify(authorizationHeader);
 
     if (!(boolean) result.get("result")) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException((ApiExceptionEnum) result.get("status"));
     }
 
-    String email = result.get("email").toString();
+    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
     return ResponseEntity.ok(BasicResponse.builder()
         .status(HttpStatus.OK.value())
-        .data(email)
+        .data(user)
+        .build());
+  }
+
+  @GetMapping("/user/token/refresh")
+  public ResponseEntity<BasicResponse> refresh(
+      @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
+    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    Map<String, Object> result = userService.refresh(authorizationHeader, refreshToken);
+
+    if (!(boolean) result.get("result")) {
+      throw new ApiException((ApiExceptionEnum) result.get("status"));
+    }
+
+    Map<String, Object> returnValue = new HashMap<String, Object>();
+    returnValue.put("token", result.get("token").toString());
+    returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
+
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(returnValue)
         .build());
   }
 }
