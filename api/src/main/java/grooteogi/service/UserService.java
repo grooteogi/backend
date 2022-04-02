@@ -83,4 +83,5 @@ public class UserService {
   public Map verify(String authorizationHeader) {
     return jwtProvider.verifyToken(authorizationHeader);
   }
+  public Map refresh(String authorizationHeader, String refreshToken){ return jwtProvider.refreshToken(authorizationHeader, refreshToken);}
 }

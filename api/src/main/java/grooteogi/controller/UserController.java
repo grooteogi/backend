@@ -12,6 +12,8 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -175,7 +171,7 @@ public class UserController {
     Map<String, Object> result = userService.verify(authorizationHeader);
 
     if (!(boolean) result.get("result")) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException((ApiExceptionEnum) result.get("status"));
     }
 
     // 사용자 이메일 가져오기
@@ -187,5 +183,23 @@ public class UserController {
         .status(HttpStatus.OK.value())
         .data(user)
         .build());
+  }
+  @GetMapping("/user/refresh")
+  public ResponseEntity<BasicResponse> refresh(@RequestHeader(value="REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
+    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    Map<String, Object> result = userService.refresh(authorizationHeader, refreshToken);
+
+    if (!(boolean) result.get("result")) {
+      throw new ApiException((ApiExceptionEnum) result.get("status"));
+    }
+
+    Map<String, Object> returnValue = new HashMap<String, Object>();
+    returnValue.put("token", result.get("token").toString());
+    returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
+
+    return ResponseEntity.ok(BasicResponse.builder()
+            .status(HttpStatus.OK.value())
+            .data(returnValue)
+            .build());
   }
 }
