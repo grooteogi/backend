@@ -4,76 +4,73 @@ import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
+import java.util.Random;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.util.Random;
-
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-    private final UserRepository userRepository;
 
-    private final JavaMailSender javaMailSender;
-    private final RedisClient redisClient;
+  private final UserRepository userRepository;
+  private final JavaMailSender javaMailSender;
+  private final RedisClient redisClient;
 
+  private final String prefix = "email_verify";
 
+  private static String createCode() {
+    Random random = new Random();
+    StringBuilder code = new StringBuilder();
 
-    private static String createcode() {
-        Random random = new Random();
-        String code = "";
-        for(int i =0; i< 3; i++){
-            int idx = random.nextInt(25)+65;
-            code+=(char)idx;
-        }
-        int numidx = random.nextInt(9999)+1000;
-
-        code+=numidx;
-        return code;
+    for (int i = 0; i < 3; i++) {
+      int idx = random.nextInt(25) + 65;
+      code.append((char) idx);
     }
+    int numIdx = random.nextInt(9999) + 1000;
+    code.append(numIdx);
 
-    // duplicate email
-    public boolean genarateEmailVerify(EmailRequest email) {
-        if(userRepository.existsByEmail(email.getEmail())){ // 중복
-            return false;
-        }else {
-            // 이메일 인증코드 전송하기
-            String code = createcode();
-            sendMail(email.getEmail(),code);
-            return true;
-        }
-    }
+    return code.toString();
+  }
 
-    public void sendMail(String email, String code){
-        String subject = "제목: 그루터기 회원 가입 인증 절차";
-        String text = "회원 가입을 위한 인증번호는 "+ code + " 입니다. " +
-                "제한 시간 3분 이내에 인증번호를 입력해주세요.";
+  public boolean isExist(EmailRequest email) {
+    return userRepository.existsByEmail(email.getEmail());
+  }
 
-        try{
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "utf-8");
-            helper.setSubject(subject);
-            helper.setText(text,true);
-            helper.setTo(email);
-            javaMailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        String prefix = "email_verify";
-        String key = prefix + email;
-        redisClient.setValue(key, code, 1L); // key(email), value(code), timeout
+  public void createEmailVerification(EmailRequest email) {
+    String code = createCode();
+    sendMail(email.getEmail(), code);
+  }
+
+  public boolean confirmEmailVerification(EmailCodeRequest emailCodeRequest) {
+    String key = prefix + emailCodeRequest.getEmail();
+    String value = redisClient.getValue(key);
+    if (value != null) {
+      return value.equals(emailCodeRequest.getCode());
+    } else {
+      return false;
     }
-    public boolean confirmEmailVerify(EmailCodeRequest emailCodeRequest)  {
-        // 보낸 인증코드와 맞는지 확인하기
-        String prefix = "email_verify";
-        String key = prefix + emailCodeRequest.getEmail();
-        String value = redisClient.getValue(key);
-        if(value != null) {
-            return value.equals(emailCodeRequest.getCode());
-        } else return false;
+  }
+
+  public void sendMail(String email, String code) {
+    String subject = "제목: 그루터기 회원 가입 인증 절차";
+    String text = "회원 가입을 위한 인증번호는 " + code + " 입니다. "
+        + "제한 시간 3분 이내에 인증번호를 입력해주세요.";
+
+    try {
+      MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "utf-8");
+      helper.setSubject(subject);
+      helper.setText(text, true);
+      helper.setTo(email);
+      javaMailSender.send(mimeMessage);
+    } catch (MessagingException e) {
+      e.printStackTrace();
     }
+    String key = prefix + email;
+    redisClient.setValue(key, code, 3L); // key(email), value(code), timeout
+  }
 }

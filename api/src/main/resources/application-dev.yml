@@ -21,6 +21,8 @@ spring:
   redis:
     host: localhost
     port: 6378
+  jwt:
+    secret: grooteogi
   session:
     timeout: 300
     store-type : redis
