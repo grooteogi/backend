@@ -1,5 +1,6 @@
 package grooteogi.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,10 +25,12 @@ public class UserHashtag {
   private Timestamp registered;
 
   @ManyToOne
+  @JsonManagedReference
   @JoinColumn(name = "user_id")
   private User user;
 
   @ManyToOne
+  @JsonManagedReference
   @JoinColumn(name = "hashtag_id")
   private Hashtag hashTag;
 }

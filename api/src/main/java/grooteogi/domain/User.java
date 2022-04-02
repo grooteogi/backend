@@ -1,5 +1,10 @@
 package grooteogi.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
 import grooteogi.enums.LoginType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -52,5 +57,6 @@ public class User {
   private UserInfo userInfo;
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @JsonBackReference
   private List<UserHashtag> userHashtag = new ArrayList<>();
 }

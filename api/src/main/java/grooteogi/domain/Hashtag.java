@@ -1,5 +1,6 @@
 package grooteogi.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import grooteogi.enums.HashtagType;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,6 +36,6 @@ public class Hashtag {
   private Timestamp registered;
 
   @OneToMany(mappedBy = "hashTag")
+  @JsonBackReference
   private List<UserHashtag> userHashtag;
-
 }
