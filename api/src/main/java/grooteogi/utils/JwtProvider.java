@@ -49,6 +49,7 @@ public class JwtProvider {
           .getBody();
       result.put("result", true);
       result.put("email", (String) claims.get("email"));
+      result.put("ID", (Integer)claims.get("ID"));
     } catch (ExpiredJwtException e) {
       result.put("result", false);
       result.put("msg", e.getMessage());

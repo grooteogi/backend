@@ -178,11 +178,14 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    String email = result.get("email").toString();
+    // 사용자 이메일 가져오기
+    // String email = result.get("email").toString();
+
+    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
     return ResponseEntity.ok(BasicResponse.builder()
         .status(HttpStatus.OK.value())
-        .data(email)
+        .data(user)
         .build());
   }
 }
