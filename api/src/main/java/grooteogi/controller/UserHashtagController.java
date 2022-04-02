@@ -6,42 +6,58 @@
 package grooteogi.controller;
 
 import grooteogi.domain.UserHashtag;
+import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 public class UserHashtagController {
-    private final UserHashtagService userHashtagService;
+
+  private final UserHashtagService userHashtagService;
 
 
+  @PostMapping("/user/hashtag")
+  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId,
+      int[] hashtagId) {
+    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId,
+        hashtagId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
+  }
 
-    @PostMapping("/user/hashtag")
-    //저장하고 해당 유저의 전체 hashtag list 확인
-    public ResponseEntity<List<UserHashtag>> saveUserHashtag(@RequestParam int userId, int[] hashtagId) {
-        List<UserHashtag> saveUserHashtaglist = this.userHashtagService.saveUserHashtag(userId, hashtagId);
-        return ResponseEntity.ok(saveUserHashtaglist);
-    }
+  @DeleteMapping("/user/hashtag")
+  public ResponseEntity<BasicResponse> deleteUserHashtag(@RequestParam int userId,
+      int[] hashtagId) {
+    List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
+  }
 
-    @DeleteMapping("/user/hashtag")
-    //저장하고 해당 유저의 전체 hashtag list 확인
-    public ResponseEntity<List<UserHashtag>> deleteUserHashtag(@RequestParam int userId, int[] hashtagId) {
-        List<UserHashtag> DeleteUserHashtaglist = this.userHashtagService.deleteUserHashtag(userId, hashtagId);
-        return ResponseEntity.ok(DeleteUserHashtaglist);
-    }
+  @GetMapping("/user/hashtag")
+  public ResponseEntity<BasicResponse> getAllUserHashtag() {
+    List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
+  }
 
-    @GetMapping("/user/hashtag")
-    public List<UserHashtag> getAllUserHashtag() {
-        return this.userHashtagService.getAllUserHashtag();
-    }
-
-    @GetMapping("/user/{userId}/hashtag")
-    public ResponseEntity<List<UserHashtag>> getUserHashtag(@PathVariable int userId) {
-        return ResponseEntity.ok(this.userHashtagService.getUserHashtag(userId));
-    }
-
+  @GetMapping("/user/{userId}/hashtag")
+  public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {
+    List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(userId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
+  }
 }
