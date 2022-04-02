@@ -6,9 +6,11 @@
 package grooteogi.controller;
 
 import grooteogi.domain.UserHashtag;
+import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,29 +27,37 @@ public class UserHashtagController {
 
 
   @PostMapping("/user/hashtag")
-  public ResponseEntity<List<UserHashtag>> saveUserHashtag(@RequestParam int userId,
+  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId,
       int[] hashtagId) {
-    List<UserHashtag> saveUserHashtaglist = this.userHashtagService.saveUserHashtag(userId,
+    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId,
         hashtagId);
-    return ResponseEntity.ok(saveUserHashtaglist);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
   }
 
   @DeleteMapping("/user/hashtag")
-  public ResponseEntity<List<UserHashtag>> deleteUserHashtag(@RequestParam int userId,
+  public ResponseEntity<BasicResponse> deleteUserHashtag(@RequestParam int userId,
       int[] hashtagId) {
-    List<UserHashtag> DeleteUserHashtaglist = this.userHashtagService.deleteUserHashtag(userId,
-        hashtagId);
-    return ResponseEntity.ok(DeleteUserHashtaglist);
+    List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
   }
 
   @GetMapping("/user/hashtag")
-  public List<UserHashtag> getAllUserHashtag() {
-    return this.userHashtagService.getAllUserHashtag();
+  public ResponseEntity<BasicResponse> getAllUserHashtag() {
+    List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
   }
 
   @GetMapping("/user/{userId}/hashtag")
-  public ResponseEntity<List<UserHashtag>> getUserHashtag(@PathVariable int userId) {
-    return ResponseEntity.ok(this.userHashtagService.getUserHashtag(userId));
+  public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {
+    List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(userId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .status(HttpStatus.OK.value())
+        .data(hashtagList).build());
   }
-
 }
