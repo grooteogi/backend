@@ -171,7 +171,7 @@ public class UserController {
         .build());
   }
 
-  @GetMapping("/user/verify")
+  @GetMapping("/user/token/verify")
   public ResponseEntity<BasicResponse> verify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify(authorizationHeader);
@@ -179,9 +179,6 @@ public class UserController {
     if (!(boolean) result.get("result")) {
       throw new ApiException((ApiExceptionEnum) result.get("status"));
     }
-
-    // 사용자 이메일 가져오기
-    // String email = result.get("email").toString();
 
     User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
@@ -191,7 +188,7 @@ public class UserController {
         .build());
   }
 
-  @GetMapping("/user/refresh")
+  @GetMapping("/user/token/refresh")
   public ResponseEntity<BasicResponse> refresh(
       @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
