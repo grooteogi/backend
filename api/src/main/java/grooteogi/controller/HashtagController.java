@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 import grooteogi.domain.Hashtag;
+import grooteogi.dto.HashtagDto;
 import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +39,8 @@ public class HashtagController {
   }
 
   @PostMapping
-  public ResponseEntity<BasicResponse> createHashtag(@RequestParam String tag) {
-    Hashtag createdHashtag = this.hashtagService.createHashtag(tag);
+  public ResponseEntity<BasicResponse> createHashtag(@RequestBody HashtagDto hashtagDto) {
+    Hashtag createdHashtag = this.hashtagService.createHashtag(hashtagDto);
     return ResponseEntity.ok(
         BasicResponse.builder().status(HttpStatus.OK.value()).data(createdHashtag).build());
   }

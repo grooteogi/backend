@@ -6,6 +6,7 @@
 package grooteogi.controller;
 
 import grooteogi.domain.UserHashtag;
+import grooteogi.dto.UserHashtagDto;
 import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +30,8 @@ public class UserHashtagController {
   private final UserHashtagService userHashtagService;
 
   @PostMapping("/hashtag")
-  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId, int[] hashtagId) {
-    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId, hashtagId);
+  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestBody UserHashtagDto userHashtagDto) {
+    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userHashtagDto);
     return ResponseEntity.ok(
         BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
             .data(hashtagList).build());
