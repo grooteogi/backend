@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - 'develop'
+      - 'main'
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./api
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ${{ env.working-directory }}
+
+      - name: Run checkstyleMain
+        run: ./gradlew -q checkstyleMain
+        working-directory: ${{ env.working-directory }}
+
+      - name: Run checkstyleTest
+        run: ./gradlew -q checkstyleTest
+        working-directory: ${{ env.working-directory }}
