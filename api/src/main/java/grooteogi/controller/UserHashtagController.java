@@ -16,48 +16,43 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserHashtagController {
 
   private final UserHashtagService userHashtagService;
 
-
-  @PostMapping("/user/hashtag")
-  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId,
-      int[] hashtagId) {
-    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId,
-        hashtagId);
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(hashtagList).build());
+  @PostMapping("/hashtag")
+  public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId, int[] hashtagId) {
+    List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId, hashtagId);
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
   }
 
-  @DeleteMapping("/user/hashtag")
+  @DeleteMapping("/hashtag")
   public ResponseEntity<BasicResponse> deleteUserHashtag(@RequestParam int userId,
       int[] hashtagId) {
     List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(hashtagList).build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
   }
 
-  @GetMapping("/user/hashtag")
+  @GetMapping("/hashtag")
   public ResponseEntity<BasicResponse> getAllUserHashtag() {
     List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(hashtagList).build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
   }
 
-  @GetMapping("/user/{userId}/hashtag")
+  @GetMapping("/{userId}/hashtag")
   public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {
     List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(userId);
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(hashtagList).build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
   }
 }

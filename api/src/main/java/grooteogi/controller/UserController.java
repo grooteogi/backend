@@ -29,41 +29,39 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequestMapping("/user")
 @RestController
 public class UserController {
 
   private final UserService userService;
   private final EmailService emailService;
 
-  @GetMapping("/user")
+  @GetMapping("")
   public ResponseEntity<BasicResponse> getAllUser() {
     List<User> userList = userService.getAllUser();
 
     return ResponseEntity.ok(
-        BasicResponse.builder()
-            .status(HttpStatus.OK.value())
-            .data(userList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(userList).build());
   }
 
-  @GetMapping("/user/{user_id}")
+  @GetMapping("/{user_id}")
   public ResponseEntity<BasicResponse> getUser(@PathVariable Integer userId) {
     User user = userService.getUser(userId);
 
     return ResponseEntity.ok(
-        BasicResponse.builder()
-            .status(HttpStatus.OK.value())
-            .data(user).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
   }
 
-  @PatchMapping("/user/{userId}")
+  @PatchMapping("/{userId}")
   public ResponseEntity patchUser(@PathVariable Integer userId) {
     return ResponseEntity.ok(null);
   }
 
-  @DeleteMapping("/user/{userId}")
+  @DeleteMapping("/{userId}")
   public ResponseEntity deleteUser(@PathVariable Integer userId) {
     return ResponseEntity.ok(null);
   }
@@ -71,7 +69,7 @@ public class UserController {
   /*
   일반 회원가입 중 이메일 인증 버튼 누를 경우 ( 유효성 검사, 이메일 중복 검사 )
   */
-  @PostMapping("/user/email-verification/create")
+  @PostMapping("/email-verification/create")
   public ResponseEntity<BasicResponse> createEmailVerification(
       @Valid @RequestBody EmailRequest email, BindingResult bindingResult) {
 
@@ -85,16 +83,14 @@ public class UserController {
 
     emailService.createEmailVerification(email);
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .message("send email verification success")
-        .build());
+    return ResponseEntity.ok(BasicResponse.builder().status(HttpStatus.OK.value())
+        .message("send email verification success").build());
   }
 
   /*
   일반 회원가입 중 이메일 인증 버튼을 누를 경우 ( 인증 코드 확인 )
   */
-  @PostMapping("/user/email-verification/confirm")
+  @PostMapping("/email-verification/confirm")
   public ResponseEntity<BasicResponse> confirmEmailVerification(
       @RequestBody EmailCodeRequest emailCodeRequest) {
 
@@ -102,18 +98,16 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     }
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .build());
+    return ResponseEntity.ok(BasicResponse.builder().status(HttpStatus.OK.value()).build());
   }
 
   /*
   일반 회원가입 중 가입 버튼을 누를 경우 ( 비밀번호 유효성 검사 )
   TODO 일반 회원가입과 OAuth 회원가입의 dto를 다르게 할지 결정 필요. 다르게 할 시 api도 다르게
    */
-  @PostMapping("/user/register")
-  public ResponseEntity<BasicResponse> register(
-      @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
+  @PostMapping("/register")
+  public ResponseEntity<BasicResponse> register(@Valid @RequestBody UserDto userDto,
+      BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
@@ -121,13 +115,11 @@ public class UserController {
 
     User user = userService.register(userDto);
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(user)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
   }
 
-  @PostMapping("/user/login")
+  @PostMapping("/login")
   public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
 
@@ -135,15 +127,13 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(token)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(token).build());
   }
 
-  @PostMapping("/user/oauth/register")
-  public ResponseEntity<BasicResponse> oauthRegister(
-      @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
+  @PostMapping("/oauth/register")
+  public ResponseEntity<BasicResponse> oauthRegister(@Valid @RequestBody UserDto userDto,
+      BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
@@ -151,13 +141,11 @@ public class UserController {
 
     User user = userService.register(userDto);
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(user)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
   }
 
-  @PostMapping("/user/oauth/login")
+  @PostMapping("/oauth/login")
   public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
 
@@ -165,13 +153,11 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(token)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(token).build());
   }
 
-  @GetMapping("/user/token/verify")
+  @GetMapping("/token/verify")
   public ResponseEntity<BasicResponse> verify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = userService.verify(authorizationHeader);
@@ -182,13 +168,11 @@ public class UserController {
 
     User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(user)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
   }
 
-  @GetMapping("/user/token/refresh")
+  @GetMapping("/token/refresh")
   public ResponseEntity<BasicResponse> refresh(
       @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -202,9 +186,7 @@ public class UserController {
     returnValue.put("token", result.get("token").toString());
     returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .status(HttpStatus.OK.value())
-        .data(returnValue)
-        .build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().status(HttpStatus.OK.value()).data(returnValue).build());
   }
 }
