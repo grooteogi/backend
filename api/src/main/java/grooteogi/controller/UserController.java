@@ -40,7 +40,7 @@ public class UserController {
   private final UserService userService;
   private final EmailService emailService;
 
-  @GetMapping("")
+  @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
     List<User> userList = userService.getAllUser();
 

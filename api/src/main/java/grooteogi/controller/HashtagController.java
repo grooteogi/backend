@@ -20,7 +20,7 @@ public class HashtagController {
 
   private final HashtagService hashtagService;
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity<BasicResponse> getAllHashtag() {
     List<Hashtag> hashtagList = hashtagService.getAllHashtag();
     return ResponseEntity.ok(
@@ -36,7 +36,7 @@ public class HashtagController {
             .data(hashtagList).build());
   }
 
-  @PostMapping("/")
+  @PostMapping
   public ResponseEntity<BasicResponse> createHashtag(@RequestParam String tag) {
     Hashtag createdHashtag = this.hashtagService.createHashtag(tag);
     return ResponseEntity.ok(
