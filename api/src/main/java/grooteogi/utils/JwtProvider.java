@@ -50,7 +50,7 @@ public class JwtProvider {
           .getBody();
       result.put("result", true);
       result.put("email", (String) claims.get("email"));
-      result.put("ID", (Integer)claims.get("ID"));
+      result.put("ID", (Integer) claims.get("ID"));
     } catch (ExpiredJwtException e) {
       result.put("result", false);
       result.put("status", ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
@@ -61,22 +61,24 @@ public class JwtProvider {
 
     return result;
   }
+
   public Map refreshToken(String authorizationHeader, String refreshToken) {
     // 토큰이 만료되었는지 확인
     Map result = verifyToken(authorizationHeader);
-    if ( (boolean)result.get("result") ){
+    if ((boolean) result.get("result")) {
       result.put("result", false);
       result.put("status", ApiExceptionEnum.NO_EXPIRED_TOKEN_EXCEPTION);
-    }
-    else if (result.get("status") == ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION ){
+    } else if (result.get("status") == ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION) {
       try {
         Claims claims = Jwts.parser().setSigningKey(secretKey) // (3)
-                .parseClaimsJws(refreshToken) // (4)
-                .getBody();
+            .parseClaimsJws(refreshToken) // (4)
+            .getBody();
         result.put("result", true);
-        result.put("token", doGenerateToken((Integer)claims.get("ID"), (String) claims.get("email"), ACCESS_TOKEN_EXPIRATION_TIME.getValue()));
+        result.put("token",
+            doGenerateToken((Integer) claims.get("ID"), (String) claims.get("email"),
+                ACCESS_TOKEN_EXPIRATION_TIME.getValue()));
         result.put("email", (String) claims.get("email"));
-        result.put("ID", (Integer)claims.get("ID"));
+        result.put("ID", (Integer) claims.get("ID"));
       } catch (ExpiredJwtException e) {
         result.put("result", false);
         result.put("status", ApiExceptionEnum.EXPIRED_REFRESH_TOKEN_EXCEPTION);
@@ -94,6 +96,7 @@ public class JwtProvider {
       throw new IllegalArgumentException();
     }
   }
+
   private String extractToken(String authorizationHeader) {
     return authorizationHeader.substring("Bearer ".length());
   }
