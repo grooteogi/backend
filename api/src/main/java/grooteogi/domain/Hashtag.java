@@ -35,7 +35,7 @@ public class Hashtag {
   @CreationTimestamp
   private Timestamp registered;
 
-  @OneToMany(mappedBy = "hashTag")
+  @OneToMany(mappedBy = "hashtag")
   @JsonBackReference
   private List<UserHashtag> userHashtag;
 }

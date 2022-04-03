@@ -32,5 +32,5 @@ public class UserHashtag {
   @ManyToOne
   @JsonManagedReference
   @JoinColumn(name = "hashtag_id")
-  private Hashtag hashTag;
+  private Hashtag hashtag;
 }

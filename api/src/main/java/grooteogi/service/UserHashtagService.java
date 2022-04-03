@@ -28,11 +28,11 @@ public class UserHashtagService {
         Optional<User> user = this.userRepository.findById(userId);
         userhashtag.setUser(user.get());
         Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId[i]);
-        userhashtag.setHashTag(hashtag.get());
+        userhashtag.setHashtag(hashtag.get());
         userhashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
         this.userHashtagRepository.save(userhashtag);
       }
-      return this.userHashtagRepository.getAllUserHashtagBy(userId);
+      return this.userHashtagRepository.findByUserId(userId);
     }
 
     return null;
@@ -41,11 +41,11 @@ public class UserHashtagService {
   public List<UserHashtag> deleteUserHashtag(int userId, int[] hashtagId) {
     if (hashtagId != null) {
       for (int i = 0; i < hashtagId.length; i++) {
-        UserHashtag userHashtag = this.userHashtagRepository.getUserHashtagBy(userId,
+        UserHashtag userHashtag = this.userHashtagRepository.findByUserIdAndHashtagId(userId,
             hashtagId[0]);
         this.userHashtagRepository.delete(userHashtag);
       }
-      return this.userHashtagRepository.getAllUserHashtagBy(userId);
+      return this.userHashtagRepository.findByUserId(userId);
     }
 
     return null;
@@ -56,8 +56,7 @@ public class UserHashtagService {
   }
 
   public List<UserHashtag> getUserHashtag(int userId) {
-    return this.userHashtagRepository.getAllUserHashtagBy(userId);
+    return this.userHashtagRepository.findByUserId(userId);
   }
-
 
 }
