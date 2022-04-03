@@ -3,6 +3,7 @@ package grooteogi.service;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.User;
 import grooteogi.domain.UserHashtag;
+import grooteogi.dto.UserHashtagDto;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.UserHashtagRepository;
 import grooteogi.repository.UserRepository;
@@ -21,18 +22,19 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-  public List<UserHashtag> saveUserHashtag(int userId, int[] hashtagId) {
-    if (hashtagId != null) {
-      for (int i = 0; i < hashtagId.length; i++) {
+  public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto) {
+    if (userHashtagDto.getHashtagId() != null) {
+      for (int i = 0; i < userHashtagDto.getHashtagId().length; i++) {
         UserHashtag userhashtag = new UserHashtag();
-        Optional<User> user = this.userRepository.findById(userId);
+        Optional<User> user = this.userRepository.findById(userHashtagDto.getUserId());
         userhashtag.setUser(user.get());
-        Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId[i]);
+        Optional<Hashtag> hashtag =
+            this.hashtagRepository.findById(userHashtagDto.getHashtagId()[i]);
         userhashtag.setHashtag(hashtag.get());
         userhashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
         this.userHashtagRepository.save(userhashtag);
       }
-      return this.userHashtagRepository.findByUserId(userId);
+      return this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
     }
 
     return null;
