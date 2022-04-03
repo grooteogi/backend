@@ -24,14 +24,16 @@ public class HashtagController {
   public ResponseEntity<BasicResponse> getAllHashtag() {
     List<Hashtag> hashtagList = hashtagService.getAllHashtag();
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 
   @GetMapping("/top10")
   public ResponseEntity<BasicResponse> getTopTenHashtag(@RequestParam String type) {
     List<Hashtag> hashtagList = hashtagService.getTopTenHashtag(type);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 
   @PostMapping("/")

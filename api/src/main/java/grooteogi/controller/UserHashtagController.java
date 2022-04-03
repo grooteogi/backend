@@ -31,7 +31,8 @@ public class UserHashtagController {
   public ResponseEntity<BasicResponse> saveUserHashtag(@RequestParam int userId, int[] hashtagId) {
     List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userId, hashtagId);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 
   @DeleteMapping("/hashtag")
@@ -39,20 +40,23 @@ public class UserHashtagController {
       int[] hashtagId) {
     List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 
   @GetMapping("/hashtag")
   public ResponseEntity<BasicResponse> getAllUserHashtag() {
     List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 
   @GetMapping("/{userId}/hashtag")
   public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {
     List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(userId);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(hashtagList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
+            .data(hashtagList).build());
   }
 }

@@ -45,7 +45,8 @@ public class UserController {
     List<User> userList = userService.getAllUser();
 
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(userList).build());
+        BasicResponse.builder().status(HttpStatus.OK.value()).count(userList.size())
+            .data(userList).build());
   }
 
   @GetMapping("/{user_id}")
