@@ -2,10 +2,10 @@ package grooteogi.repository;
 
 
 import grooteogi.domain.UserHashtag;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserHashtagRepository extends JpaRepository<UserHashtag, Integer> {
 
