@@ -44,7 +44,7 @@ public class UserHashtagService {
     if (hashtagId != null) {
       for (int i = 0; i < hashtagId.length; i++) {
         UserHashtag userHashtag = this.userHashtagRepository.findByUserIdAndHashtagId(userId,
-            hashtagId[0]);
+            hashtagId[i]);
         this.userHashtagRepository.delete(userHashtag);
       }
       return this.userHashtagRepository.findByUserId(userId);
