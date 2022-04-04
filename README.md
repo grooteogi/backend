@@ -1,45 +1,49 @@
 Grooteogi Backend
 ===
 
-Getting Start
+🚀 Getting Started
 ---
 
-### Execute docker-compose to run development database
-
 ```bash
-docker-compose -f docker-compose.dev.yml up
+docker-compose -f docker-compose.local.yml up
 ```
 
-### Run development api server
+🧐 How to develop
+---
 
 ```bash
-./gradlew build # build spring-boot project
+# Execute docker-compose to run development database
+docker-compose -f docker-compose.dev.yml up
+
+# Run development api server
+./gradlew build
 java -jar ./build/libs/[build_file].jar --spring.profiles.activate=dev
 ```
 
-How to develop
+⚙️ Profiles
 ---
 
-### Controller
+### local
 
-[Controller](/api/src/main/java/grooteogi/controller) is implementation of the `api`. This class communicates directly with the user.
+This profile for testing communication with the frontend in local.
 
-> Business logic must not be included in the source code.
+- docker configuration file
+  - docker-compose.local.yml
+- spring configuration file
+  - application.local.yml
 
-### Service
+### develop
 
-[Service](/api/src/main/java/grooteogi/service) is a class that handles requests from controllers. `All business logic` is contained here.
+This profile for development in local.
 
-### Domain
+- docker configuration file
+  - docker-compose.dev.yml
+- spring configuration file
+  - application.dev.yml
 
-[Domain](/api/src/main/java/grooteogi/domain) is a class that matches a table stored in the DB. The DB and connection are already established, so if you need additional tables, you just need to create a domain object.
+### production
 
-### Repository
+This profile for deployment in server.
 
-[Repository](/api/src/main/java/grooteogi/repository) is a interface that allows you to work with DB. It can be created by inheriting from `JpaRepository`.
-
-### Utils
-
-[Utils](/api/src/main/java/grooteogi/utils) is a useful class package needed during development.
-
-> A typical example is [RedisClient](api/src/main/java/grooteogi/utils/RedisClient.java). To set and get data from redis, you can use the `setValue` and `getValue` function of that class.
+- spring configuration file
+  - application.prod.yml
