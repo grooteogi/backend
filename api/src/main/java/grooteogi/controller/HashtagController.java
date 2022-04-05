@@ -6,7 +6,6 @@ import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,22 +25,19 @@ public class HashtagController {
   public ResponseEntity<BasicResponse> getAllHashtag() {
     List<Hashtag> hashtagList = hashtagService.getAllHashtag();
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @GetMapping("/top10")
   public ResponseEntity<BasicResponse> getTopTenHashtag(@RequestParam String type) {
     List<Hashtag> hashtagList = hashtagService.getTopTenHashtag(type);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createHashtag(@RequestBody HashtagDto hashtagDto) {
     Hashtag createdHashtag = this.hashtagService.createHashtag(hashtagDto);
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(createdHashtag).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(createdHashtag).build());
   }
 }
