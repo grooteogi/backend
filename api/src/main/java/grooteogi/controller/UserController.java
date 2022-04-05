@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,14 +52,11 @@ public class UserController {
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @PatchMapping("/{userId}")
-  public ResponseEntity patchUser(@PathVariable Integer userId) {
-    return ResponseEntity.ok(null);
-  }
-
   @DeleteMapping("/{userId}")
   public ResponseEntity deleteUser(@PathVariable Integer userId) {
-    return ResponseEntity.ok(null);
+    userService.withdrawal(userId);
+
+    return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
   /*
