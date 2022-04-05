@@ -49,7 +49,7 @@ public class UserController {
             .data(userList).build());
   }
 
-  @GetMapping("/{user_id}")
+  @GetMapping("/{userId}")
   public ResponseEntity<BasicResponse> getUser(@PathVariable Integer userId) {
     User user = userService.getUser(userId);
 
