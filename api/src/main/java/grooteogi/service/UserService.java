@@ -60,14 +60,17 @@ public class UserService {
   }
 
   public Token login(LoginDto loginDto) {
-    User user = userRepository.findByEmail(loginDto.getEmail());
-    if (loginDto.getPassword().isBlank()) {
-      return generateToken(user.getId(), loginDto.getEmail());
-    }
-    if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-      return generateToken(user.getId(), loginDto.getEmail());
-    } else {
+    Optional<User> user = userRepository.findByEmail(loginDto.getEmail());
+    if (user.isPresent()) {
+      if (loginDto.getPassword().isBlank()) {
+        return generateToken(user.get().getId(), loginDto.getEmail());
+      }
+      if (passwordEncoder.matches(loginDto.getPassword(), user.get().getPassword())) {
+        return generateToken(user.get().getId(), loginDto.getEmail());
+      }
       return null;
+    } else {
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
   }
 

@@ -71,6 +71,6 @@ public class EmailService {
       e.printStackTrace();
     }
     String key = prefix + email;
-    redisClient.setValue(key, code, 3L); // key(email), value(code), timeout
+    redisClient.setValue(key, code, 3L);
   }
 }
