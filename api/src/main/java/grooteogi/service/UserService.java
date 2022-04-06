@@ -37,6 +37,14 @@ public class UserService {
     return user.get();
   }
 
+  public User getUserByEmail(String email) {
+    Optional<User> user = userRepository.findByEmail(email);
+    if (user.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
+    }
+    return user.get();
+  }
+
   public void withdrawal(int userId) {
     Optional<User> user = userRepository.findById(userId);
     if (user.isEmpty()) {
@@ -68,14 +76,13 @@ public class UserService {
   }
 
   public Token login(LoginDto loginDto) {
-    User user = userRepository.findByEmail(loginDto.getEmail());
+    User user = getUserByEmail(loginDto.getEmail());
     if (loginDto.getPassword().isBlank()) {
       return generateToken(user.getId(), loginDto.getEmail());
-    }
-    if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+    } else if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       return generateToken(user.getId(), loginDto.getEmail());
     } else {
-      return null;
+      throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
 

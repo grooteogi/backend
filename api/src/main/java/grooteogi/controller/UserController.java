@@ -15,10 +15,14 @@ import grooteogi.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -114,12 +118,15 @@ public class UserController {
   @PostMapping("/login")
   public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
+    User user = userService.getUserByEmail(loginDto.getEmail());
 
-    if (token == null) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
+    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
 
-    return ResponseEntity.ok(BasicResponse.builder().data(token).build());
+    return new ResponseEntity<>(
+        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
+    );
   }
 
   @PostMapping("/oauth/register")
@@ -138,12 +145,15 @@ public class UserController {
   @PostMapping("/oauth/login")
   public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto) {
     Token token = userService.login(loginDto);
+    User user = userService.getUserByEmail(loginDto.getEmail());
 
-    if (token == null) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
+    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
 
-    return ResponseEntity.ok(BasicResponse.builder().data(token).build());
+    return new ResponseEntity<>(
+        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
+    );
   }
 
   @GetMapping("/token/verify")
