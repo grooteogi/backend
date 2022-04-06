@@ -37,6 +37,14 @@ public class UserService {
     return user.get();
   }
 
+  public void withdrawal(int userId) {
+    Optional<User> user = userRepository.findById(userId);
+    if (user.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
+    }
+    userRepository.delete(user.get());
+  }
+
   public User register(UserDto userDto) {
     switch (userDto.getType()) {
       case GENERAL:

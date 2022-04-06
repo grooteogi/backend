@@ -11,7 +11,6 @@ import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +32,7 @@ public class UserHashtagController {
   public ResponseEntity<BasicResponse> saveUserHashtag(@RequestBody UserHashtagDto userHashtagDto) {
     List<UserHashtag> hashtagList = userHashtagService.saveUserHashtag(userHashtagDto);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @DeleteMapping("/hashtag")
@@ -42,23 +40,20 @@ public class UserHashtagController {
       int[] hashtagId) {
     List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @GetMapping("/hashtag")
   public ResponseEntity<BasicResponse> getAllUserHashtag() {
     List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @GetMapping("/{userId}/hashtag")
   public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {
     List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(userId);
     return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(hashtagList.size())
-            .data(hashtagList).build());
+        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 }

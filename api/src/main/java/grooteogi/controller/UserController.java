@@ -19,12 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,27 +42,21 @@ public class UserController {
   public ResponseEntity<BasicResponse> getAllUser() {
     List<User> userList = userService.getAllUser();
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).count(userList.size())
-            .data(userList).build());
+    return ResponseEntity.ok(BasicResponse.builder().count(userList.size()).data(userList).build());
   }
 
-  @GetMapping("/{user_id}")
+  @GetMapping("/{userId}")
   public ResponseEntity<BasicResponse> getUser(@PathVariable Integer userId) {
     User user = userService.getUser(userId);
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
-  }
-
-  @PatchMapping("/{userId}")
-  public ResponseEntity patchUser(@PathVariable Integer userId) {
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @DeleteMapping("/{userId}")
   public ResponseEntity deleteUser(@PathVariable Integer userId) {
-    return ResponseEntity.ok(null);
+    userService.withdrawal(userId);
+
+    return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
   /*
@@ -84,8 +76,8 @@ public class UserController {
 
     emailService.createEmailVerification(email);
 
-    return ResponseEntity.ok(BasicResponse.builder().status(HttpStatus.OK.value())
-        .message("send email verification success").build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("send email verification success").build());
   }
 
   /*
@@ -99,7 +91,7 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     }
 
-    return ResponseEntity.ok(BasicResponse.builder().status(HttpStatus.OK.value())
+    return ResponseEntity.ok(BasicResponse.builder()
         .message("confirm email verification success").build());
   }
 
@@ -117,8 +109,7 @@ public class UserController {
 
     User user = userService.register(userDto);
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PostMapping("/login")
@@ -129,8 +120,7 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(token).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(token).build());
   }
 
   @PostMapping("/oauth/register")
@@ -143,8 +133,7 @@ public class UserController {
 
     User user = userService.register(userDto);
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PostMapping("/oauth/login")
@@ -155,8 +144,7 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(token).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(token).build());
   }
 
   @GetMapping("/token/verify")
@@ -170,8 +158,7 @@ public class UserController {
 
     User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(user).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @GetMapping("/token/refresh")
@@ -188,7 +175,6 @@ public class UserController {
     returnValue.put("token", result.get("token").toString());
     returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
 
-    return ResponseEntity.ok(
-        BasicResponse.builder().status(HttpStatus.OK.value()).data(returnValue).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(returnValue).build());
   }
 }
