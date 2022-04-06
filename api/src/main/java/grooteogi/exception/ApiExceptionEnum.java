@@ -18,6 +18,7 @@ public enum ApiExceptionEnum {
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버가 응답하지 않습니다."),
 
   // Custom Exception
+  LOGIN_FAIL_EXCEPTION(HttpStatus.NOT_FOUND, "로그인에 실패하였습니다."),
   USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
   EMAIL_DUPLICATION_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
   EXPIRED_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE, "만료된 토큰입니다."), //419
