@@ -95,7 +95,8 @@ public class UserController {
       throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     }
 
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("confirm email verification success").build());
   }
 
   /*
