@@ -35,7 +35,7 @@ public class Hashtag {
   @CreationTimestamp
   private Timestamp registered;
 
-  @Column(length = 100, nullable = false)
+  @Column(length = 100, nullable = false, columnDefinition = "int default 0")
   private int count;
 
   @OneToMany(mappedBy = "hashtag")

@@ -34,7 +34,6 @@ public class HashtagService {
     //새로운 해시태그는 성격만 작성 가능
     createdHashtag.setHashtagType(HashtagType.PERSONALITY);
     createdHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
-    createdHashtag.setCount(0);
     createdHashtag.setTag(hashtagDto.getTag());
     return this.hashtagRepository.save(createdHashtag);
   }
