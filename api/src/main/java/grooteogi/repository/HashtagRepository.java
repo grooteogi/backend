@@ -12,4 +12,7 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Integer> {
       + "group by id order by count desc limit 10", nativeQuery = true)
   List<Hashtag> getTopTenHashtag(@Param("type") String type);
 
+
+  @Query(value = "select * from hashtag where tag = :tag ", nativeQuery = true)
+  Hashtag findByTag(@Param("tag")String tag);
 }

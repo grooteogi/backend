@@ -4,6 +4,8 @@ package grooteogi.service;
 import grooteogi.domain.Hashtag;
 import grooteogi.dto.HashtagDto;
 import grooteogi.enums.HashtagType;
+import grooteogi.exception.ApiException;
+import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.HashtagRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -31,10 +33,16 @@ public class HashtagService {
   public Hashtag createHashtag(HashtagDto hashtagDto) {
     Hashtag createdHashtag = new Hashtag();
 
+    if (this.hashtagRepository.findByTag(hashtagDto.getTag()) != null) {
+      throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
+    }
+
     //새로운 해시태그는 성격만 작성 가능
     createdHashtag.setHashtagType(HashtagType.PERSONALITY);
     createdHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
     createdHashtag.setTag(hashtagDto.getTag());
+
+
     return this.hashtagRepository.save(createdHashtag);
   }
 
