@@ -30,9 +30,11 @@ public class UserHashtagService {
         userhashtag.setUser(user.get());
         Optional<Hashtag> hashtag =
             this.hashtagRepository.findById(userHashtagDto.getHashtagId()[i]);
+        hashtag.get().setCount(hashtag.get().getCount() + 1);
         userhashtag.setHashtag(hashtag.get());
         userhashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
         this.userHashtagRepository.save(userhashtag);
+
       }
       return this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
     }
@@ -45,7 +47,10 @@ public class UserHashtagService {
       for (int i = 0; i < hashtagId.length; i++) {
         UserHashtag userHashtag = this.userHashtagRepository.findByUserIdAndHashtagId(userId,
             hashtagId[i]);
+        Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId[i]);
+        hashtag.get().setCount(hashtag.get().getCount() - 1);
         this.userHashtagRepository.delete(userHashtag);
+
       }
       return this.userHashtagRepository.findByUserId(userId);
     }

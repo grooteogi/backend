@@ -22,8 +22,8 @@ public class HashtagService {
   }
 
   public List<Hashtag> getTopTenHashtag(String type) {
-    //사용하는 사람이 많아졌을 때 사용하면 좋을 듯
-    //현재는 getAllHashtag로 받아올 것!
+    //count가 0이어도 불러올 수 있게 함
+    //타입별 getTopTenHashtag로 불러오기
     return this.hashtagRepository.getTopTenHashtag(type);
   }
 
@@ -34,6 +34,7 @@ public class HashtagService {
     //새로운 해시태그는 성격만 작성 가능
     createdHashtag.setHashtagType(HashtagType.PERSONALITY);
     createdHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
+    createdHashtag.setCount(0);
     createdHashtag.setTag(hashtagDto.getTag());
     return this.hashtagRepository.save(createdHashtag);
   }
