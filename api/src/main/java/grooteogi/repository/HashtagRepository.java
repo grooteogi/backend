@@ -8,8 +8,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface HashtagRepository extends JpaRepository<Hashtag, Integer> {
 
-  @Query(value = "select * from hashtag where id in (select hashtag_id from user_hashtag "
-      + "group by hashtag_id order by count(hashtag_id) desc) "
-      + "and hashtag_type = :type limit 10", nativeQuery = true)
+  @Query(value = "select * from hashtag where hashtag_type = :type "
+      + "group by id order by count desc limit 10", nativeQuery = true)
   List<Hashtag> getTopTenHashtag(@Param("type") String type);
+
+
+  @Query(value = "select * from hashtag where tag = :tag ", nativeQuery = true)
+  Hashtag findByTag(@Param("tag")String tag);
 }
