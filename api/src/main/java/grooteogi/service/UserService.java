@@ -4,6 +4,7 @@ import grooteogi.domain.User;
 import grooteogi.dto.LoginDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
+import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -77,7 +78,7 @@ public class UserService {
 
   public Token login(LoginDto loginDto) {
     User user = getUserByEmail(loginDto.getEmail());
-    if (loginDto.getPassword().isBlank()) {
+    if (loginDto.getPassword().isBlank() && user.getType() != LoginType.GENERAL) {
       return generateToken(user.getId(), loginDto.getEmail());
     } else if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       return generateToken(user.getId(), loginDto.getEmail());
