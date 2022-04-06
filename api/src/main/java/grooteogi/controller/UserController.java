@@ -122,7 +122,10 @@ public class UserController {
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
-    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
+
+    ResponseCookie responseCookie = ResponseCookie.from("X-REFRESH-TOKEN", token.getRefreshToken())
+        .httpOnly(true).secure(true).path("/").build();
+    responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     return new ResponseEntity<>(
         BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
@@ -149,7 +152,10 @@ public class UserController {
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
-    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
+
+    ResponseCookie responseCookie = ResponseCookie.from("X-REFRESH-TOKEN", token.getRefreshToken())
+        .httpOnly(true).secure(true).path("/").build();
+    responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     return new ResponseEntity<>(
         BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
