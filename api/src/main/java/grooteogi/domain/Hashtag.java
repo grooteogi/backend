@@ -1,9 +1,7 @@
 package grooteogi.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import grooteogi.enums.HashtagType;
 import java.sql.Timestamp;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,7 +9,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,7 +35,4 @@ public class Hashtag {
   @Column(length = 100, nullable = false, columnDefinition = "int default 0")
   private int count;
 
-  @OneToMany(mappedBy = "hashtag")
-  @JsonBackReference
-  private List<UserHashtag> userHashtag;
 }

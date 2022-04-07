@@ -54,5 +54,9 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonBackReference
-  private List<UserHashtag> userHashtag = new ArrayList<>();
+  private List<UserHashtag> userHashtags = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @JsonBackReference
+  private List<Post> posts = new ArrayList<>();
 }
