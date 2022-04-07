@@ -84,6 +84,7 @@ public class UserService {
     } else {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
+
   }
 
   private Token generateToken(int id, String email) {

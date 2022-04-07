@@ -2,6 +2,8 @@ package grooteogi.service;
 
 import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
+import grooteogi.exception.ApiException;
+import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
 import java.util.Random;
@@ -36,22 +38,23 @@ public class EmailService {
     return code.toString();
   }
 
-  public boolean isExist(EmailRequest email) {
+  private boolean isExist(EmailRequest email) {
     return userRepository.existsByEmail(email.getEmail());
   }
 
   public void createEmailVerification(EmailRequest email) {
+    if (isExist(email)) {
+      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
+    }
     String code = createCode();
     sendMail(email.getEmail(), code);
   }
 
-  public boolean confirmEmailVerification(EmailCodeRequest emailCodeRequest) {
+  public void confirmEmailVerification(EmailCodeRequest emailCodeRequest) {
     String key = prefix + emailCodeRequest.getEmail();
     String value = redisClient.getValue(key);
-    if (value != null) {
-      return value.equals(emailCodeRequest.getCode());
-    } else {
-      return false;
+    if (value == null || !value.equals(emailCodeRequest.getCode())) {
+      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     }
   }
 
