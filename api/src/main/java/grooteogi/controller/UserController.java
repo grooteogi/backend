@@ -15,14 +15,11 @@ import grooteogi.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -69,15 +66,9 @@ public class UserController {
   @PostMapping("/email-verification/create")
   public ResponseEntity<BasicResponse> createEmailVerification(
       @Valid @RequestBody EmailRequest email, BindingResult bindingResult) {
-
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
-
-    if (emailService.isExist(email)) {
-      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
-    }
-
     emailService.createEmailVerification(email);
 
     return ResponseEntity.ok(
@@ -90,10 +81,7 @@ public class UserController {
   @PostMapping("/email-verification/confirm")
   public ResponseEntity<BasicResponse> confirmEmailVerification(
       @RequestBody EmailCodeRequest emailCodeRequest) {
-
-    if (!emailService.confirmEmailVerification(emailCodeRequest)) {
-      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
-    }
+    emailService.confirmEmailVerification(emailCodeRequest);
 
     return ResponseEntity.ok(BasicResponse.builder()
         .message("confirm email verification success").build());
