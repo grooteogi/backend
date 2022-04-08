@@ -29,7 +29,7 @@ services:
       - "8080:8080"
     build: ./api
     env_file:
-      - "./api/config/api.env"
+      - "./api/config/dev.env"
     environment:
       SPRING_PROFILES_ACTIVE: local
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/test_db?useSSL=false&useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true
