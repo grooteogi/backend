@@ -3,6 +3,7 @@ package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class Post {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+  private Long id;
 
   @Column(nullable = false, length = 30)
   private String title;
@@ -49,6 +50,6 @@ public class Post {
   @OneToMany
   @JsonManagedReference
   @JoinColumn(name = "post_hashtag")
-  private PostHashtag postHashtag;
+  private List<PostHashtag> postHashtag;
 
 }
