@@ -1,24 +1,5 @@
 version: '3'
 services:
-  api:
-    container_name: spring-boot
-    ports:
-      - "8080:8080"
-    build: ./api
-    environment:
-      SPRING_PROFILES_ACTIVE: local, email
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/test_db?useSSL=false&useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: test
-      SPRING_DATASOURCE_PASSWORD: test_pw
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-    depends_on:
-      - mysql
-      - redis
-    networks:
-      - db_network
-    restart: always
-
   mysql:
     container_name: mysql
     image: mysql/mysql-server:latest
@@ -34,7 +15,6 @@ services:
     networks:
       - db_network
     restart: always
-
   redis:
     container_name: redis
     image: redis:latest
@@ -43,7 +23,26 @@ services:
     networks:
       - db_network
     restart: always
-
+  api:
+    container_name: spring-boot
+    ports:
+      - "8080:8080"
+    build: ./api
+    env_file:
+      - "./api/config/api.env"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/test_db?useSSL=false&useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: test
+      SPRING_DATASOURCE_PASSWORD: test_pw
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - db_network
+    restart: always
 networks:
   db_network:
     driver: bridge
