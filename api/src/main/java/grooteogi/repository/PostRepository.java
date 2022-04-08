@@ -18,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   )
   List<Post> findBySearchOrderByIdDesc(@Param("title") String title,
       @Param("content") String content,
-      Long id, Pageable pageable);
+      @Param("id") Long id, Pageable pageable);
 
   /*
    * 마지막 id 기준으로 뒤에 더 있는지 여부 확인
@@ -65,5 +65,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
           + "AND id < :id ORDER BY createDate desc id desc", nativeQuery = true
   )
   List<Post> findBySearchOrderByCreateDateDesc(@Param("title") String title,
-      @Param("content") String content, Long id, Pageable pageable);
+      @Param("content") String content, @Param("id") Long id, Pageable pageable);
+
 }
