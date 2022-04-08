@@ -1,7 +1,6 @@
 package grooteogi.controller;
 
 import grooteogi.domain.Post;
-import grooteogi.dto.ModifyingPostDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.PostService;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,10 +31,10 @@ public class PostController {
   }
 
   @GetMapping("/{postId}")
-  public ResponseEntity<BasicResponse> getPostDetail(@PathVariable int postId) {
-    Post postDetail = postService.getPostDetail(postId);
+  public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
+    Post post = postService.getPost(postId);
     return ResponseEntity.ok(
-        BasicResponse.builder().data(postDetail).build());
+        BasicResponse.builder().data(post).build());
   }
 
 
@@ -46,14 +44,15 @@ public class PostController {
     return ResponseEntity.ok(BasicResponse.builder().data(createdPost).build());
   }
 
-  @PutMapping
-  public ResponseEntity<BasicResponse> modifyPost(@RequestBody ModifyingPostDto modifyingPostDto) {
-    Post modifiedPost = this.postService.modifyPost(modifyingPostDto);
+  @PutMapping("/{postId}")
+  public ResponseEntity<BasicResponse> modifyPost(
+      @RequestBody PostDto modifiedDto, @PathVariable int postId) {
+    Post modifiedPost = this.postService.modifyPost(modifiedDto, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 
-  @DeleteMapping
-  public ResponseEntity<BasicResponse> deletePost(@RequestParam int postId) {
+  @DeleteMapping("/{postId}")
+  public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
     List<Post> deletePost = this.postService.deletePost(postId);
     return ResponseEntity.ok(BasicResponse.builder().count(
         deletePost.size()).data(deletePost).build());

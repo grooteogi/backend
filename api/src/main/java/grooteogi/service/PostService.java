@@ -4,7 +4,6 @@ import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
 import grooteogi.domain.User;
-import grooteogi.dto.ModifyingPostDto;
 import grooteogi.dto.PostDto;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
@@ -12,8 +11,10 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class PostService {
     return this.postRepository.findAll();
   }
 
-  public Post getPostDetail(int postId) {
+  public Post getPost(int postId) {
 
     //조회수 증가
     Optional<Post> post = this.postRepository.findById(postId);
@@ -44,7 +45,7 @@ public class PostService {
     Post createdPost = new Post();
     Optional<User> user = this.userRepository.findById(postDto.getUserId());
 
-    //Post 데이터 처리
+    //Post 저장
     createdPost.setUser(user.get());
     createdPost.setTitle(postDto.getTitle());
     createdPost.setContent(postDto.getContent());
@@ -52,14 +53,10 @@ public class PostService {
     createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setImageUrl(postDto.getImageUrl());
 
-    this.postRepository.save(createdPost);
-
-
-    //PostHashtag 데이터 처리
-    for (int i = 0; i < postDto.getHashtagId().length; i++) {
+    //Post Hashtag 저장
+    Arrays.stream(postDto.getHashtagIds()).forEach(hashtagId -> {
       PostHashtag createdPostHashtag = new PostHashtag();
-
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(postDto.getHashtagId()[i]);
+      Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId);
 
       hashtag.get().setCount(hashtag.get().getCount() + 1);
 
@@ -67,53 +64,51 @@ public class PostService {
       createdPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       createdPostHashtag.setPost(createdPost);
 
-      this.postHashtagRepository.save(createdPostHashtag);
-    }
+      createdPost.getPostHashtags().add(createdPostHashtag);
+    });
+
+
+    this.postRepository.save(createdPost);
 
     return createdPost;
   }
 
-
-  public Post modifyPost(ModifyingPostDto modifyingPostDto) {
-    Optional<Post> modifiedPost = this.postRepository.findById(modifyingPostDto.getPostId());
+  @Transactional
+  public Post modifyPost(PostDto modifiedDto, int postId) {
+    Optional<Post> modifiedPost = this.postRepository.findById(postId);
 
     //Post 데이터 처리
-    modifiedPost.get().setTitle(modifyingPostDto.getTitle());
-    modifiedPost.get().setContent(modifyingPostDto.getContent());
-    modifiedPost.get().setImageUrl(modifyingPostDto.getImageUrl());
+    modifiedPost.get().setTitle(modifiedDto.getTitle());
+    modifiedPost.get().setContent(modifiedDto.getContent());
+    modifiedPost.get().setImageUrl(modifiedDto.getImageUrl());
     modifiedPost.get().setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
 
     //hashtag count - 1
-    List<PostHashtag> postHashtag =
-        this.postHashtagRepository.findByPostId(modifyingPostDto.getPostId());
+    List<PostHashtag> postHashtagList = modifiedPost.get().getPostHashtags();
 
-    for (int i = 0; i < postHashtag.size(); i++) {
-      Hashtag beforeHashtag = modifiedPost.get().getPostHashtags().get(i).getHashTag();
+    for (PostHashtag postHashtag : postHashtagList) {
+      Hashtag beforeHashtag = postHashtag.getHashTag();
       beforeHashtag.setCount(beforeHashtag.getCount() - 1);
+      this.postHashtagRepository.delete(postHashtag);
     }
-    modifiedPost.get().getPostHashtags().removeAll(postHashtag);
 
-    this.postRepository.save(modifiedPost.get());
-
+    modifiedPost.get().getPostHashtags().clear();
 
 
-    //PostId와 mapping 되는 PostHashtag 삭제
-    this.postHashtagRepository.deleteAll(postHashtag);
+    //PostHashtag 저장
+    Integer[] hashtagIds = modifiedDto.getHashtagIds();
 
-
-    //PostHashtag 데이터 처리
-    for (int i = 0; i < modifyingPostDto.getHashtagId().length; i++) {
+    for (int hashtagId : hashtagIds) {
       PostHashtag modifiedPostHashtag = new PostHashtag();
+      Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId);
 
-      Optional<Hashtag> newHashtag =
-          this.hashtagRepository.findById(modifyingPostDto.getHashtagId()[i]);
+      hashtag.get().setCount(hashtag.get().getCount() + 1);
 
-      //hashtag count + 1
-      newHashtag.get().setCount(newHashtag.get().getCount() + 1);
-      modifiedPostHashtag.setHashTag(newHashtag.get());
+      modifiedPostHashtag.setHashTag(hashtag.get());
       modifiedPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       modifiedPostHashtag.setPost(modifiedPost.get());
-      this.postHashtagRepository.save(modifiedPostHashtag);
+
+      modifiedPost.get().getPostHashtags().add(modifiedPostHashtag);
     }
 
 
@@ -123,15 +118,16 @@ public class PostService {
   public List<Post> deletePost(int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
 
+    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
+
+
     //hashtag count - 1
-    for (int i = 0; i < post.get().getPostHashtags().size(); i++) {
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(
-              post.get().getPostHashtags().get(i).getHashTag().getId());
+    for (PostHashtag postHashtag : postHashtagList) {
+      Optional<Hashtag> hashtag = this.hashtagRepository.findById(postHashtag.getHashTag().getId());
       hashtag.get().setCount(hashtag.get().getCount() - 1);
     }
 
     this.postRepository.delete(post.get());
-
 
     return this.postRepository.findAll();
   }

@@ -19,6 +19,6 @@ public class PostDto {
 
   private String imageUrl;
 
-  private Integer[] hashtagId;
+  private Integer[] hashtagIds;
 
 }
