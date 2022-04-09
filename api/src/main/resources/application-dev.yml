@@ -10,3 +10,12 @@ spring:
   redis:
     host: localhost
     port: 6378
+cloud:
+  aws:
+    credentials:
+      access-key: test
+      secret-key: test
+    region:
+      static: region
+    s3:
+      bucket: GRTG
