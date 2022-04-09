@@ -14,17 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class AmazonS3Client {
   private AmazonS3 s3Client;
-  static private AmazonS3Client instance = null;
+  private static AmazonS3Client instance;
 
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
-  private AmazonS3Client(){
+  private AmazonS3Client() {
     this.s3Client = new AwsS3Config().amazonS3Client();
+    this.instance = null;
   }
 
   public static AmazonS3Client getInstance() {
-    if (instance==null) {
+    if (instance == null) {
       return new AmazonS3Client();
     } else {
       return instance;
@@ -36,8 +37,9 @@ public class AmazonS3Client {
     objectMetadata.setContentLength(file.getSize());
     objectMetadata.setContentType(file.getContentType());
 
-    try (InputStream inputStream = file.getInputStream()){
-      this.s3Client.putObject(new PutObjectRequest(this.bucket, file.getName(), inputStream, objectMetadata)
+    try (InputStream inputStream = file.getInputStream()) {
+      this.s3Client.putObject(
+          new PutObjectRequest(this.bucket, file.getName(), inputStream, objectMetadata)
           .withCannedAcl(CannedAccessControlList.PublicRead));
     } catch (IOException e) {
       throw new ApiException(ApiExceptionEnum.S3_UPLOAD_FAIL_EXCEPTION);
