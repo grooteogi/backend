@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 
+import grooteogi.config.AwsS3Config;
 import grooteogi.domain.User;
 import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
@@ -43,6 +44,8 @@ public class UserController {
   public ResponseEntity<BasicResponse> getAllUser() {
     List<User> userList = userService.getAllUser();
 
+    AwsS3Config aws = new AwsS3Config();
+    aws.amazonS3Client();
     return ResponseEntity.ok(BasicResponse.builder().count(userList.size()).data(userList).build());
   }
 

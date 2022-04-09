@@ -17,14 +17,20 @@ public class AwsS3Config {
 
   @Value("${cloud.aws.region.static}")
   private String region;
+  @Value("${spring.mail.username}")
+  private String token;
 
   @Bean
   public AmazonS3 amazonS3Client() {
-    AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
-    return AmazonS3ClientBuilder
-        .standard()
-        .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-        .withRegion(region)
-        .build();
+    System.out.println("------------------------------------------------");
+    System.out.println( accessKey );
+    System.out.println( token );
+    return null;
+//    AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+//    return AmazonS3ClientBuilder
+//        .standard()
+//        .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+//        .withRegion(region)
+//        .build();
   }
 }
