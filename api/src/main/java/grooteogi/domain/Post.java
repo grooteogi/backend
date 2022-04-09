@@ -1,11 +1,15 @@
 package grooteogi.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
@@ -34,22 +37,21 @@ public class Post {
   private String content;
 
   @Column(nullable = false, length = 125)
-  private String image;
+  private String imageUrl;
 
-  @ColumnDefault("0")
-  private int count;
+  @Column(length = 100, nullable = false, columnDefinition = "int default 0")
+  private int views;
 
   @CreationTimestamp
   private Timestamp createDate;
 
   @ManyToOne
-  @JsonManagedReference
-  @JoinColumn(name = "post_user_id")
+  @JsonBackReference
+  @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany
+  @OneToMany(mappedBy = "post",
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  @JoinColumn(name = "post_hashtag")
-  private List<PostHashtag> postHashtag;
-
+  private List<PostHashtag> postHashtags = new ArrayList<>();
 }

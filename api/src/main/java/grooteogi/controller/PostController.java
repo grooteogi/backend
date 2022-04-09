@@ -2,7 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.domain.Post;
 import grooteogi.dto.response.BasicResponse;
-import grooteogi.service.PageService;
+import grooteogi.service.PostService;
 import grooteogi.utils.CursorResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/post")
 public class PostController {
 
-  private final PageService pageService;
+  private final PostService postService;
 
   @PostMapping("/")
   public ResponseEntity<BasicResponse> search(
@@ -28,7 +28,7 @@ public class PostController {
       cursor = 0L;
     }
     CursorResult<Post> posts =
-        pageService.search(search, cursor, type, PageRequest.of(0, 20));
+        postService.search(search, cursor, type, PageRequest.of(0, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
