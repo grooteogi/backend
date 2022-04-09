@@ -7,18 +7,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
   redis:
     host: localhost
     port: 6378
-  jwt:
-    secret: grooteogi
-  session:
-    timeout: 300
-    store-type : redis
-    redis:
-      namespace: spring:session
-
 cloud:
   aws:
     credentials:

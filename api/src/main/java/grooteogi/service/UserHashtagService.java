@@ -24,6 +24,20 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
+
+
+  public List<UserHashtag> getAllUserHashtag() {
+    return this.userHashtagRepository.findAll();
+  }
+
+  public List<UserHashtag> getUserHashtag(int userId) {
+    Optional<UserHashtag> userHashtag = userHashtagRepository.findById(userId);
+    if (userHashtag.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
+    }
+    return this.userHashtagRepository.findByUserId(userId);
+  }
+
   public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto) {
     if (userHashtagDto.getHashtagId() != null) {
       for (int i = 0; i < userHashtagDto.getHashtagId().length; i++) {
@@ -58,6 +72,7 @@ public class UserHashtagService {
     throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
   }
 
+
   public List<UserHashtag> deleteUserHashtag(int userId, int[] hashtagId) {
     if (hashtagId != null) {
       for (int i = 0; i < hashtagId.length; i++) {
@@ -78,18 +93,6 @@ public class UserHashtagService {
     }
 
     throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-  }
-
-  public List<UserHashtag> getAllUserHashtag() {
-    return this.userHashtagRepository.findAll();
-  }
-
-  public List<UserHashtag> getUserHashtag(int userId) {
-    Optional<UserHashtag> userHashtag = userHashtagRepository.findById(userId);
-    if (userHashtag.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
-    return this.userHashtagRepository.findByUserId(userId);
   }
 
 }
