@@ -19,3 +19,20 @@ spring:
     store-type : redis
     redis:
       namespace: spring:session
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: $(AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: GRTG
+    stack:
+      auto: false
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
