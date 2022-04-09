@@ -54,18 +54,8 @@ public class UserService {
   }
 
   public User register(UserDto userDto) {
-    switch (userDto.getType()) {
-      case GENERAL:
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        break;
-
-      default:
-        userDto.setPassword(userDto.getToken());
-        break;
-    }
-    if (userDto.getNickname() == null) {
-      userDto.setNickname("groot");
-    }
+    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    userDto.setNickname("groot");
 
     User user = new User();
     BeanUtils.copyProperties(userDto, user);

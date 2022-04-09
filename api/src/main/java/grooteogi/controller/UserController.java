@@ -12,14 +12,12 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
-import grooteogi.utils.AwsS3Client;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,10 +86,6 @@ public class UserController {
         .message("confirm email verification success").build());
   }
 
-  /*
-  일반 회원가입 중 가입 버튼을 누를 경우 ( 비밀번호 유효성 검사 )
-  TODO 일반 회원가입과 OAuth 회원가입의 dto를 다르게 할지 결정 필요. 다르게 할 시 api도 다르게
-   */
   @PostMapping("/register")
   public ResponseEntity<BasicResponse> register(@Valid @RequestBody UserDto userDto,
       BindingResult bindingResult) {

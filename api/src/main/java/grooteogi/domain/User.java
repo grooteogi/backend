@@ -31,10 +31,10 @@ public class User {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private LoginType type; //일반:0 카카오:1 페북:2
+  private LoginType type;
 
   @Column(length = 40, nullable = false)
-  private String nickname;
+  private String nickname = "groot";
 
   @Column(length = 255, nullable = false)
   private String password;
