@@ -5,6 +5,7 @@ import grooteogi.domain.User;
 import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
 import grooteogi.dto.LoginDto;
+import grooteogi.dto.OauthDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
 import grooteogi.dto.response.BasicResponse;
@@ -12,6 +13,7 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
+import grooteogi.utils.OauthClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ public class UserController {
 
   private final UserService userService;
   private final EmailService emailService;
+  private final OauthClient oauthClient;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
@@ -113,17 +116,27 @@ public class UserController {
     );
   }
 
-  @PostMapping("/oauth/register")
-  public ResponseEntity<BasicResponse> oauthRegister(@Valid @RequestBody UserDto userDto,
+  @PostMapping("/oauth")
+  public ResponseEntity<BasicResponse> oauth(@Valid @RequestBody OauthDto oauthDto,
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    User user = userService.register(userDto);
+    UserDto userDto = oauthClient.authenticate(oauthDto);
+    Map<String, Object> result = userService.oauth(userDto);
 
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
+    Token token = (Token) result.get("token");
+
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
+    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
+
+    return new ResponseEntity<>(
+        BasicResponse.builder()
+            .data((User) result.get("user")).build(), responseHeaders, HttpStatus.OK
+    );
   }
 
   @PostMapping("/oauth/login")
