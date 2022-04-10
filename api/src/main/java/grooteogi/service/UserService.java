@@ -59,7 +59,7 @@ public class UserService {
     userDto.setNickname("groot");
 
     User registerUser = registerDto(userDto);
-    if (userDto.getNickname() == null) {
+    if (registerUser.getNickname().equals("groot")) {
       registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     }
     return userRepository.save(registerUser);

@@ -139,20 +139,6 @@ public class UserController {
     );
   }
 
-  @PostMapping("/oauth/login")
-  public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto) {
-    Token token = userService.login(loginDto);
-    User user = userService.getUserByEmail(loginDto.getEmail());
-
-    HttpHeaders responseHeaders = new HttpHeaders();
-    responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
-    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
-
-    return new ResponseEntity<>(
-        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
-    );
-  }
-
   @GetMapping("/token/verify")
   public ResponseEntity<BasicResponse> verify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
