@@ -14,5 +14,5 @@ public class OauthDto {
   private LoginType type;
 
   @NotBlank(message = "")
-  private String token;
+  private String code;
 }

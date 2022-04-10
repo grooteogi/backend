@@ -44,8 +44,7 @@ logging:
 #          client-id: ${GOOGLE_CLIENT_ID}
 #          client-secret: ${GOOGLE_CLIENT_SECRET_ID}
 #          redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-#custom:
-#  oauth2:
-#    kakao:
-#      client-id: ${KAKAO_CLIENT_ID}
-#      client-secret: ${KAKAO_CLIENT_SECRET_ID}
+custom:
+  oauth2:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID}
