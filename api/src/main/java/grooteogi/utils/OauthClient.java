@@ -54,6 +54,7 @@ public class OauthClient {
       JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
       JsonObject kakaoAccount = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
 
+      userDto.setType(oauthDto.getType());
       userDto.setNickname(properties.getAsJsonObject().get("nickname").getAsString());
       userDto.setEmail(kakaoAccount.getAsJsonObject().get("email").getAsString());
     } catch (IOException e) {
