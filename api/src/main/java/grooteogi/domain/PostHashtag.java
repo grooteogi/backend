@@ -1,6 +1,7 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class PostHashtag {
   private Post post;
 
   @ManyToOne
-  @JsonBackReference
+  @JsonManagedReference
   @JoinColumn(name = "hashtag_id")
-  private Hashtag hashtag;
+  private Hashtag hashTag;
 }

@@ -2,6 +2,7 @@ package grooteogi.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class Post {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private int id;
 
   @Column(nullable = false, length = 30)
   private String title;
@@ -36,7 +37,7 @@ public class Post {
   @Lob
   private String content;
 
-  @Column(nullable = false, length = 125)
+  @Column(nullable = true, length = 125)
   private String imageUrl;
 
   @Column(length = 100, nullable = false, columnDefinition = "int default 0")
@@ -45,13 +46,19 @@ public class Post {
   @CreationTimestamp
   private Timestamp createDate;
 
+  @CreationTimestamp
+  private Timestamp modifiedDate;
+
   @ManyToOne
   @JsonBackReference
   @JoinColumn(name = "user_id")
   private User user;
 
+
   @OneToMany(mappedBy = "post",
-      cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER)
   @JsonManagedReference
+  @JsonIgnore
   private List<PostHashtag> postHashtags = new ArrayList<>();
+
 }

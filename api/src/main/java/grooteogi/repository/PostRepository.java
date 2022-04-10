@@ -15,14 +15,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   )
   List<Post> findBySearchOrderByIdDesc(@Param("title") String title,
       @Param("content") String content,
-      @Param("id") Long id, Pageable pageable);
+      @Param("id") Integer id, Pageable pageable);
 
-  Boolean existsByIdLessThan(Long id);
+  Boolean existsByIdLessThan(Integer id);
 
   List<Post> findByTitleContainingOrContentContainingOrderByIdDesc(String title,
       String content, Pageable page);
 
-  List<Post> findByIdLessThanOrderByIdDesc(Long id, Pageable page);
+  List<Post> findByIdLessThanOrderByIdDesc(Integer id, Pageable page);
 
   List<Post> findAllByOrderByIdDesc(Pageable page);
 

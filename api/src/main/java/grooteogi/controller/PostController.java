@@ -22,10 +22,10 @@ public class PostController {
   @PostMapping("/")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "search", required = false) String search,
-      @RequestParam(name = "cursor", required = false) Long cursor,
+      @RequestParam(name = "cursor", required = false) Integer cursor,
       @RequestParam(name = "type", required = false) String type) {
     if (cursor == null) {
-      cursor = 0L;
+      cursor = 0;
     }
     CursorResult<Post> posts =
         postService.search(search, cursor, type, PageRequest.of(0, 20));
