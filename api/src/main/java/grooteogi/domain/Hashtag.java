@@ -34,5 +34,4 @@ public class Hashtag {
 
   @Column(length = 100, nullable = false, columnDefinition = "int default 0")
   private int count;
-
 }

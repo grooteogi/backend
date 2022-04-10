@@ -9,6 +9,7 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.CursorResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -130,5 +132,35 @@ public class PostService {
     this.postRepository.delete(post.get());
 
     return this.postRepository.findAll();
+  }
+  
+  public CursorResult<Post> search(String search, Integer cursorId, String type,
+      Pageable page) {
+    final List<Post> posts;
+    if (search == null) {
+      posts = searchAllPosts(cursorId, page, type);
+    } else {
+      posts = searchPosts(search, cursorId, page, type);
+    }
+    final Integer lastIdOfList = posts.isEmpty() ? null : posts.get(posts.size() - 1).getId();
+    return new CursorResult<>(posts, hasNext(lastIdOfList));
+  }
+
+  private List<Post> searchAllPosts(Integer cursorId, Pageable page, String type) {
+    return cursorId == 0 ? this.postRepository.findAllByOrderByIdDesc(page) :
+        this.postRepository.findByIdLessThanOrderByIdDesc(cursorId, page);
+  }
+
+  private List<Post> searchPosts(String search, Integer cursorId, Pageable page, String type) {
+    return cursorId == 0 ? this.postRepository
+        .findByTitleContainingOrContentContainingOrderByIdDesc(search, search, page) :
+        this.postRepository.findBySearchOrderByIdDesc(search, search, cursorId, page);
+  }
+
+  private Boolean hasNext(Integer lastIdOfList) {
+    if (lastIdOfList == null) {
+      return false;
+    }
+    return this.postRepository.existsByIdLessThan(lastIdOfList);
   }
 }
