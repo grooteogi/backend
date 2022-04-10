@@ -12,12 +12,14 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
+import grooteogi.utils.AwsS3Client;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,6 @@ public class UserController {
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
     List<User> userList = userService.getAllUser();
-
     return ResponseEntity.ok(BasicResponse.builder().count(userList.size()).data(userList).build());
   }
 

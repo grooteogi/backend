@@ -25,6 +25,7 @@ public enum ApiExceptionEnum {
   EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE,
       "만료된 토큰입니다. 회원가입을 다시 시도하십시오."), //419
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."), //
+  S3_UPLOAD_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."), //
   DUPLICATION_VALUE_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 값입니다.");
 
   private final HttpStatus httpStatus;

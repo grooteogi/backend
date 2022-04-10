@@ -4,21 +4,23 @@ Grooteogi Backend
 🚀 Getting Started
 ---
 
-```bash
-docker-compose -f docker-compose.local.yml up
-```
+1. Set env_file in `./api/config/dev.env`
+Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file).
+2. Execute docker-compose
+    ```bash
+    docker-compose -f docker-compose.local.yml up
+    ```
 
 🧐 How to develop
 ---
 
-```bash
-# Execute docker-compose to run development database
-docker-compose -f docker-compose.dev.yml up
-
-# Run development api server
-./gradlew build
-java -jar ./build/libs/[build_file].jar --spring.profiles.activate=dev
-```
+1. Set env_file in `./api/config/dev.env`
+Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file).
+2. Execute docker-compose to run development database
+    ```bash
+    docker-compose -f docker-compose.dev.yml up
+    ```
+3. Run the Spring Boot project in IntelliJ.
 
 ⚙️ Profiles
 ---
