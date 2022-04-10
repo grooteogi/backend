@@ -18,20 +18,20 @@ public class PostService {
       Pageable page) {
     final List<Post> posts;
     if (search == null) {
-      posts = getAllPosts(cursorId, page, type);
+      posts = searchAllPosts(cursorId, page, type);
     } else {
-      posts = getPosts(search, cursorId, page, type);
+      posts = searchPosts(search, cursorId, page, type);
     }
     final Integer lastIdOfList = posts.isEmpty() ? null : posts.get(posts.size() - 1).getId();
     return new CursorResult<>(posts, hasNext(lastIdOfList));
   }
 
-  private List<Post> getAllPosts(Integer cursorId, Pageable page, String type) {
+  private List<Post> searchAllPosts(Integer cursorId, Pageable page, String type) {
     return cursorId == 0 ? this.postRepository.findAllByOrderByIdDesc(page) :
         this.postRepository.findByIdLessThanOrderByIdDesc(cursorId, page);
   }
 
-  private List<Post> getPosts(String search, Integer cursorId, Pageable page, String type) {
+  private List<Post> searchPosts(String search, Integer cursorId, Pageable page, String type) {
     return cursorId == 0 ? this.postRepository
         .findByTitleContainingOrContentContainingOrderByIdDesc(search, search, page) :
         this.postRepository.findBySearchOrderByIdDesc(search, search, cursorId, page);
