@@ -182,10 +182,12 @@ public class UserController {
       throw new ApiException((ApiExceptionEnum) result.get("status"));
     }
 
-    Map<String, Object> returnValue = new HashMap<String, Object>();
-    returnValue.put("token", result.get("token").toString());
-    returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.set("X-AUTH-TOKEN", result.get("token").toString());
+    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
-    return ResponseEntity.ok(BasicResponse.builder().data(returnValue).build());
+    return new ResponseEntity<>(
+        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
+    );
   }
 }
