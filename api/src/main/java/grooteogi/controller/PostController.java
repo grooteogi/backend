@@ -26,7 +26,7 @@ public class PostController {
 
   private final PostService postService;
 
-  @PostMapping("/")
+  @GetMapping("/")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "search", required = false) String search,
       @RequestParam(name = "cursor", required = false) Integer cursor,
