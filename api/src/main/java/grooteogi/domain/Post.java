@@ -2,7 +2,6 @@ package grooteogi.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ public class Post {
   @OneToMany(mappedBy = "post",
       cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER)
   @JsonManagedReference
-  @JsonIgnore
   private List<PostHashtag> postHashtags = new ArrayList<>();
 
 }
