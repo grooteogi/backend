@@ -31,7 +31,7 @@ public class UserHashtagService {
   }
 
   public List<UserHashtag> getUserHashtag(int userId) {
-    Optional<UserHashtag> userHashtag = userHashtagRepository.findById(userId);
+    List<UserHashtag> userHashtag = userHashtagRepository.findByUserId(userId);
     if (userHashtag.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
