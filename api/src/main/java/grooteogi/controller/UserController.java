@@ -9,6 +9,7 @@ import grooteogi.dto.OauthDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
 import grooteogi.dto.response.BasicResponse;
+import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -119,15 +121,27 @@ public class UserController {
     );
   }
 
-  @PostMapping("/oauth")
-  public ResponseEntity<BasicResponse> oauth(@Valid @RequestBody OauthDto oauthDto,
-      BindingResult bindingResult) {
+  @GetMapping("/oauth/kakao")
+  public ResponseEntity<BasicResponse> oauhKakao(@RequestParam("code") String code) {
+    OauthDto oauthDto = new OauthDto();
+    oauthDto.setCode(code);
+    oauthDto.setType(LoginType.KAKAO);
 
-    if (bindingResult.hasErrors()) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
+    UserDto userDto = oauthClient.kakaoToken(oauthDto);
+    return oauth(userDto);
+  }
 
-    UserDto userDto = oauthClient.authenticate(oauthDto);
+  @GetMapping("/oauth/google")
+  public ResponseEntity<BasicResponse> oauthGoogle(@RequestParam("code") String code) {
+    OauthDto oauthDto = new OauthDto();
+    oauthDto.setCode(code);
+    oauthDto.setType(LoginType.GOOGLE);
+
+    UserDto userDto = oauthClient.googleToken(oauthDto);
+    return oauth(userDto);
+  }
+
+  private ResponseEntity oauth(UserDto userDto) {
     Map<String, Object> result = userService.oauth(userDto);
 
     Token token = (Token) result.get("token");

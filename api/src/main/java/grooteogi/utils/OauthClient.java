@@ -1,5 +1,7 @@
 package grooteogi.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -15,93 +17,92 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class OauthClient {
+  private final RestTemplate restTemplate;
 
   @Value("${custom.oauth2.kakao.client-id}")
   private String kakaoClientId;
+  @Value("${custom.oauth2.kakao.client-secret}")
+  private String kakaoClientSecret;
 
-  public UserDto authenticate(OauthDto oauthDto) {
-    switch (oauthDto.getType()) {
-      case KAKAO:
-        return kakaoToken(oauthDto);
-
-      case GOOGLE:
-        return googleAuth(oauthDto);
-
-      default:
-        throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
+  @Autowired
+  public OauthClient(RestTemplateBuilder restTemplateBuilder) {
+    this.restTemplate = restTemplateBuilder.build();
   }
 
   public UserDto kakaoToken(OauthDto oauthDto) {
     String accessToken = "";
-    try {
-      URL url = new URL("https://kauth.kakao.com/oauth/token");
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("POST");
-      conn.setDoOutput(true);
-      final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-      StringBuilder sb = new StringBuilder();
-      sb.append("grant_type=authorization_code");
-      sb.append("&client_id=" + kakaoClientId);
-      sb.append("&redirect_uri=http://localhost:8080/users"); // 임시 Redirect
-      sb.append("&code=" + oauthDto.getCode());
-      bw.write(sb.toString());
-      bw.flush();
-      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-      String line = "";
-      String result = "";
-      while ((line = br.readLine()) != null) {
-        result += line;
-      }
-      JsonParser parser = new JsonParser();
-      JsonElement element = parser.parse(result);
-      accessToken = element.getAsJsonObject().get("access_token").getAsString();
-      br.close();
-      bw.close();
 
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("grant_type", "authorization_code");
+    params.add("client_id", kakaoClientId);
+    params.add("client_secret", kakaoClientSecret);
+    params.add("redirect_uri", "http://localhost:8080/user/oauth");
+    params.add("code", oauthDto.getCode());
+
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://kauth.kakao.com/oauth/token";
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(response.getBody());
+      accessToken = element.getAsJsonObject().get("access_token").getAsString();
       UserDto userDto = kakaoAuth(accessToken);
       userDto.setType(oauthDto.getType());
       return userDto;
-    } catch (IOException e) {
-      throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
+    } catch (RestClientException e) {
+      throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
 
   private UserDto kakaoAuth(String token) {
     UserDto userDto = new UserDto();
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://kapi.kakao.com/v2/user/me";
     try {
-      URL url = new URL("https://kapi.kakao.com/v2/user/me");
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("GET");
-      conn.setRequestProperty("Authorization", "Bearer " + token);
-
-      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-      String line = "";
-      String result = "";
-
-      while ((line = br.readLine()) != null) {
-        result += line;
-      }
-
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
       JsonParser parser = new JsonParser();
-      JsonElement element = parser.parse(result);
+      JsonElement element = parser.parse(response.getBody());
 
       JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
       JsonObject kakaoAccount = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
 
-      userDto.setNickname(properties.getAsJsonObject().get("nickname").getAsString());
-      userDto.setEmail(kakaoAccount.getAsJsonObject().get("email").getAsString());
-    } catch (IOException e) {
+      userDto.setNickname(properties.get("nickname").getAsString());
+      userDto.setEmail(kakaoAccount.get("email").getAsString());
+    } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
     return userDto;
+  }
+
+  public UserDto googleToken(OauthDto oauthDto) {
+    return null;
   }
 
   private UserDto googleAuth(OauthDto oauthDto) {
