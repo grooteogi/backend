@@ -8,6 +8,7 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.JwtProvider;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,37 +55,51 @@ public class UserService {
   }
 
   public User register(UserDto userDto) {
-    switch (userDto.getType()) {
-      case GENERAL:
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        break;
+    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    userDto.setNickname("groot");
 
-      default:
-        userDto.setPassword(userDto.getToken());
-        break;
+    User registerUser = registerDto(userDto);
+    if (registerUser.getNickname().equals("groot")) {
+      registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     }
-    if (userDto.getNickname() == null) {
-      userDto.setNickname("groot");
-    }
-
-    User user = new User();
-    BeanUtils.copyProperties(userDto, user);
-
-    User registerUser = userRepository.save(user);
-    registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     return userRepository.save(registerUser);
   }
 
   public Token login(LoginDto loginDto) {
     User user = getUserByEmail(loginDto.getEmail());
-    if (loginDto.getPassword().isBlank()) {
-      return generateToken(user.getId(), loginDto.getEmail());
-    } else if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+    if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       return generateToken(user.getId(), loginDto.getEmail());
     } else {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
+  }
 
+  public Map<String, Object> oauth(UserDto userDto) {
+    Map<String, Object> result = new HashMap<String, Object>();
+
+    Optional<User> userEmail = userRepository.findByEmail(userDto.getEmail());
+    User user;
+    if (userEmail.isEmpty()) {
+      user = registerDto(userDto);
+    } else {
+      user = userEmail.get();
+    }
+
+    if (user.getType().equals(userDto.getType())) {
+      result.put("token", generateToken(user.getId(), user.getEmail()));
+    } else {
+      throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
+    }
+
+    result.put("user", user);
+    return result;
+  }
+
+  private User registerDto(UserDto userDto) {
+    User user = new User();
+    BeanUtils.copyProperties(userDto, user);
+
+    return userRepository.save(user);
   }
 
   private Token generateToken(int id, String email) {

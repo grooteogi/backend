@@ -5,23 +5,25 @@ import grooteogi.domain.User;
 import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
 import grooteogi.dto.LoginDto;
+import grooteogi.dto.OauthDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
 import grooteogi.dto.response.BasicResponse;
+import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
-import grooteogi.utils.AwsS3Client;
+import grooteogi.utils.OauthClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class UserController {
 
   private final UserService userService;
   private final EmailService emailService;
+  private final OauthClient oauthClient;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
@@ -88,10 +92,6 @@ public class UserController {
         .message("confirm email verification success").build());
   }
 
-  /*
-  일반 회원가입 중 가입 버튼을 누를 경우 ( 비밀번호 유효성 검사 )
-  TODO 일반 회원가입과 OAuth 회원가입의 dto를 다르게 할지 결정 필요. 다르게 할 시 api도 다르게
-   */
   @PostMapping("/register")
   public ResponseEntity<BasicResponse> register(@Valid @RequestBody UserDto userDto,
       BindingResult bindingResult) {
@@ -112,37 +112,49 @@ public class UserController {
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
-    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
+    ResponseCookie responseCookie = ResponseCookie.from("X-REFRESH-TOKEN", token.getRefreshToken())
+        .httpOnly(true).secure(true).path("/").build();
+    responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     return new ResponseEntity<>(
         BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
     );
   }
 
-  @PostMapping("/oauth/register")
-  public ResponseEntity<BasicResponse> oauthRegister(@Valid @RequestBody UserDto userDto,
-      BindingResult bindingResult) {
+  @GetMapping("/oauth/kakao")
+  public ResponseEntity<BasicResponse> oauhKakao(@RequestParam("code") String code) {
+    OauthDto oauthDto = new OauthDto();
+    oauthDto.setCode(code);
+    oauthDto.setType(LoginType.KAKAO);
 
-    if (bindingResult.hasErrors()) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
-
-    User user = userService.register(userDto);
-
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
+    UserDto userDto = oauthClient.kakaoToken(oauthDto);
+    return oauth(userDto);
   }
 
-  @PostMapping("/oauth/login")
-  public ResponseEntity<BasicResponse> oauthLogin(@RequestBody LoginDto loginDto) {
-    Token token = userService.login(loginDto);
-    User user = userService.getUserByEmail(loginDto.getEmail());
+  @GetMapping("/oauth/google")
+  public ResponseEntity<BasicResponse> oauthGoogle(@RequestParam("code") String code) {
+    OauthDto oauthDto = new OauthDto();
+    oauthDto.setCode(code);
+    oauthDto.setType(LoginType.GOOGLE);
+
+    UserDto userDto = oauthClient.googleToken(oauthDto);
+    return oauth(userDto);
+  }
+
+  private ResponseEntity oauth(UserDto userDto) {
+    Map<String, Object> result = userService.oauth(userDto);
+
+    Token token = (Token) result.get("token");
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
-    responseHeaders.set("X-REFRESH-TOKEN", token.getRefreshToken());
+    ResponseCookie responseCookie = ResponseCookie.from("X-REFRESH-TOKEN", token.getRefreshToken())
+        .httpOnly(true).secure(true).path("/").build();
+    responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     return new ResponseEntity<>(
-        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
+        BasicResponse.builder()
+            .data((User) result.get("user")).build(), responseHeaders, HttpStatus.OK
     );
   }
 
@@ -170,10 +182,12 @@ public class UserController {
       throw new ApiException((ApiExceptionEnum) result.get("status"));
     }
 
-    Map<String, Object> returnValue = new HashMap<String, Object>();
-    returnValue.put("token", result.get("token").toString());
-    returnValue.put("user", userService.getUser(Integer.parseInt(result.get("ID").toString())));
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.set("X-AUTH-TOKEN", result.get("token").toString());
+    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
-    return ResponseEntity.ok(BasicResponse.builder().data(returnValue).build());
+    return new ResponseEntity<>(
+        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
+    );
   }
 }
