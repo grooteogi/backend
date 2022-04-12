@@ -82,8 +82,14 @@ public class UserHashtagService {
             hashtagId[i]);
         Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId[i]);
 
+        //예외 처리
+        if (this.userHashtagRepository.findByUserIdAndHashtagId(userId, hashtagId[i]) == null) {
+          throw new ApiException(ApiExceptionEnum.USERHASHTAG_NOT_FOUND_EXCEPTION);
+        }
+
         //데이터 처리
         hashtag.get().setCount(hashtag.get().getCount() - 1);
+
 
         //리턴
         this.userHashtagRepository.delete(userHashtag);
