@@ -36,9 +36,8 @@ public class PostService {
 
   public Post getPost(int postId) {
 
-    //예외처리
     if (this.postRepository.findById(postId).isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
     //조회수 증가
