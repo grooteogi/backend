@@ -1,5 +1,6 @@
 package grooteogi.config;
 
+import grooteogi.utils.OauthClient;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
+  private final OauthClient oauthClient;
+
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.cors().configurationSource(request -> {
@@ -37,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     httpSecurity.csrf().disable()
         .formLogin().disable()
-        .headers().frameOptions().disable();
+        .headers().frameOptions().disable()
+        .and().oauth2Login().userInfoEndpoint().userService(oauthClient);
   }
 }
