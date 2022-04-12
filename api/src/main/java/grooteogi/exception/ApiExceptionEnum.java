@@ -27,7 +27,8 @@ public enum ApiExceptionEnum {
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."), //
   S3_UPLOAD_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."), //
   DUPLICATION_VALUE_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 값입니다."),
-  USERHASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 사용자 해시태그가 없습니다.");
+  USERHASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 사용자 해시태그가 없습니다."),
+  POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다.");
 
   private final HttpStatus httpStatus;
   private final Integer status;

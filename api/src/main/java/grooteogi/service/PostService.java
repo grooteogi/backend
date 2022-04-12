@@ -5,6 +5,8 @@ import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.exception.ApiException;
+import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
@@ -33,6 +35,11 @@ public class PostService {
   }
 
   public Post getPost(int postId) {
+
+    //예외처리
+    if (this.postRepository.findById(postId).isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+    }
 
     //조회수 증가
     Optional<Post> post = this.postRepository.findById(postId);
@@ -119,6 +126,10 @@ public class PostService {
 
   public List<Post> deletePost(int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
+
+    if (post.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
+    }
 
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
