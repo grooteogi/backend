@@ -56,7 +56,7 @@ public class JwtProvider {
       result.put("status", ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     } catch (JwtException e) {
       result.put("result", false);
-      result.put("status", ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      result.put("status", ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
 
     return result;

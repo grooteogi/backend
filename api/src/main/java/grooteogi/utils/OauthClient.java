@@ -1,7 +1,5 @@
 package grooteogi.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -9,17 +7,9 @@ import grooteogi.dto.OauthDto;
 import grooteogi.dto.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -56,7 +46,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", kakaoClientId);
     params.add("client_secret", kakaoClientSecret);
-    params.add("redirect_uri", "http://localhost:8080/user/oauth");
+    params.add("redirect_uri", "http://localhost:8080/user/oauth/kakao");
     params.add("code", oauthDto.getCode());
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
