@@ -1,0 +1,16 @@
+= Grooteogi API
+:toc: left
+:sectnums:
+:toclevels: 2
+:source-highlighter: highlightjs
+
+== User API
+
+==== Request
+include::{snippets}/user/http-request.adoc[]
+
+===== Try with curl
+include::{snippets}/user/curl-request.adoc[]
+
+==== Response
+include::{snippets}/user/http-response.adoc[]
