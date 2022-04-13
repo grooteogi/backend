@@ -1,5 +1,7 @@
-## 개요
+## Related Issue
 
-## 작업내용
+## Description
 
-## 주의사항
+## Changes
+
+## Note
