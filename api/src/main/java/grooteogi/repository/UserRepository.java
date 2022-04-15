@@ -18,5 +18,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
       value = "select * from user join user_info on user_info_id = :id",
       nativeQuery = true
   )
-  Optional<User> findUserById(@Param("id") Integer id);
+  Optional<User> findProfileById(@Param("id") Integer id);
 }

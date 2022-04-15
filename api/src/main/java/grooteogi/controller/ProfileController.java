@@ -21,17 +21,17 @@ public class ProfileController {
   private final ProfileService profileService;
 
   @GetMapping("/user/{userId}")
-  public ResponseEntity<BasicResponse> getUserInfo(@PathVariable Integer userId) {
-    User user = profileService.getUserInfo(userId);
+  public ResponseEntity<BasicResponse> getUserProfile(@PathVariable Integer userId) {
+    User user = profileService.getUserProfile(userId);
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/user/{userId}")
-  public ResponseEntity<BasicResponse> modifyUserInfo(@PathVariable Integer userId,
+  public ResponseEntity<BasicResponse> modifyUserProfile(@PathVariable Integer userId,
       @RequestBody ProfileDto profileDto) {
 
-    User user = profileService.modifyUserInfo(userId, profileDto);
+    User user = profileService.modifyUserProfile(userId, profileDto);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 }
