@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,12 +28,14 @@ public class UserInfo {
   @Column(length = 50)
   private String address;
 
-  @Column(length = 45)
-  private String collegeEmail;
+  @Column(nullable = true, length = 125)
+  private String imageUrl;
 
   @CreationTimestamp
   private Timestamp registered;
 
-  @OneToOne(mappedBy = "userInfo")
-  private User user;
+  @CreationTimestamp
+  private Timestamp modified;
+
+
 }
