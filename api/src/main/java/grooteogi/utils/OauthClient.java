@@ -7,6 +7,7 @@ import grooteogi.dto.OauthDto;
 import grooteogi.dto.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import java.net.URL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,10 @@ public class OauthClient {
   private String kakaoClientId;
   @Value("${custom.oauth2.kakao.client-secret}")
   private String kakaoClientSecret;
+  @Value("${security.oauth2.client.registration.google.client-id}")
+  private String googleClientId;
+  @Value("${security.oauth2.client.registration.google.client-secret}")
+  private String googleClientSecret;
 
   @Autowired
   public OauthClient(RestTemplateBuilder restTemplateBuilder) {
@@ -92,11 +97,55 @@ public class OauthClient {
   }
 
   public UserDto googleToken(OauthDto oauthDto) {
-    return null;
+    String accessToken = "";
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("grant_type", "authorization_code");
+    params.add("client_id", googleClientId);
+    params.add("client_secret", googleClientSecret);
+    params.add("redirect_uri", "http://localhost:8080/user/oauth/google");
+    params.add("code", oauthDto.getCode());
+    params.add("state", "url_parameter");
+
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://www.googleapis.com/oauth/v2/token";
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(response.getBody());
+      accessToken = element.getAsJsonObject().get("access_token").getAsString();
+      UserDto userDto = googleAuth(accessToken);
+      userDto.setType(oauthDto.getType());
+      return userDto;
+    } catch (RestClientException e) {
+      throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
+    }
   }
 
-  private UserDto googleAuth(OauthDto oauthDto) {
+  private UserDto googleAuth(String token) {
+    UserDto userDto = new UserDto();
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-    return null;
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://www.googleapis.com/userinfo/v2/me";
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(response.getBody());
+
+      userDto.setNickname(element.getAsJsonObject().get("name").getAsString());
+      userDto.setEmail(element.getAsJsonObject().get("email").getAsString());
+    } catch (RestClientException e) {
+      throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
+    }
+    return userDto;
   }
 }
