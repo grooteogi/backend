@@ -36,14 +36,13 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: error
-#security:
-#  oauth2:
-#    client:
-#      registration:
-#        google:
-#          client-id: ${GOOGLE_CLIENT_ID}
-#          client-secret: ${GOOGLE_CLIENT_SECRET_ID}
-#          redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+security:
+  oauth2:
+    client:
+      registration:
+        google:
+          client-id: ${GOOGLE_CLIENT_ID}
+          client-secret: ${GOOGLE_CLIENT_SECRET}
 custom:
   oauth2:
     kakao:

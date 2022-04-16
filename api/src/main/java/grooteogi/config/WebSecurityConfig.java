@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -37,12 +36,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
       return configuration;
     });
-
-    httpSecurity.authorizeRequests()
-        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
-
-    httpSecurity.csrf().disable()
-        .formLogin().disable()
-        .headers().frameOptions().disable();
   }
 }
