@@ -1,4 +1,6 @@
 spring:
+  origin:
+    url: "http://localhost:3000"
   jpa:
     hibernate:
       ddl-auto: update
