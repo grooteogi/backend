@@ -130,10 +130,11 @@ public class UserController {
     return oauth(userDto);
   }
 
-  @GetMapping( "/oauth/request")
+  @GetMapping("/oauth/request")
   public void request() {
     oauthClient.googleRequest();
   }
+
   @GetMapping("/oauth/google")
   public ResponseEntity<BasicResponse> oauthGoogle(@RequestParam("code") String code) {
     OauthDto oauthDto = new OauthDto();

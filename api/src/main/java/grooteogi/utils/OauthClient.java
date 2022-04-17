@@ -42,7 +42,8 @@ public class OauthClient {
   private String googleClientSecret;
 
   @Autowired
-  public OauthClient(RestTemplateBuilder restTemplateBuilder, HttpServletResponse httpServletResponse) {
+  public OauthClient(RestTemplateBuilder restTemplateBuilder,
+      HttpServletResponse httpServletResponse) {
     this.restTemplate = restTemplateBuilder.build();
     this.httpServletResponse = httpServletResponse;
   }
@@ -102,7 +103,7 @@ public class OauthClient {
     return userDto;
   }
 
-  public void googleRequest(){
+  public void googleRequest() {
     Map<String, Object> params = new HashMap<>();
     params.put("scope", "profile https://www.googleapis.com/auth/userinfo.email");
     params.put("response_type", "code");
@@ -121,6 +122,7 @@ public class OauthClient {
       e.printStackTrace();
     }
   }
+
   public UserDto googleToken(OauthDto oauthDto) {
     String accessToken = "";
 
@@ -151,7 +153,7 @@ public class OauthClient {
     }
   }
 
-  public UserDto googleAuth(String token) {
+  private UserDto googleAuth(String token) {
     UserDto userDto = new UserDto();
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
