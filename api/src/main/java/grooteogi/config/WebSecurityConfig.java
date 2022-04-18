@@ -36,5 +36,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
       return configuration;
     });
+
+    httpSecurity.csrf().disable()
+        .formLogin().disable()
+        .headers().frameOptions().disable();
   }
 }
