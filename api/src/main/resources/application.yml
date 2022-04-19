@@ -2,7 +2,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
   mail:
-    host: smtp.gmail.com
+    host: smtp-mail.outlook.com
     port: 587
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
