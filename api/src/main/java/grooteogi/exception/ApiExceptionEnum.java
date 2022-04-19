@@ -30,7 +30,8 @@ public enum ApiExceptionEnum {
   USERINFO_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저 프로필 정보를 찾을 수 없습니다."),
   PASSWORD_VALUE_EXCEPTION(HttpStatus.BAD_REQUEST, "비밀번호는 영문과 특수문자 숫자를 포함하며 8자 이상이어야 합니다."),
   USERHASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 사용자 해시태그가 없습니다."),
-  POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다.");
+  POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
+  HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다.");
 
   private final HttpStatus httpStatus;
   private final Integer status;
