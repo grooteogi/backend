@@ -12,6 +12,6 @@ public class UserHashtagDto {
   private Integer userId;
 
   @NotBlank(message = "hashtag id를 입력하세요.")
-  private Integer[] hashtagId;
+  private Integer[] hashtagIds;
 
 }

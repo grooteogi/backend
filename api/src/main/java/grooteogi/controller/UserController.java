@@ -15,7 +15,6 @@ import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -129,6 +128,11 @@ public class UserController {
 
     UserDto userDto = oauthClient.kakaoToken(oauthDto);
     return oauth(userDto);
+  }
+
+  @GetMapping("/oauth/request")
+  public void request() {
+    oauthClient.googleRequest();
   }
 
   @GetMapping("/oauth/google")

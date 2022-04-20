@@ -55,6 +55,10 @@ public class UserService {
   }
 
   public User register(UserDto userDto) {
+    Optional<User> user = userRepository.findByEmail(userDto.getEmail());
+    if (user.isPresent()) {
+      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
+    }
     userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
     userDto.setNickname("groot");
 

@@ -49,4 +49,5 @@ public class HashtagService {
     return this.hashtagRepository.save(createdHashtag);
   }
 
+
 }

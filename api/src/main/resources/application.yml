@@ -25,9 +25,9 @@ cloud:
       access-key: ${AWS_ACCESS_KEY}
       secret-key: $(AWS_SECRET_KEY}
     region:
-      static: ap-northeast-2
+      static: ${AWS_REGION_NAME}
     s3:
-      bucket: GRTG
+      bucket: ${AWS_BUCKET_NAME}
     stack:
       auto: false
 logging:
@@ -36,14 +36,14 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: error
-#security:
-#  oauth2:
-#    client:
-#      registration:
-#        google:
-#          client-id: ${GOOGLE_CLIENT_ID}
-#          client-secret: ${GOOGLE_CLIENT_SECRET_ID}
-#          redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+security:
+  oauth2:
+    client:
+      registration:
+        google:
+          client-id: ${GOOGLE_CLIENT_ID}
+          client-secret: ${GOOGLE_CLIENT_SECRET}
+          scope: profile,email
 custom:
   oauth2:
     kakao:
