@@ -6,11 +6,16 @@
 
 == User API
 
-==== Request
-include::{snippets}/user/http-request.adoc[]
+=== Register
 
-===== Try with curl
-include::{snippets}/user/curl-request.adoc[]
+==== Request
+include::{snippets}/user-register/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/user-register/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/user/http-response.adoc[]
+include::{snippets}/user-register/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/user-register/response-fields.adoc[]
