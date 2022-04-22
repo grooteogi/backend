@@ -14,7 +14,6 @@ import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
-import grooteogi.service.PwService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
 import java.util.List;
@@ -46,7 +45,6 @@ public class UserController {
   private final UserService userService;
   private final EmailService emailService;
   private final OauthClient oauthClient;
-  private final PwService pwService;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
@@ -198,7 +196,7 @@ public class UserController {
   public ResponseEntity<BasicResponse> modifyUserPw(@PathVariable Integer userId,
       @RequestBody PwDto pwDto) {
 
-    pwService.modifyUserPw(userId, pwDto);
+    userService.modifyUserPw(userId, pwDto);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("modify user password success").build());
   }
