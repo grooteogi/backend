@@ -26,6 +26,9 @@ public class HashtagService {
   public List<Hashtag> getTopTenHashtag(String type) {
     //count가 0이어도 불러올 수 있게 함
     //타입별 getTopTenHashtag로 불러오기
+    if (!type.equals("personality") && !type.equals("concern")) {
+      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+    }
     return this.hashtagRepository.getTopTenHashtag(type);
   }
 
@@ -45,5 +48,6 @@ public class HashtagService {
 
     return this.hashtagRepository.save(createdHashtag);
   }
+
 
 }

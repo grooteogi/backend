@@ -1,7 +1,7 @@
 package grooteogi.config;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,12 +10,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Value("${spring.origin.url}")
+  private String url;
 
   @Bean
   public PasswordEncoder getPasswordEncoder() {
@@ -25,15 +27,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.cors().configurationSource(request -> {
-      var cors = new CorsConfiguration();
-      cors.setAllowedOrigins(List.of("http://localhost:3000"));
-      cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-      cors.setAllowedHeaders(List.of("*"));
-      return cors;
-    });
+      final CorsConfiguration configuration = new CorsConfiguration();
 
-    httpSecurity.authorizeRequests()
-        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
+      configuration.addAllowedOrigin(url);
+      configuration.addAllowedHeader("*");
+      configuration.addAllowedMethod("*");
+      configuration.setAllowCredentials(true);
+
+      return configuration;
+    });
 
     httpSecurity.csrf().disable()
         .formLogin().disable()

@@ -7,6 +7,11 @@ import grooteogi.dto.OauthDto;
 import grooteogi.dto.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,15 +30,22 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class OauthClient {
   private final RestTemplate restTemplate;
+  private final HttpServletResponse httpServletResponse;
 
   @Value("${custom.oauth2.kakao.client-id}")
   private String kakaoClientId;
   @Value("${custom.oauth2.kakao.client-secret}")
   private String kakaoClientSecret;
+  @Value("${security.oauth2.client.registration.google.client-id}")
+  private String googleClientId;
+  @Value("${security.oauth2.client.registration.google.client-secret}")
+  private String googleClientSecret;
 
   @Autowired
-  public OauthClient(RestTemplateBuilder restTemplateBuilder) {
+  public OauthClient(RestTemplateBuilder restTemplateBuilder,
+      HttpServletResponse httpServletResponse) {
     this.restTemplate = restTemplateBuilder.build();
+    this.httpServletResponse = httpServletResponse;
   }
 
   public UserDto kakaoToken(OauthDto oauthDto) {
@@ -91,12 +103,78 @@ public class OauthClient {
     return userDto;
   }
 
-  public UserDto googleToken(OauthDto oauthDto) {
-    return null;
+  public void googleRequest() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("scope", "profile https://www.googleapis.com/auth/userinfo.email");
+    params.put("response_type", "code");
+    params.put("client_id", googleClientId);
+    params.put("redirect_uri", "http://localhost:8080/user/oauth/google");
+
+    String parameterString = params.entrySet().stream()
+        .map(x -> x.getKey() + "=" + x.getValue())
+        .collect(Collectors.joining("&"));
+
+    String url = "https://accounts.google.com/o/oauth2/v2/auth" + "?" + parameterString;
+
+    try {
+      httpServletResponse.sendRedirect(url);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
-  private UserDto googleAuth(OauthDto oauthDto) {
+  public UserDto googleToken(OauthDto oauthDto) {
+    String accessToken = "";
 
-    return null;
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("grant_type", "authorization_code");
+    params.add("client_id", googleClientId);
+    params.add("client_secret", googleClientSecret);
+    params.add("redirect_uri", "http://localhost:8080/user/oauth/google");
+    params.add("code", oauthDto.getCode());
+    params.add("state", "url_parameter");
+
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://oauth2.googleapis.com/token";
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(response.getBody());
+      accessToken = element.getAsJsonObject().get("access_token").getAsString();
+      UserDto userDto = googleAuth(accessToken);
+      userDto.setType(oauthDto.getType());
+      return userDto;
+    } catch (RestClientException e) {
+      throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
+    }
+  }
+
+  private UserDto googleAuth(String token) {
+    UserDto userDto = new UserDto();
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+    String url = "https://www.googleapis.com/oauth2/v3/userinfo";
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(response.getBody());
+
+      userDto.setNickname(element.getAsJsonObject().get("name").getAsString());
+      userDto.setEmail(element.getAsJsonObject().get("email").getAsString());
+    } catch (RestClientException e) {
+      e.printStackTrace();
+      throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
+    }
+    return userDto;
   }
 }
