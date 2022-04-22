@@ -2,7 +2,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
   mail:
-    host: smtp.gmail.com
+    host: smtp-mail.outlook.com
     port: 587
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
@@ -16,14 +16,11 @@ spring:
     secret: ${JWT_KEY}
   session:
     timeout: 300
-    store-type : redis
+    store-type: redis
     redis:
       namespace: spring:session
 cloud:
   aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: $(AWS_SECRET_KEY}
     region:
       static: ${AWS_REGION_NAME}
     s3:
