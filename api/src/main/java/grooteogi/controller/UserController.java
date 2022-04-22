@@ -6,6 +6,7 @@ import grooteogi.dto.EmailCodeRequest;
 import grooteogi.dto.EmailRequest;
 import grooteogi.dto.LoginDto;
 import grooteogi.dto.OauthDto;
+import grooteogi.dto.PwDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
 import grooteogi.dto.response.BasicResponse;
@@ -13,9 +14,9 @@ import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;
+import grooteogi.service.PwService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +46,7 @@ public class UserController {
   private final UserService userService;
   private final EmailService emailService;
   private final OauthClient oauthClient;
+  private final PwService pwService;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
@@ -189,5 +192,14 @@ public class UserController {
     return new ResponseEntity<>(
         BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
     );
+  }
+
+  @PatchMapping("/user/{userId}/password")
+  public ResponseEntity<BasicResponse> modifyUserPw(@PathVariable Integer userId,
+      @RequestBody PwDto pwDto) {
+
+    pwService.modifyUserPw(userId, pwDto);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("modify user password success").build());
   }
 }
