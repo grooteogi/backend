@@ -6,7 +6,6 @@ import lombok.Getter;
 public class ProfileDto {
 
   private String nickname;
-  private String password;
   private String imageUrl;
   private String name;
   private String address;

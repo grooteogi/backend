@@ -6,7 +6,6 @@ import grooteogi.dto.ProfileDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
-import grooteogi.utils.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,12 +17,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProfileService {
   private final UserRepository userRepository;
-  private final Validator validator;
 
   public User getUserProfile(Integer userId) {
     Optional<User> user = userRepository.findProfileById(userId);
     if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USERINFO_NOT_FOUND_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
     return user.get();
   }
@@ -48,10 +46,6 @@ public class ProfileService {
     }
     user.get().setNickname(profileDto.getNickname());
 
-    if (!user.get().getPassword().equals(profileDto.getPassword())) {
-      validator.confirmPasswordVerification(profileDto.getPassword());
-      user.get().setPassword(profileDto.getPassword());
-    }
     user.get().setModified(Timestamp.valueOf(LocalDateTime.now()));
     return userRepository.save(user.get());
   }
