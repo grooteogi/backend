@@ -40,12 +40,14 @@ public class AwsS3Service {
     return this.amazonS3Client.getUrl(this.bucket, fileName).toString();
   }
 
-  public void deleteImage(String fileName) {
+  public String deleteImage(String fileName) {
 
     if (!this.amazonS3Client.doesObjectExist(this.bucket, fileName)) {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
     amazonS3Client.deleteObject(new DeleteObjectRequest(this.bucket, fileName));
+
+    return "삭제가 정상적으로 완료되었습니다.";
   }
 
   private String createFileName(String fileName) {

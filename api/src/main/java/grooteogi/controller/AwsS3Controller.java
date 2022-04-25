@@ -1,5 +1,6 @@
 package grooteogi.controller;
 
+import grooteogi.dto.response.BasicResponse;
 import grooteogi.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,15 @@ public class AwsS3Controller {
 
 
   @PostMapping("/image")
-  public ResponseEntity<String> uploadImage(@RequestParam MultipartFile multipartFile) {
-    return ResponseEntity.ok(awsS3Service.uploadImage(multipartFile));
+  public ResponseEntity<BasicResponse> uploadImage(@RequestParam MultipartFile multipartFile) {
+    String image = awsS3Service.uploadImage(multipartFile);
+    return ResponseEntity.ok(BasicResponse.builder().data(image).build());
   }
 
   @DeleteMapping("/image")
-  public ResponseEntity<Void> deleteImage(@RequestParam String fileName) {
-    awsS3Service.deleteImage(fileName);
-    return ResponseEntity.ok(null);
+  public ResponseEntity<BasicResponse> deleteImage(@RequestParam String fileName) {
+    String deleteImage = awsS3Service.deleteImage(fileName);
+    return ResponseEntity.ok(BasicResponse.builder().data(deleteImage).build());
   }
 
 }
