@@ -197,7 +197,7 @@ public class UserController {
     );
   }
 
-  @PatchMapping("/user/{userId}/password")
+  @PatchMapping("/{userId}/password")
   public ResponseEntity<BasicResponse> modifyUserPw(@PathVariable Integer userId,
       @RequestBody PwDto pwDto) {
 
