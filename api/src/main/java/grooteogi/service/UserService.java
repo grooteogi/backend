@@ -135,7 +135,7 @@ public class UserService {
     }
 
     if (passwordEncoder.matches(pwDto.getPassword(), user.get().getPassword())) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
     validator.confirmPasswordVerification(pwDto.getPassword());
