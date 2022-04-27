@@ -62,13 +62,13 @@ public class PostService {
     createdPost.setImageUrl(postDto.getImageUrl());
 
     //Post Hashtag 저장
-    Arrays.stream(postDto.getHashtagIds()).forEach(hashtagId -> {
+    Arrays.stream(postDto.getHashtags()).forEach(name -> {
       PostHashtag createdPostHashtag = new PostHashtag();
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId);
+      Hashtag hashtag = this.hashtagRepository.findByTag(name);
 
-      hashtag.get().setCount(hashtag.get().getCount() + 1);
+      hashtag.setCount(hashtag.getCount() + 1);
 
-      createdPostHashtag.setHashTag(hashtag.get());
+      createdPostHashtag.setHashTag(hashtag);
       createdPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       createdPostHashtag.setPost(createdPost);
 
@@ -94,31 +94,30 @@ public class PostService {
     //hashtag count - 1
     List<PostHashtag> postHashtagList = modifiedPost.get().getPostHashtags();
 
-    for (PostHashtag postHashtag : postHashtagList) {
+    postHashtagList.forEach(postHashtag -> {
       Hashtag beforeHashtag = postHashtag.getHashTag();
       beforeHashtag.setCount(beforeHashtag.getCount() - 1);
       this.postHashtagRepository.delete(postHashtag);
-    }
+    });
 
     modifiedPost.get().getPostHashtags().clear();
 
 
     //PostHashtag 저장
-    Integer[] hashtagIds = modifiedDto.getHashtagIds();
+    String[] hashtags = modifiedDto.getHashtags();
 
-    for (int hashtagId : hashtagIds) {
+    Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(hashtagId);
+      Hashtag hashtag = this.hashtagRepository.findByTag(name);
 
-      hashtag.get().setCount(hashtag.get().getCount() + 1);
+      hashtag.setCount(hashtag.getCount() + 1);
 
-      modifiedPostHashtag.setHashTag(hashtag.get());
+      modifiedPostHashtag.setHashTag(hashtag);
       modifiedPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       modifiedPostHashtag.setPost(modifiedPost.get());
 
       modifiedPost.get().getPostHashtags().add(modifiedPostHashtag);
-    }
-
+    });
 
     return modifiedPost.get();
   }
@@ -132,12 +131,10 @@ public class PostService {
 
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
-
-    //hashtag count - 1
-    for (PostHashtag postHashtag : postHashtagList) {
+    postHashtagList.forEach(postHashtag -> {
       Optional<Hashtag> hashtag = this.hashtagRepository.findById(postHashtag.getHashTag().getId());
       hashtag.get().setCount(hashtag.get().getCount() - 1);
-    }
+    });
 
     this.postRepository.delete(post.get());
 
