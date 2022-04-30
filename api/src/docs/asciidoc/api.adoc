@@ -23,18 +23,32 @@ include::{snippets}/user-register/response-fields.adoc[]
 === Get All User
 
 ==== Request
-include::{snippets}/user-get-all/http-request.adoc[]
+include::{snippets}/get-all-user/http-request.adoc[]
 
 ==== Response
-include::{snippets}/user-get-all/http-response.adoc[]
+include::{snippets}/get-all-user/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/get-all-user/response-fields.adoc[]
 
 === Get User
 
 ==== Request
-include::{snippets}/user-get-id/http-request.adoc[]
+include::{snippets}/get-user/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/get-user/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/user-get-id/http-response.adoc[]
+include::{snippets}/get-user/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/get-user/response-fields.adoc[]
 
 === Delete User
 
+==== Request
+include::{snippets}/delete-user/http-request.adoc[]
+
+==== Response
+include::{snippets}/delete-user/http-response.adoc[]
