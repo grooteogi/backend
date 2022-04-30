@@ -1,7 +1,7 @@
 package grooteogi.service;
 
-import grooteogi.dto.EmailCodeRequest;
-import grooteogi.dto.EmailRequest;
+import grooteogi.dto.EmailCodeDto;
+import grooteogi.dto.EmailDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -28,11 +28,11 @@ public class EmailService {
 
   private final String prefix = "email_verify";
 
-  private boolean isExist(EmailRequest email) {
+  private boolean isExist(EmailDto email) {
     return userRepository.existsByEmail(email.getEmail());
   }
 
-  public void createEmailVerification(EmailRequest email) {
+  public void createEmailVerification(EmailDto email) {
     if (isExist(email)) {
       throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
     }
@@ -40,7 +40,7 @@ public class EmailService {
     sendMail(email.getEmail(), code);
   }
 
-  public void confirmEmailVerification(EmailCodeRequest emailCodeRequest) {
+  public void confirmEmailVerification(EmailCodeDto emailCodeRequest) {
     String key = prefix + emailCodeRequest.getEmail();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(emailCodeRequest.getCode())) {
