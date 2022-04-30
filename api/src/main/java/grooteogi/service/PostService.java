@@ -34,6 +34,15 @@ public class PostService {
     return this.postRepository.findAll();
   }
 
+  private Post setPostDefault(Post post, PostDto postDto) {
+    post.setTitle(postDto.getTitle());
+    post.setContent(postDto.getContent());
+    post.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
+    post.setImageUrl(postDto.getImageUrl());
+
+    return post;
+  }
+
   public Post getPost(int postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
@@ -55,11 +64,8 @@ public class PostService {
 
     //Post 저장
     createdPost.setUser(user.get());
-    createdPost.setTitle(postDto.getTitle());
-    createdPost.setContent(postDto.getContent());
     createdPost.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-    createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
-    createdPost.setImageUrl(postDto.getImageUrl());
+    this.setPostDefault(createdPost, postDto);
 
     //Post Hashtag 저장
     Arrays.stream(postDto.getHashtags()).forEach(name -> {
@@ -85,11 +91,7 @@ public class PostService {
   public Post modifyPost(PostDto modifiedDto, int postId) {
     Optional<Post> modifiedPost = this.postRepository.findById(postId);
 
-    //Post 데이터 처리
-    modifiedPost.get().setTitle(modifiedDto.getTitle());
-    modifiedPost.get().setContent(modifiedDto.getContent());
-    modifiedPost.get().setImageUrl(modifiedDto.getImageUrl());
-    modifiedPost.get().setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
+    this.setPostDefault(modifiedPost.get(), modifiedDto);
 
     //hashtag count - 1
     List<PostHashtag> postHashtagList = modifiedPost.get().getPostHashtags();
