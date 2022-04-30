@@ -68,12 +68,9 @@ public class UserDocumentationTests {
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
-    mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-        .apply(documentationConfiguration(restDocumentation)
-            .operationPreprocessors()
-            .withRequestDefaults(prettyPrint())
-            .withResponseDefaults(prettyPrint()))
-        .build();
+    mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(
+        documentationConfiguration(restDocumentation).operationPreprocessors()
+            .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
   }
 
   public UserDto getUserDto() {
@@ -106,40 +103,26 @@ public class UserDocumentationTests {
 
     // then
     ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/user/register")
-            .characterEncoding("utf-8")
+        RestDocumentationRequestBuilders.post("/user/register").characterEncoding("utf-8")
             .content(objectMapper.writeValueAsString(userDto))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-    );
-    result.andExpect(status().isOk())
-        .andDo(print())
-        .andDo(
-            document("user-register",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                requestFields(
-                    fieldWithPath("type").description("로그인 타입"),
-                    fieldWithPath("email").description("이메일"),
-                    fieldWithPath("password").description("패스워드")
-                ),
-                responseFields(
-                    fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("data.id").description("아이디"),
-                    fieldWithPath("data.type").description("타입"),
-                    fieldWithPath("data.nickname").description("닉네임"),
-                    fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
-                    fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
-                        .optional(),
-                    fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
-                        .optional(),
-                    fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY)
-                        .description("해시태그"),
-                    fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트")
-                )
-            )
-        );
+            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+    result.andExpect(status().isOk()).andDo(print()).andDo(
+        document("user-register", getDocumentRequest(), getDocumentResponse(),
+            requestFields(fieldWithPath("type").description("로그인 타입"),
+                fieldWithPath("email").description("이메일"),
+                fieldWithPath("password").description("패스워드")),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("data.id").description("아이디"),
+                fieldWithPath("data.type").description("타입"),
+                fieldWithPath("data.nickname").description("닉네임"),
+                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
+                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
+                    .optional(),
+                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
+                    .optional(),
+                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
+                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"))));
   }
 
   @DisplayName("모든 회원정보 조회")
@@ -153,37 +136,24 @@ public class UserDocumentationTests {
 
     //then
     ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/user")
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
+        RestDocumentationRequestBuilders.get("/user").characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON));
 
-    result.andExpect(status().isOk())
-        .andDo(print())
-        .andDo(
-            document("get-all-user",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                responseFields(
-                    fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("count").description("리스트 카운트"),
-                    fieldWithPath("data.[].id").description("아이디"),
-                    fieldWithPath("data.[].type").description("타입"),
-                    fieldWithPath("data.[].nickname").description("닉네임"),
-                    fieldWithPath("data.[].password").type(JsonFieldType.STRING)
-                        .description("패스워드"),
-                    fieldWithPath("data.[].email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("data.[].modified").type(JsonFieldType.STRING).description("수정날짜")
-                        .optional(),
-                    fieldWithPath("data.[].registered").type(JsonFieldType.STRING)
-                        .description("가입날짜")
-                        .optional(),
-                    fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY)
-                        .description("해시태그"),
-                    fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트")
-                )
-            )
-        );
+    result.andExpect(status().isOk()).andDo(print()).andDo(
+        document("get-all-user", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("count").description("리스트 카운트"),
+                fieldWithPath("data.[].id").description("아이디"),
+                fieldWithPath("data.[].type").description("타입"),
+                fieldWithPath("data.[].nickname").description("닉네임"),
+                fieldWithPath("data.[].password").type(JsonFieldType.STRING).description("패스워드"),
+                fieldWithPath("data.[].email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("data.[].modified").type(JsonFieldType.STRING).description("수정날짜")
+                    .optional(),
+                fieldWithPath("data.[].registered").type(JsonFieldType.STRING).description("가입날짜")
+                    .optional(),
+                fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
+                fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트"))));
   }
 
   @DisplayName("회원정보 조회")
@@ -195,33 +165,41 @@ public class UserDocumentationTests {
     given(userService.getUser(userId)).willReturn(testUser);
 
     ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/user/{userId}", userId)
-            .characterEncoding("utf-8")
+        RestDocumentationRequestBuilders.get("/user/{userId}", userId).characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON));
+    result.andExpect(status().isOk()).andDo(print()).andDo(
+        document("get-user", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("data.id").description("아이디"),
+                fieldWithPath("data.type").description("타입"),
+                fieldWithPath("data.nickname").description("닉네임"),
+                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
+                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
+                    .optional(),
+                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
+                    .optional(),
+                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
+                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"))));
+  }
+
+  @DisplayName("회원정보 삭제")
+  @Test
+  void deleteUser() throws Exception {
+    int userId = anyInt();
+
+    ResultActions result = mockMvc.perform(
+        RestDocumentationRequestBuilders.delete("/user/{userId}", userId)
             .accept(MediaType.APPLICATION_JSON)
     );
+
     result.andExpect(status().isOk())
         .andDo(print())
         .andDo(
-            document("get-user",
+            document("delete-user",
                 getDocumentRequest(),
-                getDocumentResponse(),
-                responseFields(
-                    fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("data.id").description("아이디"),
-                    fieldWithPath("data.type").description("타입"),
-                    fieldWithPath("data.nickname").description("닉네임"),
-                    fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
-                    fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
-                        .optional(),
-                    fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
-                        .optional(),
-                    fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY)
-                        .description("해시태그"),
-                    fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트")
-                )
-            )
-        );
+                getDocumentResponse()
+            ));
   }
 }
 
