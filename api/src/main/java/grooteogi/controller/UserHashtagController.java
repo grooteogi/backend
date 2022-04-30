@@ -60,8 +60,8 @@ public class UserHashtagController {
 
   @DeleteMapping("/hashtag")
   public ResponseEntity<BasicResponse> deleteUserHashtag(@RequestParam int userId,
-      int[] hashtagId) {
-    List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtagId);
+      String[] hashtags) {
+    List<UserHashtag> hashtagList = userHashtagService.deleteUserHashtag(userId, hashtags);
     return ResponseEntity.ok(
         BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
