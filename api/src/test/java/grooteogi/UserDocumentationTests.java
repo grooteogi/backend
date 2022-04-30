@@ -21,6 +21,8 @@ import grooteogi.enums.LoginType;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,15 +83,15 @@ public class UserDocumentationTests {
     return userDto;
   }
 
-    private User getTestUser() {
-      User user = new User();
-      user.setId(1);
-      user.setType(LoginType.GENERAL);
-      user.setEmail("groot@example.com");
-      user.setPassword(passwordEncoder.encode("groot1234*"));
-      user.setNickname("groot-1");
-      return user;
-    }
+  private User getTestUser() {
+    User user = new User();
+    user.setId(1);
+    user.setType(LoginType.GENERAL);
+    user.setEmail("groot@example.com");
+    user.setPassword(passwordEncoder.encode("groot1234*"));
+    user.setNickname("groot-1");
+    return user;
+  }
 
   @DisplayName("회원가입 테스트")
   @Test
@@ -98,8 +100,10 @@ public class UserDocumentationTests {
     UserDto userDto = getUserDto(); // for  request
     User testUser = getTestUser(); // for response
 
-    given(userService.register(any())).willReturn(testUser);
     // when
+    given(userService.register(any())).willReturn(testUser);
+
+    // then
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders.post("/user/register")
             .characterEncoding("utf-8")
@@ -107,7 +111,6 @@ public class UserDocumentationTests {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
     );
-    // then
     result.andExpect(status().isOk())
         .andDo(print())
         .andDo(
@@ -126,12 +129,58 @@ public class UserDocumentationTests {
                     fieldWithPath("data.nickname").description("닉네임"),
                     fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
                     fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜").optional(),
-                    fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜").optional(),
-                    fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
+                    fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
+                        .optional(),
+                    fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
+                        .optional(),
+                    fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY)
+                        .description("해시태그"),
                     fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트")
                 )
             )
         );
   }
-}
+
+  @DisplayName("모든 회원정보 조회")
+  @Test
+  void getAllUser() throws Exception {
+
+    User testUser = getTestUser();
+    List<User> userList = new ArrayList<>();
+    userList.add(testUser);
+    given(userService.getAllUser()).willReturn(userList);
+
+    //then
+    ResultActions result = mockMvc.perform(
+        RestDocumentationRequestBuilders.get("/user")
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    result.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("get-all-user",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("count").description("리스트 카운트"),
+                    fieldWithPath("data.[].id").description("아이디"),
+                    fieldWithPath("data.[].type").description("타입"),
+                    fieldWithPath("data.[].nickname").description("닉네임"),
+                    fieldWithPath("data.[].password").type(JsonFieldType.STRING).description("패스워드"),
+                    fieldWithPath("data.[].email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("data.[].modified").type(JsonFieldType.STRING).description("수정날짜")
+                        .optional(),
+                    fieldWithPath("data.[].registered").type(JsonFieldType.STRING).description("가입날짜")
+                        .optional(),
+                    fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY)
+                        .description("해시태그"),
+                    fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트")
+                )
+            )
+        );
+  }
+  }
+
