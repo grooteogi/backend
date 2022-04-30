@@ -2,8 +2,8 @@ package grooteogi.controller;
 
 
 import grooteogi.domain.User;
-import grooteogi.dto.EmailCodeRequest;
-import grooteogi.dto.EmailRequest;
+import grooteogi.dto.EmailCodeDto;
+import grooteogi.dto.EmailDto;
 import grooteogi.dto.LoginDto;
 import grooteogi.dto.OauthDto;
 import grooteogi.dto.PwDto;
@@ -71,7 +71,7 @@ public class UserController {
   */
   @PostMapping("/email-verification/create")
   public ResponseEntity<BasicResponse> createEmailVerification(
-      @Valid @RequestBody EmailRequest email, BindingResult bindingResult) {
+      @Valid @RequestBody EmailDto email, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
@@ -86,7 +86,7 @@ public class UserController {
   */
   @PostMapping("/email-verification/confirm")
   public ResponseEntity<BasicResponse> confirmEmailVerification(
-      @RequestBody EmailCodeRequest emailCodeRequest) {
+      @RequestBody EmailCodeDto emailCodeRequest) {
     emailService.confirmEmailVerification(emailCodeRequest);
 
     return ResponseEntity.ok(BasicResponse.builder()
@@ -197,7 +197,7 @@ public class UserController {
     );
   }
 
-  @PatchMapping("/user/{userId}/password")
+  @PatchMapping("/{userId}/password")
   public ResponseEntity<BasicResponse> modifyUserPw(@PathVariable Integer userId,
       @RequestBody PwDto pwDto) {
 
