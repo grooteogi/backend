@@ -120,11 +120,11 @@ public class UserService {
   }
 
   // TODO change public to private
-  public Map verify(String authorizationHeader) {
+  public Map tokenVerify(String authorizationHeader) {
     return jwtProvider.verifyToken(authorizationHeader);
   }
 
-  public Map refresh(String authorizationHeader, String refreshToken) {
+  public Map tokenRefresh(String authorizationHeader, String refreshToken) {
     return jwtProvider.refreshToken(authorizationHeader, refreshToken);
   }
 

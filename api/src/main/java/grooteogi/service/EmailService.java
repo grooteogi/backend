@@ -1,7 +1,6 @@
 package grooteogi.service;
 
 import grooteogi.dto.EmailCodeDto;
-import grooteogi.dto.EmailDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -19,34 +18,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EmailService {
 
-  @Value("${spring.mail.username}")
-  private String mailServer;
-
   private final UserRepository userRepository;
   private final JavaMailSender javaMailSender;
   private final RedisClient redisClient;
-
   private final String prefix = "email_verify";
 
-  private boolean isExist(EmailDto email) {
-    return userRepository.existsByEmail(email.getEmail());
-  }
-
-  public void createEmailVerification(EmailDto email) {
-    if (isExist(email)) {
-      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
-    }
-    String code = createCode();
-    sendMail(email.getEmail(), code);
-  }
-
-  public void confirmEmailVerification(EmailCodeDto emailCodeRequest) {
-    String key = prefix + emailCodeRequest.getEmail();
-    String value = redisClient.getValue(key);
-    if (value == null || !value.equals(emailCodeRequest.getCode())) {
-      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
-    }
-  }
+  @Value("${spring.mail.username}")
+  private String mailServer;
 
   private static String createCode() {
     Random random = new Random();
@@ -62,10 +40,29 @@ public class EmailService {
     return code.toString();
   }
 
+  private boolean isExist(String email) {
+    return userRepository.existsByEmail(email);
+  }
+
+  public void sendVerifyEmail(String email) {
+    if (isExist(email)) {
+      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
+    }
+    String code = createCode();
+    sendMail(email, code);
+  }
+
+  public void checkVerifyEmail(EmailCodeDto emailCodeRequest) {
+    String key = prefix + emailCodeRequest.getEmail();
+    String value = redisClient.getValue(key);
+    if (value == null || !value.equals(emailCodeRequest.getCode())) {
+      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
+    }
+  }
+
   public void sendMail(String email, String code) {
     String subject = "제목: 그루터기 회원 가입 인증 절차";
-    String text = "회원 가입을 위한 인증번호는 " + code + " 입니다. "
-        + "제한 시간 3분 이내에 인증번호를 입력해주세요.";
+    String text = "회원 가입을 위한 인증번호는 " + code + " 입니다. " + "제한 시간 3분 이내에 인증번호를 입력해주세요.";
 
     try {
       MimeMessage mimeMessage = javaMailSender.createMimeMessage();
