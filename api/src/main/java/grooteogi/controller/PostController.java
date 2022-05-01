@@ -34,16 +34,14 @@ public class PostController {
     if (cursor == null) {
       cursor = 0;
     }
-    CursorResult<Post> posts =
-        postService.search(search, cursor, type, PageRequest.of(0, 20));
+    CursorResult<Post> posts = postService.search(search, cursor, type, PageRequest.of(0, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
     Post post = postService.getPost(postId);
-    return ResponseEntity.ok(
-        BasicResponse.builder().data(post).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
   @PostMapping
@@ -53,8 +51,8 @@ public class PostController {
   }
 
   @PutMapping("/{postId}")
-  public ResponseEntity<BasicResponse> modifyPost(
-      @RequestBody PostDto modifiedDto, @PathVariable int postId) {
+  public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto modifiedDto,
+      @PathVariable int postId) {
     Post modifiedPost = this.postService.modifyPost(modifiedDto, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
@@ -62,7 +60,7 @@ public class PostController {
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
     List<Post> deletePost = this.postService.deletePost(postId);
-    return ResponseEntity.ok(BasicResponse.builder().count(
-        deletePost.size()).data(deletePost).build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().count(deletePost.size()).data(deletePost).build());
   }
 }
