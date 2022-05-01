@@ -18,7 +18,6 @@ public class AwsS3Controller {
 
   private final AwsS3Service awsS3Service;
 
-
   @PostMapping("/image")
   public ResponseEntity<BasicResponse> uploadImage(@RequestParam MultipartFile multipartFile) {
     String imageUrl = awsS3Service.uploadImage(multipartFile);
@@ -30,5 +29,4 @@ public class AwsS3Controller {
     awsS3Service.deleteImage(fileName);
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
-
 }

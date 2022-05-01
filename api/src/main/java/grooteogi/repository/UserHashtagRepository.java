@@ -10,5 +10,4 @@ public interface UserHashtagRepository extends JpaRepository<UserHashtag, Intege
   List<UserHashtag> findByUserId(int userId);
 
   UserHashtag findByUserIdAndHashtagId(int userId, int hashtagId);
-
 }

@@ -45,7 +45,6 @@ public class UserHashtagService {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
 
-
     String[] hashtags = userHashtagDto.getHashtags();
 
     Arrays.stream(hashtags).forEach(name -> {

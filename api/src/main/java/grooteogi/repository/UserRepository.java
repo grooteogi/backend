@@ -14,9 +14,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
   boolean existsByNickname(String nickname);
 
-  @Query(
-      value = "select * from user join user_info on user_info_id = :id",
-      nativeQuery = true
-  )
+  @Query(value = "select * from user join user_info on user_info_id = :id", nativeQuery = true)
   Optional<User> findProfileById(@Param("id") Integer id);
 }

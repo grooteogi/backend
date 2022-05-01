@@ -65,6 +65,4 @@ public class UserHashtagController {
     return ResponseEntity.ok(
         BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
-
-
 }

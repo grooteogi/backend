@@ -1,6 +1,5 @@
 package grooteogi.service;
 
-
 import grooteogi.domain.Hashtag;
 import grooteogi.dto.HashtagDto;
 import grooteogi.enums.HashtagType;
@@ -44,7 +43,6 @@ public class HashtagService {
     createdHashtag.setHashtagType(HashtagType.PERSONALITY);
     createdHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
     createdHashtag.setTag(hashtagDto.getTag());
-
 
     return this.hashtagRepository.save(createdHashtag);
   }

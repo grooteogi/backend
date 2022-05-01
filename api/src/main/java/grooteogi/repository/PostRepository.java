@@ -25,5 +25,4 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   List<Post> findByIdLessThanOrderByIdDesc(Integer id, Pageable page);
 
   List<Post> findAllByOrderByIdDesc(Pageable page);
-
 }

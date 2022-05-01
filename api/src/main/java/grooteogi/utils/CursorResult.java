@@ -14,5 +14,4 @@ public class CursorResult<T> {
     this.values = values;
     this.hasNext = hasNext;
   }
-
 }

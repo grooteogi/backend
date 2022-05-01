@@ -70,8 +70,8 @@ public class UserController {
   일반 회원가입 중 이메일 인증 버튼 누를 경우 ( 유효성 검사, 이메일 중복 검사 )
   */
   @PostMapping("/email-verification/create")
-  public ResponseEntity<BasicResponse> createEmailVerification(
-      @Valid @RequestBody EmailDto email, BindingResult bindingResult) {
+  public ResponseEntity<BasicResponse> createEmailVerification(@Valid @RequestBody EmailDto email,
+      BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
@@ -89,8 +89,8 @@ public class UserController {
       @RequestBody EmailCodeDto emailCodeRequest) {
     emailService.confirmEmailVerification(emailCodeRequest);
 
-    return ResponseEntity.ok(BasicResponse.builder()
-        .message("confirm email verification success").build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("confirm email verification success").build());
   }
 
   @PostMapping("/register")
@@ -117,9 +117,8 @@ public class UserController {
         .httpOnly(true).secure(true).path("/").build();
     responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-    return new ResponseEntity<>(
-        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
-    );
+    return new ResponseEntity<>(BasicResponse.builder().data(user).build(), responseHeaders,
+        HttpStatus.OK);
   }
 
   @GetMapping("/oauth/kakao")
@@ -158,10 +157,8 @@ public class UserController {
         .httpOnly(true).secure(true).path("/").build();
     responseHeaders.set(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-    return new ResponseEntity<>(
-        BasicResponse.builder()
-            .data((User) result.get("user")).build(), responseHeaders, HttpStatus.OK
-    );
+    return new ResponseEntity<>(BasicResponse.builder().data((User) result.get("user")).build(),
+        responseHeaders, HttpStatus.OK);
   }
 
   @GetMapping("/token/verify")
@@ -192,9 +189,8 @@ public class UserController {
     responseHeaders.set("X-AUTH-TOKEN", result.get("token").toString());
     User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
 
-    return new ResponseEntity<>(
-        BasicResponse.builder().data(user).build(), responseHeaders, HttpStatus.OK
-    );
+    return new ResponseEntity<>(BasicResponse.builder().data(user).build(), responseHeaders,
+        HttpStatus.OK);
   }
 
   @PatchMapping("/{userId}/password")
@@ -202,7 +198,7 @@ public class UserController {
       @RequestBody PwDto pwDto) {
 
     userService.modifyUserPw(userId, pwDto);
-    return ResponseEntity.ok(BasicResponse.builder()
-        .message("modify user password success").build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("modify user password success").build());
   }
 }

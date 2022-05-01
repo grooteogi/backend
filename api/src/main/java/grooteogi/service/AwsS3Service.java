@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @RequiredArgsConstructor
 public class AwsS3Service {
+
   private final AmazonS3Client amazonS3Client;
 
   @Value("${cloud.aws.s3.bucket}")
@@ -31,8 +32,8 @@ public class AwsS3Service {
 
     try (InputStream inputStream = file.getInputStream()) {
       this.amazonS3Client.putObject(
-          new PutObjectRequest(this.bucket, fileName, inputStream, objectMetadata)
-              .withCannedAcl(CannedAccessControlList.PublicRead));
+          new PutObjectRequest(this.bucket, fileName, inputStream, objectMetadata).withCannedAcl(
+              CannedAccessControlList.PublicRead));
     } catch (IOException e) {
       throw new ApiException(ApiExceptionEnum.S3_UPLOAD_FAIL_EXCEPTION);
     }

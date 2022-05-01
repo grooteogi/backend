@@ -54,9 +54,8 @@ public class Post {
   private User user;
 
 
-  @OneToMany(mappedBy = "post",
-      cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+      CascadeType.REMOVE}, fetch = FetchType.EAGER)
   @JsonManagedReference
   private List<PostHashtag> postHashtags = new ArrayList<>();
-
 }
