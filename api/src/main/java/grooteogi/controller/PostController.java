@@ -26,7 +26,7 @@ public class PostController {
 
   private final PostService postService;
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "search", required = false) String search,
       @RequestParam(name = "cursor", required = false) Integer cursor,
@@ -37,13 +37,6 @@ public class PostController {
     CursorResult<Post> posts =
         postService.search(search, cursor, type, PageRequest.of(0, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
-  }
-
-  @GetMapping
-  public ResponseEntity<BasicResponse> getAllPost() {
-    List<Post> postList = postService.getAllPost();
-    return ResponseEntity.ok(
-        BasicResponse.builder().count(postList.size()).data(postList).build());
   }
 
   @GetMapping("/{postId}")
