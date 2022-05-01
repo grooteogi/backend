@@ -1,4 +1,4 @@
-package grooteogi.utils;
+package grooteogi.response;
 
 import java.util.List;
 import lombok.Getter;

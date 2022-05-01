@@ -4,7 +4,7 @@ import grooteogi.domain.User;
 import grooteogi.dto.OauthDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.enums.LoginType;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;

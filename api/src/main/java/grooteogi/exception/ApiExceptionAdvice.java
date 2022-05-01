@@ -1,6 +1,6 @@
 package grooteogi.exception;
 
-import grooteogi.dto.response.ExceptionResponse;
+import grooteogi.response.ExceptionResponse;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

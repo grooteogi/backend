@@ -1,6 +1,6 @@
 package grooteogi.controller;
 
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -5,7 +5,7 @@ import grooteogi.dto.EmailCodeDto;
 import grooteogi.dto.LoginDto;
 import grooteogi.dto.Token;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.service.EmailService;

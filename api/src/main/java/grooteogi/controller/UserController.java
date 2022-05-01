@@ -3,7 +3,7 @@ package grooteogi.controller;
 import grooteogi.domain.User;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.PwDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.ProfileService;
 import grooteogi.service.UserService;
 import java.util.List;

@@ -2,9 +2,9 @@ package grooteogi.controller;
 
 import grooteogi.domain.Post;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
-import grooteogi.utils.CursorResult;
+import grooteogi.response.CursorResult;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

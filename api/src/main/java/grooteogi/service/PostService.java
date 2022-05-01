@@ -11,7 +11,7 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import grooteogi.utils.CursorResult;
+import grooteogi.response.CursorResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
