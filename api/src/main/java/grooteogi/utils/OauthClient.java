@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import grooteogi.dto.OauthDto;
-import grooteogi.dto.UserDto;
+import grooteogi.dto.auth.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import java.io.IOException;

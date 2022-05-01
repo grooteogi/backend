@@ -1,7 +1,7 @@
 package grooteogi.service;
 
 import grooteogi.domain.Hashtag;
-import grooteogi.dto.HashtagDto;
+import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.enums.HashtagType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;

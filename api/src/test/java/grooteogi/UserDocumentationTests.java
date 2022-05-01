@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.controller.UserController;
 import grooteogi.domain.User;
-import grooteogi.dto.UserDto;
+import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;

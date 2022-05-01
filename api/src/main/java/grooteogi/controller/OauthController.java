@@ -2,10 +2,10 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.OauthDto;
-import grooteogi.dto.Token;
-import grooteogi.dto.UserDto;
-import grooteogi.response.BasicResponse;
+import grooteogi.dto.auth.Token;
+import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
 import java.util.Map;

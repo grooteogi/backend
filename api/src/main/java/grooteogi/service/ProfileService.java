@@ -2,7 +2,7 @@ package grooteogi.service;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
-import grooteogi.dto.ProfileDto;
+import grooteogi.dto.user.ProfileDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;

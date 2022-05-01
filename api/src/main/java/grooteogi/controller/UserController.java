@@ -1,8 +1,8 @@
 package grooteogi.controller;
 
 import grooteogi.domain.User;
-import grooteogi.dto.ProfileDto;
-import grooteogi.dto.PwDto;
+import grooteogi.dto.user.ProfileDto;
+import grooteogi.dto.user.PwDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ProfileService;
 import grooteogi.service.UserService;

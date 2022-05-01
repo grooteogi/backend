@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.auth;
 
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;

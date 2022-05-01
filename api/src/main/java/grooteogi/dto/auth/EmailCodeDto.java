@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.auth;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

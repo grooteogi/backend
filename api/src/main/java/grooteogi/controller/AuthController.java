@@ -1,13 +1,13 @@
 package grooteogi.controller;
 
 import grooteogi.domain.User;
-import grooteogi.dto.EmailCodeDto;
-import grooteogi.dto.LoginDto;
-import grooteogi.dto.Token;
-import grooteogi.dto.UserDto;
-import grooteogi.response.BasicResponse;
+import grooteogi.dto.auth.EmailCodeDto;
+import grooteogi.dto.auth.LoginDto;
+import grooteogi.dto.auth.Token;
+import grooteogi.dto.auth.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.EmailService;
 import grooteogi.service.UserService;
 import java.util.Map;

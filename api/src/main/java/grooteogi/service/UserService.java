@@ -1,10 +1,10 @@
 package grooteogi.service;
 
 import grooteogi.domain.User;
-import grooteogi.dto.LoginDto;
-import grooteogi.dto.PwDto;
-import grooteogi.dto.Token;
-import grooteogi.dto.UserDto;
+import grooteogi.dto.auth.LoginDto;
+import grooteogi.dto.auth.Token;
+import grooteogi.dto.auth.UserDto;
+import grooteogi.dto.user.PwDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;

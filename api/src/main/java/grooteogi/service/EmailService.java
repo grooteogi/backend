@@ -1,6 +1,6 @@
 package grooteogi.service;
 
-import grooteogi.dto.EmailCodeDto;
+import grooteogi.dto.auth.EmailCodeDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
