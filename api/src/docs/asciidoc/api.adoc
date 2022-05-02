@@ -6,20 +6,6 @@
 
 == User API
 
-=== Register
-
-==== Request
-include::{snippets}/user-register/http-request.adoc[]
-
-==== Request Fields
-include::{snippets}/user-register/request-fields.adoc[]
-
-==== Response
-include::{snippets}/user-register/http-response.adoc[]
-
-==== Response Fields
-include::{snippets}/user-register/response-fields.adoc[]
-
 === Get All User
 
 ==== Request
@@ -45,10 +31,26 @@ include::{snippets}/get-user/http-response.adoc[]
 ==== Response Fields
 include::{snippets}/get-user/response-fields.adoc[]
 
-=== Delete User
+== Auth API
+
+=== Register
 
 ==== Request
-include::{snippets}/delete-user/http-request.adoc[]
+include::{snippets}/auth-register/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/auth-register/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/delete-user/http-response.adoc[]
+include::{snippets}/auth-register/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/auth-register/response-fields.adoc[]
+
+=== Withdrawal
+
+==== Request
+include::{snippets}/auth-withdrawal/http-request.adoc[]
+
+==== Response
+include::{snippets}/auth-withdrawal/http-response.adoc[]
