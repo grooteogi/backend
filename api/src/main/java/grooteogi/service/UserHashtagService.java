@@ -26,7 +26,6 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-
   public List<UserHashtag> getAllUserHashtag() {
     return this.userHashtagRepository.findAll();
   }

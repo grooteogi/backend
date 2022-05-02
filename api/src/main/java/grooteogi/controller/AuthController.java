@@ -8,7 +8,7 @@ import grooteogi.dto.auth.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.response.BasicResponse;
-import grooteogi.service.EmailService;
+import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -37,12 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final UserService userService;
-  private final EmailService emailService;
+  private final AuthService authService;
 
   @PostMapping("/login")
   public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
-    Token token = userService.login(loginDto);
     User user = userService.getUserByEmail(loginDto.getEmail());
+    Token token = authService.login(user, loginDto);
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("X-AUTH-TOKEN", token.getAccessToken());
@@ -62,14 +62,14 @@ public class AuthController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    User user = userService.register(userDto);
+    User user = authService.register(userDto);
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @DeleteMapping("/withdrawal")
   public ResponseEntity withdrawal(@RequestParam("user-id") Integer userId) {
-    userService.withdrawal(userId);
+    authService.withdrawal(userId);
 
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
@@ -77,7 +77,7 @@ public class AuthController {
   @GetMapping("/token/verify")
   public ResponseEntity<BasicResponse> tokenVerify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = userService.tokenVerify(authorizationHeader);
+    Map<String, Object> result = authService.tokenVerify(authorizationHeader);
 
     if (!(boolean) result.get("result")) {
       throw new ApiException((ApiExceptionEnum) result.get("status"));
@@ -92,7 +92,7 @@ public class AuthController {
   public ResponseEntity<BasicResponse> tokenRefresh(
       @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = userService.tokenRefresh(authorizationHeader, refreshToken);
+    Map<String, Object> result = authService.tokenRefresh(authorizationHeader, refreshToken);
 
     if (!(boolean) result.get("result")) {
       throw new ApiException((ApiExceptionEnum) result.get("status"));
@@ -111,7 +111,11 @@ public class AuthController {
       @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
       @RequestParam String address) {
 
-    emailService.sendVerifyEmail(address);
+    if (userService.isExistEmail(address)) {
+      throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
+    }
+
+    authService.sendVerifyEmail(address);
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("send email verification success").build());
@@ -120,7 +124,7 @@ public class AuthController {
   @PostMapping("/email")
   public ResponseEntity<BasicResponse> checkVerifyEmail(
       @RequestBody EmailCodeDto emailCodeRequest) {
-    emailService.checkVerifyEmail(emailCodeRequest);
+    authService.checkVerifyEmail(emailCodeRequest);
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("confirm email verification success").build());

@@ -31,7 +31,6 @@ public class HashtagService {
     return this.hashtagRepository.getTopTenHashtag(type);
   }
 
-
   public Hashtag createHashtag(HashtagDto hashtagDto) {
     Hashtag createdHashtag = new Hashtag();
 
@@ -46,6 +45,5 @@ public class HashtagService {
 
     return this.hashtagRepository.save(createdHashtag);
   }
-
 
 }

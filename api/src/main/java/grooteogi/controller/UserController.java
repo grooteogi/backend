@@ -4,7 +4,6 @@ import grooteogi.domain.User;
 import grooteogi.dto.user.ProfileDto;
 import grooteogi.dto.user.PwDto;
 import grooteogi.response.BasicResponse;
-import grooteogi.service.ProfileService;
 import grooteogi.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-  private final ProfileService profileService;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllUser() {
@@ -39,7 +37,7 @@ public class UserController {
 
   @GetMapping("/{userId}/profile")
   public ResponseEntity<BasicResponse> getUserProfile(@PathVariable Integer userId) {
-    User user = profileService.getUserProfile(userId);
+    User user = userService.getUserProfile(userId);
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
@@ -48,7 +46,7 @@ public class UserController {
   public ResponseEntity<BasicResponse> modifyUserProfile(@PathVariable Integer userId,
       @RequestBody ProfileDto profileDto) {
 
-    User user = profileService.modifyUserProfile(userId, profileDto);
+    User user = userService.modifyUserProfile(userId, profileDto);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 

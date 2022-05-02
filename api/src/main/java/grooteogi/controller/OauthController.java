@@ -6,7 +6,7 @@ import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
 import grooteogi.response.BasicResponse;
-import grooteogi.service.UserService;
+import grooteogi.service.AuthService;
 import grooteogi.utils.OauthClient;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OauthController {
 
-  private final UserService userService;
+  private final AuthService authService;
   private final OauthClient oauthClient;
 
   @GetMapping("/kakao")
@@ -48,7 +48,7 @@ public class OauthController {
   }
 
   private ResponseEntity oauth(UserDto userDto) {
-    Map<String, Object> result = userService.oauth(userDto);
+    Map<String, Object> result = authService.oauth(userDto);
 
     Token token = (Token) result.get("token");
 
