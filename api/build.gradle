@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'grooteogi'
-version = '0.3.0-alpha'
+version = '0.4.0-alpha'
 sourceCompatibility = '11'
 
 repositories {
@@ -20,31 +20,31 @@ configurations {
 
 dependencies {
 	// spring-boot starter
-	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.6'
-	implementation 'org.springframework.boot:spring-boot-starter-test:2.6.6'
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
 
-	implementation 'org.springframework.boot:spring-boot-starter-security:2.6.6'
-	implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.6'
-	implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.6'
+	implementation 'org.springframework.boot:spring-boot-starter-security:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.7'
 
 	// restdocs
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.6.RELEASE'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
 
 	// hibernate
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.6'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
 	implementation 'mysql:mysql-connector-java:8.0.28'
 
 	// redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.6'
-	implementation 'org.springframework.session:spring-session-data-redis:2.6.2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.7'
+	implementation 'org.springframework.session:spring-session-data-redis:2.6.3'
 
 	// lombok
-	compileOnly 'org.projectlombok:lombok:1.18.22'
-	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.22'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+	testCompileOnly 'org.projectlombok:lombok:1.18.24'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
 	// jwt
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
@@ -53,7 +53,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
 	// oauth
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.6'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.7'
 
 	// gson
 	implementation 'com.google.code.gson:gson:2.9.0'
