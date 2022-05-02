@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

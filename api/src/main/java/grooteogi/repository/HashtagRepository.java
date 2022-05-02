@@ -14,5 +14,5 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Integer> {
 
 
   @Query(value = "select * from hashtag where tag = :tag ", nativeQuery = true)
-  Hashtag findByTag(@Param("tag")String tag);
+  Hashtag findByTag(@Param("tag") String tag);
 }

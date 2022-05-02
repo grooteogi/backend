@@ -2,9 +2,9 @@ package grooteogi.controller;
 
 import grooteogi.domain.Post;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
+import grooteogi.response.CursorResult;
 import grooteogi.service.PostService;
-import grooteogi.utils.CursorResult;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +26,7 @@ public class PostController {
 
   private final PostService postService;
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "search", required = false) String search,
       @RequestParam(name = "cursor", required = false) Integer cursor,
@@ -34,23 +34,14 @@ public class PostController {
     if (cursor == null) {
       cursor = 0;
     }
-    CursorResult<Post> posts =
-        postService.search(search, cursor, type, PageRequest.of(0, 20));
+    CursorResult<Post> posts = postService.search(search, cursor, type, PageRequest.of(0, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
-  }
-
-  @GetMapping
-  public ResponseEntity<BasicResponse> getAllPost() {
-    List<Post> postList = postService.getAllPost();
-    return ResponseEntity.ok(
-        BasicResponse.builder().count(postList.size()).data(postList).build());
   }
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
     Post post = postService.getPost(postId);
-    return ResponseEntity.ok(
-        BasicResponse.builder().data(post).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
   @PostMapping
@@ -60,8 +51,8 @@ public class PostController {
   }
 
   @PutMapping("/{postId}")
-  public ResponseEntity<BasicResponse> modifyPost(
-      @RequestBody PostDto modifiedDto, @PathVariable int postId) {
+  public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto modifiedDto,
+      @PathVariable int postId) {
     Post modifiedPost = this.postService.modifyPost(modifiedDto, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
@@ -69,7 +60,7 @@ public class PostController {
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
     List<Post> deletePost = this.postService.deletePost(postId);
-    return ResponseEntity.ok(BasicResponse.builder().count(
-        deletePost.size()).data(deletePost).build());
+    return ResponseEntity.ok(
+        BasicResponse.builder().count(deletePost.size()).data(deletePost).build());
   }
 }

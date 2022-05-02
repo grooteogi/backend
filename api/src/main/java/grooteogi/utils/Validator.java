@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Validator {
+
   public void confirmPasswordVerification(String password) {
     Pattern pwPattern = Pattern.compile("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$");
     Matcher pwMatcher = pwPattern.matcher(password);
@@ -15,7 +16,5 @@ public class Validator {
     if (!pwMatcher.find()) {
       throw new ApiException(ApiExceptionEnum.PASSWORD_VALUE_EXCEPTION);
     }
-
   }
-
 }

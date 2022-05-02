@@ -1,8 +1,8 @@
 package grooteogi.controller;
 
 import grooteogi.domain.Hashtag;
-import grooteogi.dto.HashtagDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

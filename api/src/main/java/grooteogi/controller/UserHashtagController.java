@@ -7,7 +7,7 @@ package grooteogi.controller;
 
 import grooteogi.domain.UserHashtag;
 import grooteogi.dto.UserHashtagDto;
-import grooteogi.dto.response.BasicResponse;
+import grooteogi.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +65,4 @@ public class UserHashtagController {
     return ResponseEntity.ok(
         BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
-
-
 }

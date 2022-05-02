@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import grooteogi.dto.OauthDto;
-import grooteogi.dto.UserDto;
+import grooteogi.dto.auth.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import java.io.IOException;
@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class OauthClient {
+
   private final RestTemplate restTemplate;
   private final HttpServletResponse httpServletResponse;
 
@@ -110,8 +111,7 @@ public class OauthClient {
     params.put("client_id", googleClientId);
     params.put("redirect_uri", "http://localhost:8080/user/oauth/google");
 
-    String parameterString = params.entrySet().stream()
-        .map(x -> x.getKey() + "=" + x.getValue())
+    String parameterString = params.entrySet().stream().map(x -> x.getKey() + "=" + x.getValue())
         .collect(Collectors.joining("&"));
 
     String url = "https://accounts.google.com/o/oauth2/v2/auth" + "?" + parameterString;

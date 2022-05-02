@@ -26,7 +26,6 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-
   public List<UserHashtag> getAllUserHashtag() {
     return this.userHashtagRepository.findAll();
   }
@@ -44,7 +43,6 @@ public class UserHashtagService {
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
-
 
     String[] hashtags = userHashtagDto.getHashtags();
 

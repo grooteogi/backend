@@ -1,8 +1,7 @@
 package grooteogi.service;
 
-
 import grooteogi.domain.Hashtag;
-import grooteogi.dto.HashtagDto;
+import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.enums.HashtagType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -32,7 +31,6 @@ public class HashtagService {
     return this.hashtagRepository.getTopTenHashtag(type);
   }
 
-
   public Hashtag createHashtag(HashtagDto hashtagDto) {
     Hashtag createdHashtag = new Hashtag();
 
@@ -45,9 +43,7 @@ public class HashtagService {
     createdHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
     createdHashtag.setTag(hashtagDto.getTag());
 
-
     return this.hashtagRepository.save(createdHashtag);
   }
-
 
 }

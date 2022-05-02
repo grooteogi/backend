@@ -1,4 +1,4 @@
-package grooteogi.utils;
+package grooteogi.response;
 
 import java.util.List;
 import lombok.Getter;
@@ -14,5 +14,4 @@ public class CursorResult<T> {
     this.values = values;
     this.hasNext = hasNext;
   }
-
 }

@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.auth;
 
 import grooteogi.enums.LoginType;
 import javax.validation.constraints.NotBlank;

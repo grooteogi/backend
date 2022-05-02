@@ -11,7 +11,7 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import grooteogi.utils.CursorResult;
+import grooteogi.response.CursorResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
   private final PostRepository postRepository;
   private final PostHashtagRepository postHashtagRepository;
   private final UserRepository userRepository;
@@ -75,7 +76,6 @@ public class PostService {
       createdPost.getPostHashtags().add(createdPostHashtag);
     });
 
-
     this.postRepository.save(createdPost);
 
     return createdPost;
@@ -101,7 +101,6 @@ public class PostService {
     });
 
     modifiedPost.get().getPostHashtags().clear();
-
 
     //PostHashtag 저장
     String[] hashtags = modifiedDto.getHashtags();
@@ -140,7 +139,7 @@ public class PostService {
 
     return this.postRepository.findAll();
   }
-  
+
   public CursorResult<Post> search(String search, Integer cursorId, String type,
       Pageable page) {
     final List<Post> posts;

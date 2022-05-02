@@ -1,4 +1,4 @@
-package grooteogi.dto;
+package grooteogi.dto.user;
 
 import lombok.Getter;
 

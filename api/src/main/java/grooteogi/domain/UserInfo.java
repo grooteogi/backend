@@ -36,6 +36,4 @@ public class UserInfo {
 
   @CreationTimestamp
   private Timestamp modified;
-
-
 }
