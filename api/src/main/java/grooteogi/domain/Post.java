@@ -54,17 +54,17 @@ public class Post {
   private User user;
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
-      CascadeType.REMOVE}, fetch = FetchType.EAGER)
+      CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
   private List<PostHashtag> postHashtags = new ArrayList<>();
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
-      CascadeType.REMOVE}, fetch = FetchType.EAGER)
+      CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
   private List<Schedule> schedule = new ArrayList<>();
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
-      CascadeType.REMOVE}, fetch = FetchType.EAGER)
+      CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
   private List<Like> like = new ArrayList<>();
 }
