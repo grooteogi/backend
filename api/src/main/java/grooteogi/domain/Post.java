@@ -53,9 +53,18 @@ public class Post {
   @JoinColumn(name = "user_id")
   private User user;
 
-
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.EAGER)
   @JsonManagedReference
   private List<PostHashtag> postHashtags = new ArrayList<>();
+
+  @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+      CascadeType.REMOVE}, fetch = FetchType.EAGER)
+  @JsonManagedReference
+  private List<Schedule> schedule = new ArrayList<>();
+
+  @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+      CascadeType.REMOVE}, fetch = FetchType.EAGER)
+  @JsonManagedReference
+  private List<Like> like = new ArrayList<>();
 }
