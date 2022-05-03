@@ -61,10 +61,10 @@ public class Post {
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<Schedule> schedule = new ArrayList<>();
+  private List<Schedule> schedules = new ArrayList<>();
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<Like> like = new ArrayList<>();
+  private List<Heart> hearts = new ArrayList<>();
 }

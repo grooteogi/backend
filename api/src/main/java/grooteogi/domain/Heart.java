@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class LikePost{
+public class Heart {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
