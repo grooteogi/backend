@@ -70,6 +70,6 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Like> likes = new ArrayList<>();
+  private List<Heart> hearts = new ArrayList<>();
 
 }
