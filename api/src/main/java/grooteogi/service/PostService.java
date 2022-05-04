@@ -3,6 +3,7 @@ package grooteogi.service;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
 import grooteogi.exception.ApiException;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +76,15 @@ public class PostService {
       createdPostHashtag.setPost(createdPost);
 
       createdPost.getPostHashtags().add(createdPostHashtag);
+    });
+
+    // Schedule 저장
+    Arrays.stream(postDto.getSchedules()).forEach(schedule -> {
+      Schedule createdSchedule = new Schedule();
+      BeanUtils.copyProperties(schedule, createdSchedule);
+      createdSchedule.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+
+      createdPost.getSchedules().add(createdSchedule);
     });
 
     this.postRepository.save(createdPost);

@@ -21,4 +21,5 @@ public class PostDto {
 
   private String[] hashtags;
 
+  private Object[] schedules;
 }
