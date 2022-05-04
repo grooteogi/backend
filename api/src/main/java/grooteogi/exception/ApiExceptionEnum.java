@@ -32,6 +32,7 @@ public enum ApiExceptionEnum {
   USERHASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 사용자 해시태그가 없습니다."),
   POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
   HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다."),
+  DUPLICATION_RESERVATION_EXCEPTION(HttpStatus.CONFLICT, "신청 불가능한 일정입니다."),
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다.");
 
   private final HttpStatus httpStatus;
