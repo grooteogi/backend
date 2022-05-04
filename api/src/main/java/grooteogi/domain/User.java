@@ -60,13 +60,9 @@ public class User {
   @JsonManagedReference
   private List<Post> posts = new ArrayList<>();
 
-  @OneToMany(mappedBy = "hostUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Reservation> hostReserves = new ArrayList<>();
-
-  @OneToMany(mappedBy = "participateUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-  @JsonManagedReference
-  private List<Reservation> participateReserves = new ArrayList<>();
+  private List<Reservation> reservations = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
