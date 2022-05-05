@@ -42,7 +42,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class UserDocumentationTests {
 
   @Autowired
-  protected MockMvc mockMvc;
+  private MockMvc mockMvc;
 
   @MockBean
   private UserService userService;
@@ -96,7 +96,11 @@ public class UserDocumentationTests {
                 fieldWithPath("data.[].registered").type(JsonFieldType.STRING).description("가입날짜")
                     .optional(),
                 fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트"))));
+                fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트"),
+                fieldWithPath("data.[].hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
+                fieldWithPath("data.[].participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
+                fieldWithPath("data.[].hearts").type(JsonFieldType.ARRAY).description("찜").optional()
+                )));
   }
 
   @DisplayName("회원정보 조회")
@@ -123,8 +127,43 @@ public class UserDocumentationTests {
                 fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
                     .optional(),
                 fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"))));
+                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
+                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
+                fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
+                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜").optional()
+            )));
   }
 
-}
+  @DisplayName("프로필 조회")
+  @Test
+  void getProfile() throws Exception {
+    int userId = anyInt();
+    User testUser = getTestUser();
 
+    given(userService.getUser(userId)).willReturn(testUser);
+
+    ResultActions result = mockMvc.perform(
+        RestDocumentationRequestBuilders.get("/user/{userId}", userId).characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON));
+    result.andExpect(status().isOk()).andDo(print()).andDo(
+        document("get-user", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("data.id").description("아이디"),
+                fieldWithPath("data.type").description("타입"),
+                fieldWithPath("data.nickname").description("닉네임"),
+                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
+                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
+                    .optional(),
+                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
+                    .optional(),
+                fieldWithPath("data.userInfo").type(JsonFieldType.STRING).description("추가정보")
+                    .optional(),
+                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
+                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
+                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
+                fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
+                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜").optional()
+            )));
+  }
+}
