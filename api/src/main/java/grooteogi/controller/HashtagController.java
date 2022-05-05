@@ -2,11 +2,13 @@ package grooteogi.controller;
 
 import grooteogi.domain.Hashtag;
 import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.dto.user.SessionDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
