@@ -120,7 +120,7 @@ public class AuthService {
     return result;
   }
 
-  private void session(String token, int ID){
-    redisClient.setValue(token, Integer.toString(ID), REDIS_TOKEN_EXPIRATION_TIME.getValue());
+  private void session(String token, int id) {
+    redisClient.setValue(token, Integer.toString(id), REDIS_TOKEN_EXPIRATION_TIME.getValue());
   }
 }

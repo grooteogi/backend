@@ -16,10 +16,11 @@ public class UserInterceptor implements HandlerInterceptor {
   private final JwtProvider jwtProvider;
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+      Object handler) throws Exception {
     String jwt = jwtProvider.extractToken(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-    if (jwt != null){
+    if (jwt != null) {
       return jwtProvider.isUsable(jwt);
     } else {
       throw new ApiException(ApiExceptionEnum.ACCESS_DENIED_EXCEPTION);
