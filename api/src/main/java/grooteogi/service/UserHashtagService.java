@@ -35,8 +35,8 @@ public class UserHashtagService {
     return this.userHashtagRepository.findByUserId(userId);
   }
 
-  public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto) {
-    Optional<User> user = this.userRepository.findById(userHashtagDto.getUserId());
+  public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto, Integer userId) {
+    Optional<User> user = this.userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
@@ -63,11 +63,11 @@ public class UserHashtagService {
       this.userHashtagRepository.save(userHashtag);
     });
 
-    return this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
+    return this.userHashtagRepository.findByUserId(userId);
   }
 
-  public List<UserHashtag> modifyUserHashtag(UserHashtagDto userHashtagDto) {
-    Optional<User> user = this.userRepository.findById(userHashtagDto.getUserId());
+  public List<UserHashtag> modifyUserHashtag(UserHashtagDto userHashtagDto, Integer userId) {
+    Optional<User> user = this.userRepository.findById(userId);
     String[] hashtags = userHashtagDto.getHashtags();
 
     if (user.isEmpty()) {
@@ -85,7 +85,7 @@ public class UserHashtagService {
         modifyHashtagList.add(this.hashtagRepository.findByTag(name)));
 
     List<UserHashtag> beforeUserHashtagList =
-        this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
+        this.userHashtagRepository.findByUserId(userId);
 
     beforeUserHashtagList.forEach(beforeUserHashtag -> {
       Hashtag beforeHashtag = beforeUserHashtag.getHashtag();

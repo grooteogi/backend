@@ -14,7 +14,6 @@ import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,41 +71,7 @@ public class AuthController {
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
-  @GetMapping("/auth/token/verify")
-  public ResponseEntity<BasicResponse> tokenVerify(HttpServletRequest request) {
-    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = authService.tokenVerify(authorizationHeader);
-
-    if (!(boolean) result.get("result")) {
-      throw new ApiException((ApiExceptionEnum) result.get("status"));
-    }
-
-    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
-
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
-  }
-
-  @GetMapping("/auth/token/refresh")
-  public ResponseEntity<BasicResponse> tokenRefresh(
-      @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
-    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = authService.tokenRefresh(authorizationHeader, refreshToken);
-
-    if (!(boolean) result.get("result")) {
-      throw new ApiException((ApiExceptionEnum) result.get("status"));
-    }
-
-    Token token = new Token();
-    token.setAccessToken(result.get("token").toString());
-
-    HttpHeaders responseHeaders = setHeader(token, false);
-    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
-
-    return new ResponseEntity<>(BasicResponse.builder().data(user).build(), responseHeaders,
-        HttpStatus.OK);
-  }
-
-  @GetMapping("/auth/email")
+  @GetMapping("/email")
   public ResponseEntity<BasicResponse> sendVerifyEmail(
       @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
       @RequestParam String address) {

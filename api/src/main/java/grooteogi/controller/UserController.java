@@ -5,12 +5,13 @@ import grooteogi.dto.user.ProfileDto;
 import grooteogi.dto.user.PwDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
+import grooteogi.utils.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,33 +29,37 @@ public class UserController {
     return ResponseEntity.ok(BasicResponse.builder().count(userList.size()).data(userList).build());
   }
 
-  @GetMapping("/{userId}")
-  public ResponseEntity<BasicResponse> getUser(@PathVariable Integer userId) {
-    User user = userService.getUser(userId);
+  @GetMapping("/self")
+  public ResponseEntity<BasicResponse> getUser() {
+    Session session = (Session) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    User user = userService.getUser(session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @GetMapping("/{userId}/profile")
-  public ResponseEntity<BasicResponse> getUserProfile(@PathVariable Integer userId) {
-    User user = userService.getUserProfile(userId);
+  @GetMapping("/profile")
+  public ResponseEntity<BasicResponse> getUserProfile() {
+    Session session = (Session) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    User user = userService.getUserProfile(session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @PatchMapping("/{userId}/profile")
-  public ResponseEntity<BasicResponse> modifyUserProfile(@PathVariable Integer userId,
-      @RequestBody ProfileDto profileDto) {
-
-    User user = userService.modifyUserProfile(userId, profileDto);
+  @PatchMapping("/profile")
+  public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto profileDto) {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    User user = userService.modifyUserProfile(session.getId(), profileDto);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @PatchMapping("/{userId}/password")
-  public ResponseEntity<BasicResponse> modifyUserPw(@PathVariable Integer userId,
-      @RequestBody PwDto pwDto) {
-
-    userService.modifyUserPw(userId, pwDto);
+  @PatchMapping("/password")
+  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody PwDto pwDto) {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    userService.modifyUserPw(session.getId(), pwDto);
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify user password success").build());
   }

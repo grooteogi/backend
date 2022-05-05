@@ -1,5 +1,7 @@
 package grooteogi.service;
 
+import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
+
 import grooteogi.domain.User;
 import grooteogi.dto.auth.EmailCodeDto;
 import grooteogi.dto.auth.LoginDto;
@@ -32,9 +34,10 @@ public class AuthService {
   private final RedisClient redisClient;
 
   public Token login(User user, LoginDto loginDto) {
-
     if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-      return generateToken(user.getId(), loginDto.getEmail());
+      Token token = generateToken(user.getId(), user.getEmail());
+      session(token.getAccessToken(), user.getId());
+      return token;
     } else {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
@@ -78,16 +81,7 @@ public class AuthService {
     return token;
   }
 
-  public Map tokenVerify(String authorizationHeader) {
-    return jwtProvider.verifyToken(authorizationHeader);
-  }
-
-  public Map tokenRefresh(String authorizationHeader, String refreshToken) {
-    return jwtProvider.refreshToken(authorizationHeader, refreshToken);
-  }
-
   public void sendVerifyEmail(String email) {
-
     String code = emailClient.createCode();
     emailClient.send(email, code);
 
@@ -115,12 +109,18 @@ public class AuthService {
     }
 
     if (user.getType().equals(userDto.getType())) {
-      result.put("token", generateToken(user.getId(), user.getEmail()));
+      Token token = generateToken(user.getId(), user.getEmail());
+      session(token.getAccessToken(), user.getId());
+      result.put("token", token);
     } else {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
 
     result.put("user", user);
     return result;
+  }
+
+  private void session(String token, int id) {
+    redisClient.setValue(token, Integer.toString(id), REDIS_TOKEN_EXPIRATION_TIME.getValue());
   }
 }

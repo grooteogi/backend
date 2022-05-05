@@ -3,15 +3,14 @@ package grooteogi.utils;
 import static grooteogi.enums.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
 import static grooteogi.enums.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
 
+import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,65 +38,32 @@ public class JwtProvider {
         .signWith(SignatureAlgorithm.HS256, secretKey).compact();
   }
 
-  public Map verifyToken(String authorizationHeader) {
-    validationAuthorizationHeader(authorizationHeader);
-    String token = extractToken(authorizationHeader);
-    Map<String, Object> result = new HashMap<String, Object>();
-
+  public boolean isUsable(String token) {
     try {
-      Claims claims = Jwts.parser().setSigningKey(secretKey) // (3)
-          .parseClaimsJws(token) // (4)
-          .getBody();
-      result.put("result", true);
-      result.put("email", (String) claims.get("email"));
-      result.put("ID", (Integer) claims.get("ID"));
+      Jwts.parser()
+          .setSigningKey(secretKey)
+          .parseClaimsJws(token);
+      return true;
+    } catch (MalformedJwtException e) {
+      throw new ApiException(ApiExceptionEnum.MALFORED_TOKEN_EXCEPTION);
     } catch (ExpiredJwtException e) {
-      result.put("result", false);
-      result.put("status", ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
-    } catch (JwtException e) {
-      result.put("result", false);
-      result.put("status", ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
-    }
-
-    return result;
-  }
-
-  public Map refreshToken(String authorizationHeader, String refreshToken) {
-    // 토큰이 만료되었는지 확인
-    Map result = verifyToken(authorizationHeader);
-    if ((boolean) result.get("result")) {
-      result.put("result", false);
-      result.put("status", ApiExceptionEnum.NO_EXPIRED_TOKEN_EXCEPTION);
-    } else if (result.get("status") == ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION) {
-      try {
-        Claims claims = Jwts.parser().setSigningKey(secretKey) // (3)
-            .parseClaimsJws(refreshToken) // (4)
-            .getBody();
-        result.put("result", true);
-        result.put("token",
-            doGenerateToken((Integer) claims.get("ID"), (String) claims.get("email"),
-                ACCESS_TOKEN_EXPIRATION_TIME.getValue()));
-        result.put("email", (String) claims.get("email"));
-        result.put("ID", (Integer) claims.get("ID"));
-      } catch (ExpiredJwtException e) {
-        result.put("result", false);
-        result.put("status", ApiExceptionEnum.EXPIRED_REFRESH_TOKEN_EXCEPTION);
-      } catch (JwtException e) {
-        result.put("result", false);
-        result.put("status", ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-      }
-    }
-
-    return result;
-  }
-
-  private void validationAuthorizationHeader(String header) {
-    if (header == null || !header.startsWith("Bearer ")) {
-      throw new IllegalArgumentException();
+      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
     }
   }
 
-  private String extractToken(String authorizationHeader) {
+  public Session extractAllClaims(String token) throws ExpiredJwtException {
+    Claims claims = Jwts.parser().setSigningKey(secretKey)
+        .parseClaimsJws(token)
+        .getBody();
+
+    Session session = new Session();
+    session.setEmail((String) claims.get("email"));
+    session.setId((Integer) claims.get("ID"));
+
+    return session;
+  }
+
+  public String extractToken(String authorizationHeader) {
     return authorizationHeader.substring("Bearer ".length());
   }
 }
