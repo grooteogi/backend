@@ -3,9 +3,9 @@ package grooteogi.controller;
 import grooteogi.domain.User;
 import grooteogi.dto.user.ProfileDto;
 import grooteogi.dto.user.PwDto;
-import grooteogi.dto.user.SessionDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
+import grooteogi.utils.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,35 +31,35 @@ public class UserController {
 
   @GetMapping("/self")
   public ResponseEntity<BasicResponse> getUser() {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext()
+    Session session = (Session) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
-    User user = userService.getUser(sessionDto.getId());
+    User user = userService.getUser(session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @GetMapping("/profile")
   public ResponseEntity<BasicResponse> getUserProfile() {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext()
+    Session session = (Session) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
-    User user = userService.getUserProfile(sessionDto.getId());
+    User user = userService.getUserProfile(session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/profile")
   public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto profileDto) {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication()
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    User user = userService.modifyUserProfile(sessionDto.getId(), profileDto);
+    User user = userService.modifyUserProfile(session.getId(), profileDto);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/password")
   public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody PwDto pwDto) {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication()
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    userService.modifyUserPw(sessionDto.getId(), pwDto);
+    userService.modifyUserPw(session.getId(), pwDto);
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify user password success").build());
   }

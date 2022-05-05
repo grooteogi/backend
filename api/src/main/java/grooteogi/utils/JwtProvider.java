@@ -3,7 +3,6 @@ package grooteogi.utils;
 import static grooteogi.enums.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
 import static grooteogi.enums.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
 
-import grooteogi.dto.user.SessionDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import io.jsonwebtoken.Claims;
@@ -52,16 +51,16 @@ public class JwtProvider {
     }
   }
 
-  public SessionDto extractAllClaims(String token) throws ExpiredJwtException {
+  public Session extractAllClaims(String token) throws ExpiredJwtException {
     Claims claims = Jwts.parser().setSigningKey(secretKey)
         .parseClaimsJws(token)
         .getBody();
 
-    SessionDto sessionDto = new SessionDto();
-    sessionDto.setEmail((String) claims.get("email"));
-    sessionDto.setId((Integer) claims.get("ID"));
+    Session session = new Session();
+    session.setEmail((String) claims.get("email"));
+    session.setId((Integer) claims.get("ID"));
 
-    return sessionDto;
+    return session;
   }
 
   public String extractToken(String authorizationHeader) {

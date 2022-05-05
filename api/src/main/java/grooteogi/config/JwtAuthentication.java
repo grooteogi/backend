@@ -1,17 +1,17 @@
 package grooteogi.config;
 
-import grooteogi.dto.user.SessionDto;
+import grooteogi.utils.Session;
 import java.util.Collection;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 public class JwtAuthentication implements Authentication {
 
-  private SessionDto sessionDto;
+  private Session session;
   private boolean isAuthenticated;
 
-  public JwtAuthentication(SessionDto sessionDto) {
-    this.sessionDto = sessionDto;
+  public JwtAuthentication(Session session) {
+    this.session = session;
     this.isAuthenticated = true;
   }
 
@@ -32,7 +32,7 @@ public class JwtAuthentication implements Authentication {
 
   @Override
   public Object getPrincipal() {
-    return sessionDto;
+    return session;
   }
 
   @Override
@@ -47,6 +47,6 @@ public class JwtAuthentication implements Authentication {
 
   @Override
   public String getName() {
-    return sessionDto.getEmail();
+    return session.getEmail();
   }
 }

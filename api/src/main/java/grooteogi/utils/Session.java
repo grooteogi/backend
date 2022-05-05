@@ -1,4 +1,4 @@
-package grooteogi.dto.user;
+package grooteogi.utils;
 
 import java.io.Serializable;
 import lombok.Getter;
@@ -6,8 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SessionDto implements Serializable {
+public class Session implements Serializable {
   private int id;
-  private String nickname;
   private String email;
 }
