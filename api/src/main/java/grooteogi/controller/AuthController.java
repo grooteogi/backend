@@ -10,8 +10,6 @@ import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,38 +69,6 @@ public class AuthController {
     authService.withdrawal(userId);
 
     return ResponseEntity.ok(BasicResponse.builder().build());
-  }
-
-  @GetMapping("/token/verify")
-  public ResponseEntity<BasicResponse> tokenVerify(HttpServletRequest request) {
-    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = authService.tokenVerify(authorizationHeader);
-
-    if (!(boolean) result.get("result")) {
-      throw new ApiException((ApiExceptionEnum) result.get("status"));
-    }
-
-    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
-
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
-  }
-
-  @GetMapping("/token/refresh")
-  public ResponseEntity<BasicResponse> tokenRefresh(
-      @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
-    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    Map<String, Object> result = authService.tokenRefresh(authorizationHeader, refreshToken);
-
-    if (!(boolean) result.get("result")) {
-      throw new ApiException((ApiExceptionEnum) result.get("status"));
-    }
-
-    HttpHeaders responseHeaders = new HttpHeaders();
-    responseHeaders.set("X-AUTH-TOKEN", result.get("token").toString());
-    User user = userService.getUser(Integer.parseInt(result.get("ID").toString()));
-
-    return new ResponseEntity<>(BasicResponse.builder().data(user).build(), responseHeaders,
-        HttpStatus.OK);
   }
 
   @GetMapping("/email")
