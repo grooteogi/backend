@@ -59,7 +59,7 @@ public class JwtProvider {
 
     SessionDto sessionDto = new SessionDto();
     sessionDto.setEmail((String) claims.get("email"));
-    sessionDto.setID((Integer) claims.get("ID"));
+    sessionDto.setId((Integer) claims.get("ID"));
 
     return sessionDto;
   }

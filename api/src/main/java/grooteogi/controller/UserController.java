@@ -31,31 +31,35 @@ public class UserController {
 
   @GetMapping("/self")
   public ResponseEntity<BasicResponse> getUser() {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userService.getUser(sessionDto.getID());
+    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    User user = userService.getUser(sessionDto.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @GetMapping("/profile")
   public ResponseEntity<BasicResponse> getUserProfile() {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userService.getUserProfile(sessionDto.getID());
+    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    User user = userService.getUserProfile(sessionDto.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/profile")
   public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto profileDto) {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userService.modifyUserProfile(sessionDto.getID(), profileDto);
+    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    User user = userService.modifyUserProfile(sessionDto.getId(), profileDto);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/password")
   public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody PwDto pwDto) {
-    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    userService.modifyUserPw(sessionDto.getID(), pwDto);
+    SessionDto sessionDto = (SessionDto) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    userService.modifyUserPw(sessionDto.getId(), pwDto);
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify user password success").build());
   }

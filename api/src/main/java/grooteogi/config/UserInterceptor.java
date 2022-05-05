@@ -14,6 +14,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 @RequiredArgsConstructor
 public class UserInterceptor implements HandlerInterceptor {
+
   private final JwtProvider jwtProvider;
 
   @Override
@@ -22,7 +23,7 @@ public class UserInterceptor implements HandlerInterceptor {
     String jwt = jwtProvider.extractToken(request.getHeader(HttpHeaders.AUTHORIZATION));
 
     if (jwt != null) {
-      if ( jwtProvider.isUsable(jwt) ){
+      if (jwtProvider.isUsable(jwt)) {
         SecurityContextHolder.getContext().setAuthentication(
             new JwtAuthentication(jwtProvider.extractAllClaims(jwt)));
       }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SessionDto implements Serializable {
-  private int ID;
+  private int id;
   private String nickname;
   private String email;
 }
