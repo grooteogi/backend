@@ -1,5 +1,6 @@
 package grooteogi.dto;
 
+import grooteogi.enums.CreditType;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +18,12 @@ public class PostDto {
   @NotBlank(message = "내용을 입력하세요.")
   private String content;
 
+  private CreditType credit;
+
   private String imageUrl;
 
   private String[] hashtags;
 
   private Object[] schedules;
+
 }
