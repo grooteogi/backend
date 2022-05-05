@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,9 +20,6 @@ public class HashtagService {
 
   private final HashtagRepository hashtagRepository;
 
-  public List<Hashtag> getAllHashtag() {
-    return this.hashtagRepository.findAll();
-  }
 
   public List<Hashtag> getTopTenHashtag(String type) {
     //count가 0이어도 불러올 수 있게 함
@@ -46,4 +45,7 @@ public class HashtagService {
     return this.hashtagRepository.save(createdHashtag);
   }
 
+  public Page<Hashtag> search(Pageable page) {
+    return this.hashtagRepository.findAll(page);
+  }
 }

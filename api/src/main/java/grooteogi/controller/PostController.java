@@ -3,10 +3,10 @@ package grooteogi.controller;
 import grooteogi.domain.Post;
 import grooteogi.dto.PostDto;
 import grooteogi.response.BasicResponse;
-import grooteogi.response.CursorResult;
 import grooteogi.service.PostService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,12 +29,16 @@ public class PostController {
   @GetMapping
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "search", required = false) String search,
-      @RequestParam(name = "cursor", required = false) Integer cursor,
+      @RequestParam(name = "page", required = false) Integer page,
       @RequestParam(name = "type", required = false) String type) {
-    if (cursor == null) {
-      cursor = 0;
+    if (page == null) {
+      page = 1;
     }
-    CursorResult<Post> posts = postService.search(search, cursor, type, PageRequest.of(0, 20));
+    if (search == null) {
+      Page<Post> posts = postService.searchAllPosts(PageRequest.of(page - 1, 20), type);
+      return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
+    }
+    List<Post> posts = postService.search(search, type, PageRequest.of(page - 1, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 

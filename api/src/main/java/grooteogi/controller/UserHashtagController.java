@@ -11,6 +11,8 @@ import grooteogi.response.BasicResponse;
 import grooteogi.service.UserHashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +32,24 @@ public class UserHashtagController {
   private final UserHashtagService userHashtagService;
 
   @GetMapping("/hashtag")
-  public ResponseEntity<BasicResponse> getAllUserHashtag() {
-    List<UserHashtag> hashtagList = userHashtagService.getAllUserHashtag();
-    return ResponseEntity.ok(
-        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
+  public ResponseEntity<BasicResponse> search(
+      @RequestParam(name = "userId", required = false) Integer userId,
+      @RequestParam(name = "page", required = false) Integer page) {
+
+    if (page == null) {
+      page = 1;
+    }
+    if (userId == null) {
+      Page<UserHashtag> userHashtags =
+          userHashtagService.searchAllUserHashtags(PageRequest.of(page - 1, 20));
+      return ResponseEntity.ok(BasicResponse.builder().data(userHashtags).build());
+    }
+
+    List<UserHashtag> userHashtags = userHashtagService.search(
+        userId, PageRequest.of(page - 1, 20));
+    return ResponseEntity.ok(BasicResponse.builder().data(userHashtags).build());
   }
+
 
   @GetMapping("/{userId}/hashtag")
   public ResponseEntity<BasicResponse> getUserHashtag(@PathVariable int userId) {

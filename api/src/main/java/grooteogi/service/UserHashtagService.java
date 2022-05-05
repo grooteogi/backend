@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -138,4 +140,13 @@ public class UserHashtagService {
 
     return this.userHashtagRepository.findByUserId(userId);
   }
+
+  public List<UserHashtag> search(Integer userId, Pageable page) {
+    return this.userHashtagRepository.findByUserIdAndPage(userId, page);
+  }
+
+  public Page<UserHashtag> searchAllUserHashtags(Pageable page) {
+    return this.userHashtagRepository.findAll(page);
+  }
+
 }
