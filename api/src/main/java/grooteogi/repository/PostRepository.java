@@ -15,9 +15,4 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   )
   List<Post> findBySearch(@Param("title") String title,
       @Param("content") String content, Pageable pageable);
-
-  Boolean existsByIdLessThan(Integer id);
-
-
-  //List<Post> findAllBy(Pageable page);
 }

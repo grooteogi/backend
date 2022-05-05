@@ -31,10 +31,6 @@ public class PostService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-  public List<Post> getAllPost() {
-    return this.postRepository.findAll();
-  }
-
   public Post getPost(int postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {

@@ -28,10 +28,6 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-  public List<UserHashtag> getAllUserHashtag() {
-    return this.userHashtagRepository.findAll();
-  }
-
   public List<UserHashtag> getUserHashtag(int userId) {
     List<UserHashtag> userHashtag = userHashtagRepository.findByUserId(userId);
     if (userHashtag.isEmpty()) {
