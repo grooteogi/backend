@@ -25,7 +25,7 @@ public class Reservation {
   private int id;
 
   @Column(length = 200)
-  private String massage;
+  private String message;
 
   @CreationTimestamp
   private Timestamp createDate;
