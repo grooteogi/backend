@@ -21,9 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
   private final ReservationService reservationService;
 
+  /*
+  * 내가 호스트인 약속 리스트
+  * */
   @GetMapping("/post")
-  public ResponseEntity<BasicResponse> getAllReservation() {
-    List<Reservation> reservationList = this.reservationService.getAllReservation();
+  public ResponseEntity<BasicResponse> getPostReservation() {
+    List<Reservation> reservationList = this.reservationService.getPostReservation();
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
@@ -33,6 +36,9 @@ public class ReservationController {
     return ResponseEntity.ok(BasicResponse.builder().data(reservation).build());
   }
 
+  /*
+  * 내가 잡은 약속 리스트
+  * */
   @GetMapping("/apply/{userId}")
   public ResponseEntity<BasicResponse> getUserReservation(@PathVariable Integer userId) {
     List<Reservation> reservations = reservationService.getUserReservation(userId);

@@ -4,6 +4,7 @@ import grooteogi.domain.Reservation;
 import grooteogi.dto.ReservationDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.UserRepository;
 import java.sql.Timestamp;
@@ -20,8 +21,17 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final UserRepository userRepository;
 
-  public List<Reservation> getAllReservation() {
-    List<Reservation> reservations = reservationRepository.findAll();
+  public List<Reservation> getPostReservation() {
+    List<Object> reservations = reservationRepository.findPostReservation();
+
+    if (reservations.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    }
+    return null;
+  }
+
+  public List<Reservation> getUserReservation(Integer userId) {
+    List<Reservation> reservations = reservationRepository.findByUserId(userId);
     if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
@@ -57,13 +67,4 @@ public class ReservationService {
   public void deleteReservation(Integer reservationId) {
     reservationRepository.deleteById(reservationId);
   }
-
-  public List<Reservation> getUserReservation(Integer userId) {
-    List<Reservation> reservations = reservationRepository.findByUserId(userId);
-    if (reservations.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
-    }
-    return reservations;
-  }
-
 }
