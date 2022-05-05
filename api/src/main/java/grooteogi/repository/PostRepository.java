@@ -10,19 +10,15 @@ import org.springframework.data.jpa.repository.Query;
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
   @Query(
-      value = "SELECT * FROM post WHERE (title LIKE %:title% OR content LIKE %:content%)"
-          + "AND id < :id ORDER BY id desc", nativeQuery = true
+      value = "SELECT * FROM post WHERE (title LIKE %:title% OR content LIKE %:content%)",
+      nativeQuery = true
   )
-  List<Post> findBySearchOrderByIdDesc(@Param("title") String title,
-      @Param("content") String content,
-      @Param("id") Integer id, Pageable pageable);
+  List<Post> findBySearch(@Param("title") String title,
+      @Param("content") String content, Pageable pageable);
 
-  Boolean existsByIdLessThan(Integer id);
-
-  List<Post> findByTitleContainingOrContentContainingOrderByIdDesc(String title,
-      String content, Pageable page);
-
-  List<Post> findByIdLessThanOrderByIdDesc(Integer id, Pageable page);
-
-  List<Post> findAllByOrderByIdDesc(Pageable page);
+  @Query(
+      value = "SELECT * FROM post",
+      nativeQuery = true
+  )
+  List<Post> findAllByPage(Pageable pageable);
 }

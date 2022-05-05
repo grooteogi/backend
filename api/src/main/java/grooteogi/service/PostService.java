@@ -11,7 +11,6 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import grooteogi.response.CursorResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -30,10 +29,6 @@ public class PostService {
   private final PostHashtagRepository postHashtagRepository;
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
-
-  public List<Post> getAllPost() {
-    return this.postRepository.findAll();
-  }
 
   public Post getPost(int postId) {
 
@@ -140,33 +135,24 @@ public class PostService {
     return this.postRepository.findAll();
   }
 
-  public CursorResult<Post> search(String search, Integer cursorId, String type,
+  public List<Post> search(String search, String type,
       Pageable page) {
     final List<Post> posts;
     if (search == null) {
-      posts = searchAllPosts(cursorId, page, type);
+      posts = searchAllPosts(page, type);
     } else {
-      posts = searchPosts(search, cursorId, page, type);
+      posts = searchPosts(search, page, type);
     }
-    final Integer lastIdOfList = posts.isEmpty() ? null : posts.get(posts.size() - 1).getId();
-    return new CursorResult<>(posts, hasNext(lastIdOfList));
+    return posts;
   }
 
-  private List<Post> searchAllPosts(Integer cursorId, Pageable page, String type) {
-    return cursorId == 0 ? this.postRepository.findAllByOrderByIdDesc(page) :
-        this.postRepository.findByIdLessThanOrderByIdDesc(cursorId, page);
+
+  public List<Post> searchAllPosts(Pageable page, String type) {
+    return this.postRepository.findAllByPage(page);
   }
 
-  private List<Post> searchPosts(String search, Integer cursorId, Pageable page, String type) {
-    return cursorId == 0 ? this.postRepository
-        .findByTitleContainingOrContentContainingOrderByIdDesc(search, search, page) :
-        this.postRepository.findBySearchOrderByIdDesc(search, search, cursorId, page);
+  private List<Post> searchPosts(String search, Pageable page, String type) {
+    return this.postRepository.findBySearch(search, search, page);
   }
 
-  private Boolean hasNext(Integer lastIdOfList) {
-    if (lastIdOfList == null) {
-      return false;
-    }
-    return this.postRepository.existsByIdLessThan(lastIdOfList);
-  }
 }

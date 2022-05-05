@@ -9,7 +9,9 @@ import grooteogi.repository.HashtagRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,18 +20,6 @@ public class HashtagService {
 
   private final HashtagRepository hashtagRepository;
 
-  public List<Hashtag> getAllHashtag() {
-    return this.hashtagRepository.findAll();
-  }
-
-  public List<Hashtag> getTopTenHashtag(String type) {
-    //count가 0이어도 불러올 수 있게 함
-    //타입별 getTopTenHashtag로 불러오기
-    if (!type.equals("personality") && !type.equals("concern")) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    }
-    return this.hashtagRepository.getTopTenHashtag(type);
-  }
 
   public Hashtag createHashtag(HashtagDto hashtagDto) {
     Hashtag createdHashtag = new Hashtag();
@@ -46,4 +36,18 @@ public class HashtagService {
     return this.hashtagRepository.save(createdHashtag);
   }
 
+  public List<Hashtag> search(Pageable page, String type) {
+    final List<Hashtag> hashtags;
+
+    if (type == null) {
+      hashtags = this.hashtagRepository.findAllByPage(page);
+    } else if (!type.toLowerCase(Locale.ROOT).equals("personality")
+        && !type.toLowerCase(Locale.ROOT).equals("concern")) {
+      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+    } else {
+      type = type.toLowerCase(Locale.ROOT);
+      hashtags = this.hashtagRepository.findByTypeAndPage(type, page);
+    }
+    return hashtags;
+  }
 }
