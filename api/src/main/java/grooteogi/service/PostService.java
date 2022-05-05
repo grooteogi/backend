@@ -1,5 +1,6 @@
 package grooteogi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
@@ -17,10 +18,10 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,7 @@ public class PostService {
     createdPost.setUser(user.get());
     createdPost.setTitle(postDto.getTitle());
     createdPost.setContent(postDto.getContent());
+    createdPost.setCredit(postDto.getCredit());
     createdPost.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setImageUrl(postDto.getImageUrl());
@@ -79,10 +81,16 @@ public class PostService {
     });
 
     // Schedule 저장
+    ObjectMapper mapper = new ObjectMapper();
     Arrays.stream(postDto.getSchedules()).forEach(schedule -> {
+      Map<String,Object> map = mapper.convertValue(schedule, Map.class);
       Schedule createdSchedule = new Schedule();
-      BeanUtils.copyProperties(schedule, createdSchedule);
-      createdSchedule.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+      createdSchedule.setDate((String) map.get("date"));
+      createdSchedule.setRegion((String) map.get("region"));
+      createdSchedule.setPlace((String) map.get("place"));
+      createdSchedule.setStartTime((String) map.get("startTime"));
+      createdSchedule.setEndTime((String) map.get("endTime"));
+      createdSchedule.setPost(createdPost);
 
       createdPost.getSchedules().add(createdSchedule);
     });
