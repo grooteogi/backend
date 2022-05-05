@@ -6,7 +6,6 @@ import grooteogi.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,21 +24,12 @@ public class HashtagController {
 
   @GetMapping
   public ResponseEntity<BasicResponse> search(
-      @RequestParam(name = "page", required = false) Integer page) {
+      @RequestParam(name = "page", defaultValue = "1") Integer page,
+      @RequestParam(name = "type", required = false) String type,
+      @RequestParam(name = "size", defaultValue = "20") Integer size) {
 
-    if (page == null) {
-      page = 1;
-    }
-    Page<Hashtag> hashtags = hashtagService.search(PageRequest.of(page - 1, 20));
+    List<Hashtag> hashtags = hashtagService.search(PageRequest.of(page - 1, size), type);
     return ResponseEntity.ok(BasicResponse.builder().data(hashtags).build());
-
-  }
-
-  @GetMapping("/top10")
-  public ResponseEntity<BasicResponse> getTopTenHashtag(@RequestParam String type) {
-    List<Hashtag> hashtagList = hashtagService.getTopTenHashtag(type);
-    return ResponseEntity.ok(
-        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
   }
 
   @PostMapping

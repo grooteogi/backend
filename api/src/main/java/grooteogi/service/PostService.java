@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -139,13 +138,17 @@ public class PostService {
   public List<Post> search(String search, String type,
       Pageable page) {
     final List<Post> posts;
-    posts = searchPosts(search, page, type);
+    if (search == null) {
+      posts = searchAllPosts(page, type);
+    } else {
+      posts = searchPosts(search, page, type);
+    }
     return posts;
   }
 
 
-  public Page<Post> searchAllPosts(Pageable page, String type) {
-    return this.postRepository.findAll(page);
+  public List<Post> searchAllPosts(Pageable page, String type) {
+    return this.postRepository.findAllByPage(page);
   }
 
   private List<Post> searchPosts(String search, Pageable page, String type) {
