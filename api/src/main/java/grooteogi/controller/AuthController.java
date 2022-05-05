@@ -30,13 +30,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/auth")
 @RestController
 public class AuthController {
 
@@ -44,7 +42,7 @@ public class AuthController {
   private final AuthService authService;
   private final OauthClient oauthClient;
 
-  @PostMapping("/login")
+  @PostMapping("/auth/login")
   public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
     User user = userService.getUserByEmail(loginDto.getEmail());
     Token token = authService.login(user, loginDto);
@@ -55,7 +53,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
-  @PostMapping("/register")
+  @PostMapping("/auth/register")
   public ResponseEntity<BasicResponse> register(@Valid @RequestBody UserDto userDto,
       BindingResult bindingResult) {
 
@@ -68,14 +66,14 @@ public class AuthController {
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @DeleteMapping("/withdrawal")
+  @DeleteMapping("/auth/withdrawal")
   public ResponseEntity withdrawal(@RequestParam("user-id") Integer userId) {
     authService.withdrawal(userId);
 
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
-  @GetMapping("/token/verify")
+  @GetMapping("/auth/token/verify")
   public ResponseEntity<BasicResponse> tokenVerify(HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     Map<String, Object> result = authService.tokenVerify(authorizationHeader);
@@ -89,7 +87,7 @@ public class AuthController {
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
-  @GetMapping("/token/refresh")
+  @GetMapping("/auth/token/refresh")
   public ResponseEntity<BasicResponse> tokenRefresh(
       @RequestHeader(value = "REFRESH-TOKEN") String refreshToken, HttpServletRequest request) {
     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -109,7 +107,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
-  @GetMapping("/email")
+  @GetMapping("/auth/email")
   public ResponseEntity<BasicResponse> sendVerifyEmail(
       @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
       @RequestParam String address) {
@@ -124,7 +122,7 @@ public class AuthController {
         BasicResponse.builder().message("send email verification success").build());
   }
 
-  @PostMapping("/email")
+  @PostMapping("/auth/email")
   public ResponseEntity<BasicResponse> checkVerifyEmail(
       @RequestBody EmailCodeDto emailCodeRequest) {
     authService.checkVerifyEmail(emailCodeRequest);
@@ -134,7 +132,7 @@ public class AuthController {
   }
 
   @GetMapping("/oauth/{type}")
-  public ResponseEntity<BasicResponse> oauthGoogle(
+  public ResponseEntity<BasicResponse> oauth(
       @PathVariable String type, @RequestParam("code") String code) {
     OauthDto oauthDto = new OauthDto();
     oauthDto.setCode(code);
