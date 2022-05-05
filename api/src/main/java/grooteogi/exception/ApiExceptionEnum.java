@@ -33,6 +33,8 @@ public enum ApiExceptionEnum {
   POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
   HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다."),
   DUPLICATION_RESERVATION_EXCEPTION(HttpStatus.CONFLICT, "신청 불가능한 일정입니다."),
+  SCHEDULE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
+  RESERVATION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "예약이 존재하지 않습니다."),
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다.");
 
   private final HttpStatus httpStatus;
