@@ -1,7 +1,6 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -35,9 +33,6 @@ public class Schedule {
 
   @Column(length = 40)
   private String place;
-
-  @CreationTimestamp
-  private Timestamp createDate;
 
   @ManyToOne
   @JsonBackReference
