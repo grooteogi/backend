@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package grooteogi.controller;
 
 import grooteogi.domain.UserHashtag;
@@ -12,6 +7,7 @@ import grooteogi.service.UserHashtagService;
 import grooteogi.utils.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,12 +27,14 @@ public class UserHashtagController {
   private final UserHashtagService userHashtagService;
 
   @GetMapping("/hashtag")
-  public ResponseEntity<BasicResponse> getUserHashtag() {
+  public ResponseEntity<BasicResponse> search(
+      @RequestParam(name = "page", defaultValue = "1") Integer page) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    List<UserHashtag> hashtagList = userHashtagService.getUserHashtag(session.getId());
-    return ResponseEntity.ok(
-        BasicResponse.builder().count(hashtagList.size()).data(hashtagList).build());
+
+    List<UserHashtag> userHashtags = userHashtagService.search(
+        session.getId(), PageRequest.of(page - 1, 20));
+    return ResponseEntity.ok(BasicResponse.builder().data(userHashtags).build());
   }
 
   @PostMapping("/hashtag")

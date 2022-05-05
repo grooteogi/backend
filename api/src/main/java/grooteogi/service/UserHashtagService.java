@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,10 +26,6 @@ public class UserHashtagService {
   private final UserHashtagRepository userHashtagRepository;
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
-
-  public List<UserHashtag> getAllUserHashtag() {
-    return this.userHashtagRepository.findAll();
-  }
 
   public List<UserHashtag> getUserHashtag(int userId) {
     List<UserHashtag> userHashtag = userHashtagRepository.findByUserId(userId);
@@ -138,4 +135,23 @@ public class UserHashtagService {
 
     return this.userHashtagRepository.findByUserId(userId);
   }
+
+  public List<UserHashtag> search(Integer userId, Pageable page) {
+    final List<UserHashtag> userHashtags;
+    if (userId == null) {
+      userHashtags = searchAllUserHashtags(page);
+    } else {
+      userHashtags = searchUserhashtags(userId, page);
+    }
+    return userHashtags;
+  }
+
+  private List<UserHashtag> searchUserhashtags(Integer userId, Pageable page) {
+    return this.userHashtagRepository.findByUserIdAndPage(userId, page);
+  }
+
+  public List<UserHashtag> searchAllUserHashtags(Pageable page) {
+    return this.userHashtagRepository.findAllByPage(page);
+  }
+
 }
