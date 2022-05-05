@@ -12,8 +12,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.controller.UserController;
 import grooteogi.domain.User;
+import grooteogi.dto.user.PwDto;
 import grooteogi.enums.LoginType;
 import grooteogi.service.UserService;
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ public class UserDocumentationTests {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -97,10 +102,12 @@ public class UserDocumentationTests {
                     .optional(),
                 fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
                 fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.[].hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
-                fieldWithPath("data.[].participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
-                fieldWithPath("data.[].hearts").type(JsonFieldType.ARRAY).description("찜").optional()
-                )));
+                fieldWithPath("data.[].hostReserves").type(JsonFieldType.ARRAY).description("주최자")
+                    .optional(),
+                fieldWithPath("data.[].participateReserves").type(JsonFieldType.ARRAY)
+                    .description("참가자").optional(),
+                fieldWithPath("data.[].hearts").type(JsonFieldType.ARRAY).description("찜")
+                    .optional())));
   }
 
   @DisplayName("회원정보 조회")
@@ -128,10 +135,11 @@ public class UserDocumentationTests {
                     .optional(),
                 fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
                 fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
-                fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
-                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜").optional()
-            )));
+                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자")
+                    .optional(), fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY)
+                    .description("참가자").optional(),
+                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜")
+                    .optional())));
   }
 
   @DisplayName("프로필 조회")
@@ -161,9 +169,31 @@ public class UserDocumentationTests {
                     .optional(),
                 fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
                 fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자").optional(),
-                fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY).description("참가자").optional(),
-                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜").optional()
-            )));
+                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자")
+                    .optional(), fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY)
+                    .description("참가자").optional(),
+                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜")
+                    .optional())));
+  }
+
+  @DisplayName("비밀번호 변경")
+  @Test
+  void UpdatePassword() throws Exception {
+    PwDto pwDto = new PwDto();
+    pwDto.setPassword("groot1234*");
+    int userId = anyInt();
+
+    User testUser = getTestUser();
+    given(userService.getUser(userId)).willReturn(testUser);
+
+    ResultActions result = mockMvc.perform(
+        RestDocumentationRequestBuilders.patch("/user/{userId}/password", userId)
+            .characterEncoding("utf-8").content(objectMapper.writeValueAsString(pwDto))
+            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+
+    result.andExpect(status().isOk()).andDo(print()).andDo(
+        document("update-password", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("message").description("메시지"))));
   }
 }
