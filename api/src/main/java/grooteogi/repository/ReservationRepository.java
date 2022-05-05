@@ -13,5 +13,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
   @Query("select r, s, p from Post as p left outer join Schedule as s on p.id = s.post.id "
       + "inner join Reservation as r on s.id = r.schedule.id")
-  List<Object> findPostReservation();
+  List<Object[]> findPostReservation();
 }
