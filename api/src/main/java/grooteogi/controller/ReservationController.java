@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/reservation")
 public class ReservationController {
-  private ReservationService reservationService;
+  private final ReservationService reservationService;
 
   @GetMapping
   public ResponseEntity<BasicResponse> getAllReservation() {
