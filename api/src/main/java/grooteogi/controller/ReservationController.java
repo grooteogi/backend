@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
   private final ReservationService reservationService;
 
-  @GetMapping
+  @GetMapping("/post")
   public ResponseEntity<BasicResponse> getAllReservation() {
     List<Reservation> reservationList = this.reservationService.getAllReservation();
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
@@ -33,8 +33,15 @@ public class ReservationController {
     return ResponseEntity.ok(BasicResponse.builder().data(reservation).build());
   }
 
+  @GetMapping("/apply/{userId}")
+  public ResponseEntity<BasicResponse> getUserReservation(@PathVariable Integer userId) {
+    List<Reservation> reservations = reservationService.getUserReservation(userId);
+    return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
+  }
+
   @PostMapping
-  public ResponseEntity<BasicResponse> createReservation(@RequestBody ReservationDto reservationDto) {
+  public ResponseEntity<BasicResponse> createReservation(
+      @RequestBody ReservationDto reservationDto) {
     Reservation createdReservation = this.reservationService.createReservation(reservationDto);
     return ResponseEntity.ok(BasicResponse.builder().data(createdReservation).build());
   }

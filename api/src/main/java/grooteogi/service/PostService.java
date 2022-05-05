@@ -83,7 +83,7 @@ public class PostService {
     // Schedule 저장
     ObjectMapper mapper = new ObjectMapper();
     Arrays.stream(postDto.getSchedules()).forEach(schedule -> {
-      Map<String,Object> map = mapper.convertValue(schedule, Map.class);
+      Map<String, Object> map = mapper.convertValue(schedule, Map.class);
       Schedule createdSchedule = new Schedule();
       createdSchedule.setDate((String) map.get("date"));
       createdSchedule.setRegion((String) map.get("region"));

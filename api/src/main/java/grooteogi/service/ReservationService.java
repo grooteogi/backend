@@ -5,6 +5,7 @@ import grooteogi.dto.ReservationDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.ReservationRepository;
+import grooteogi.repository.UserRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationService {
   private final ReservationRepository reservationRepository;
+  private final UserRepository userRepository;
 
   public List<Reservation> getAllReservation() {
     List<Reservation> reservations = reservationRepository.findAll();
-    if(reservations.isEmpty()) {
+    if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
     return reservations;
@@ -35,12 +37,13 @@ public class ReservationService {
   }
 
   public Reservation createReservation(ReservationDto reservationDto) {
-    Optional<Reservation> reservation = reservationRepository.findByScheduleId(reservationDto.getScheduleId());
-    if(reservation.isPresent()) {
+    Optional<Reservation> reservation = reservationRepository
+        .findByScheduleId(reservationDto.getScheduleId());
+    if (reservation.isPresent()) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_RESERVATION_EXCEPTION);
     }
 
-    if(reservation.get().getSchedule() == null) {
+    if (reservation.get().getSchedule() == null) {
       throw new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION);
     }
 
@@ -54,4 +57,13 @@ public class ReservationService {
   public void deleteReservation(Integer reservationId) {
     reservationRepository.deleteById(reservationId);
   }
+
+  public List<Reservation> getUserReservation(Integer userId) {
+    List<Reservation> reservations = reservationRepository.findByUserId(userId);
+    if (reservations.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    }
+    return reservations;
+  }
+
 }
