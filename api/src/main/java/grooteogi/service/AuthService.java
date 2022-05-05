@@ -99,7 +99,7 @@ public class AuthService {
     String key = prefix + emailCodeRequest.getEmail();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(emailCodeRequest.getCode())) {
-      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
     }
   }
 
