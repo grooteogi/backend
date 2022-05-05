@@ -3,12 +3,15 @@ package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import grooteogi.enums.CreditType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,6 +51,10 @@ public class Post {
   @CreationTimestamp
   private Timestamp modifiedDate;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private CreditType credit;
+
   @ManyToOne
   @JsonBackReference
   @JoinColumn(name = "user_id")
@@ -67,4 +74,9 @@ public class Post {
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
   private List<Heart> hearts = new ArrayList<>();
+
+  @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+    CascadeType.REMOVE}, fetch = FetchType.LAZY)
+  @JsonManagedReference
+  private List<Review> reviews = new ArrayList<>();
 }

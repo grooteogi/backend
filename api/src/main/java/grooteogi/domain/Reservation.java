@@ -25,23 +25,18 @@ public class Reservation {
   private int id;
 
   @Column(length = 200)
-  private String massage;
+  private String message;
 
   @CreationTimestamp
   private Timestamp createDate;
 
   @ManyToOne
   @JsonBackReference
-  @JoinColumn(name = "host_user_id")
-  private User hostUser;
-
-  @ManyToOne
-  @JsonBackReference
-  @JoinColumn(name = "participate_user_id")
-  private User participateUser;
+  @JoinColumn(name = "user_id")
+  private User user;
 
   @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-  @JoinColumn(name = "post_id")
-  private Post post;
+  @JoinColumn(name = "schedule_id")
+  private Schedule schedule;
 
 }
