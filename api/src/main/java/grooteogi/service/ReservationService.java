@@ -29,8 +29,8 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
 
-  public List<ReservationRes> getPostReservation() {
-     List<Object[]> reservations = reservationRepository.findPostReservation();
+  public List<ReservationRes> getPostReservation(int id) {
+    List<Object[]> reservations = reservationRepository.findPostReservation(id);
 
     if (reservations.size() == 0) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);

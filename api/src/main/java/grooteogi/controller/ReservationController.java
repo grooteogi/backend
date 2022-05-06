@@ -26,13 +26,15 @@ public class ReservationController {
 
   @GetMapping("/post")
   public ResponseEntity<BasicResponse> getPostReservation() {
-    List<ReservationRes> reservationList = this.reservationService.getPostReservation();
+    Session session = (Session) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    List<ReservationRes> reservationList = reservationService.getPostReservation(session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    Reservation reservation = this.reservationService.getReservation(reservationId);
+    Reservation reservation = reservationService.getReservation(reservationId);
     return ResponseEntity.ok(BasicResponse.builder().data(reservation).build());
   }
 
