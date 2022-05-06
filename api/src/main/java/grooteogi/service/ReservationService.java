@@ -1,6 +1,7 @@
 package grooteogi.service;
 
 import grooteogi.domain.Post;
+import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
@@ -29,12 +30,7 @@ public class ReservationService {
   private final PostRepository postRepository;
 
   public List<ReservationRes> getPostReservation() {
-    /*
-    * [grooteogi.domain.Reservation@17743dc4,
-    * grooteogi.domain.Schedule@245c2d9c,
-    * grooteogi.domain.Post@4d1f340e]
-    * */
-    List<Object[]> reservations = reservationRepository.findPostReservation();
+     List<Object[]> reservations = reservationRepository.findPostReservation();
 
     if (reservations.size() == 0) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
@@ -51,11 +47,20 @@ public class ReservationService {
       response.setRegion(schedule.getRegion());
       response.setStartTime(schedule.getStartTime());
       response.setTitle(post.getTitle());
-//      response.setHashtags();
+      response.setHashtags(getTags(post.getPostHashtags()));
       response.setImgUrl(post.getImageUrl());
       responseList.add(response);
     }
     return responseList;
+  }
+
+  private String[] getTags(List<PostHashtag> postHashtags) {
+    String[] tags = new String[postHashtags.size()];
+    postHashtags.forEach(tag -> {
+      int i = 0;
+      tags[i++] = tag.getHashTag().getTag();
+    });
+    return tags;
   }
 
   public List<Reservation> getUserReservation(Integer userId) {
