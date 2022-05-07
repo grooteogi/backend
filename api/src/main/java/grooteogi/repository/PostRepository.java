@@ -1,6 +1,7 @@
 package grooteogi.repository;
 
 import grooteogi.domain.Post;
+import grooteogi.domain.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
       nativeQuery = true
   )
   List<Post> findAllByPage(Pageable pageable);
+
+  Boolean existsByUser(User user);
 }
