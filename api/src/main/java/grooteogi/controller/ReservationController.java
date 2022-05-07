@@ -2,7 +2,6 @@ package grooteogi.controller;
 
 import grooteogi.domain.Reservation;
 import grooteogi.dto.ReservationDto;
-import grooteogi.dto.ReservationRes;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.Session;
@@ -22,13 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/reservation")
 public class ReservationController {
+
   private final ReservationService reservationService;
 
-  @GetMapping("/post")
+  @GetMapping("/host")
   public ResponseEntity<BasicResponse> getHostReservation() {
-    Session session = (Session) SecurityContextHolder.getContext()
-        .getAuthentication().getPrincipal();
-    List<ReservationRes> reservationList = reservationService.getHostReservation(session.getId());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<ReservationDto.Response> reservationList = reservationService.getHostReservation(
+        session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
@@ -40,19 +42,22 @@ public class ReservationController {
 
   @GetMapping("/apply")
   public ResponseEntity<BasicResponse> getUserReservation() {
-    Session session = (Session) SecurityContextHolder.getContext()
-        .getAuthentication().getPrincipal();
-    List<ReservationRes> reservations = reservationService.getUserReservation(session.getId());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<ReservationDto.Response> reservations = reservationService.getUserReservation(
+        session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createReservation(
-      @RequestBody ReservationDto reservationDto) {
-    Session session = (Session) SecurityContextHolder.getContext()
-        .getAuthentication().getPrincipal();
-    Reservation createdReservation = reservationService
-        .createReservation(reservationDto, session.getId());
+      @RequestBody ReservationDto.Request request) {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    Reservation createdReservation = reservationService.createReservation(request,
+        session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(createdReservation).build());
   }
 
