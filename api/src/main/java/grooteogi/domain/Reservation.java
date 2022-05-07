@@ -2,7 +2,6 @@ package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.sql.Timestamp;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,7 +34,7 @@ public class Reservation {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @OneToOne
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
 
