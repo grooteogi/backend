@@ -15,6 +15,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
   ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
 
   @Mapping(target = "id", ignore = true)
+  @Mapping(source = "schedule", target = "schedule")
   @Mapping(source = "user", target = "participateUser")
   @Mapping(source = "schedule.post.user", target = "hostUser")
   Reservation toEntity(ReservationDto.Request dto, User user, Schedule schedule);
