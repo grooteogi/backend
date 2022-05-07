@@ -25,10 +25,10 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @GetMapping("/post")
-  public ResponseEntity<BasicResponse> getPostReservation() {
+  public ResponseEntity<BasicResponse> getHostReservation() {
     Session session = (Session) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
-    List<ReservationRes> reservationList = reservationService.getPostReservation(session.getId());
+    List<ReservationRes> reservationList = reservationService.getHostReservation(session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
@@ -42,7 +42,7 @@ public class ReservationController {
   public ResponseEntity<BasicResponse> getUserReservation() {
     Session session = (Session) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
-    List<Reservation> reservations = reservationService.getUserReservation(session.getId());
+    List<ReservationRes> reservations = reservationService.getUserReservation(session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
   }
 

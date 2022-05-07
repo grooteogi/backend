@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class ReservationRes {
 
-  private int id;
+  private int reservationId;
   private String imgUrl;
   private String title;
   private String[] hashtags;
