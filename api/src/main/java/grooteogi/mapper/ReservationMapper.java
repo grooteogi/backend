@@ -21,6 +21,6 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
 
   ReservationDto toDto(Reservation entity);
 
-  ReservationRes toResDto(Reservation eReservation, Post ePost, Schedule eSchedule);
+  ReservationRes toResDto(Reservation reservation, Post post, Schedule schedule);
 
 }
