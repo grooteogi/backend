@@ -9,6 +9,7 @@ import grooteogi.dto.ReservationDto;
 import grooteogi.dto.ReservationRes;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.ReservationMapper;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
@@ -29,29 +30,30 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
 
-  public List<ReservationRes> getPostReservation(int id) {
-    List<Object[]> reservations = reservationRepository.findPostReservation(id);
+  public List<ReservationRes> getHostReservation(int userId) {
+    List<Reservation> reservations = reservationRepository.findByHostUserId(userId);
+    return getReservationResponse(reservations);
+  }
 
-    if (reservations.size() == 0) {
+  public List<ReservationRes> getUserReservation(Integer userId) {
+    List<Reservation> reservations = reservationRepository.findByParticipateUserId(userId);
+    return getReservationResponse(reservations);
+  }
+
+  private List<ReservationRes> getReservationResponse(List<Reservation> reservations) {
+    if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
 
     List<ReservationRes> responseList = new ArrayList<>();
-    for (Object[] arr : reservations) {
-      Reservation reservation = (Reservation) arr[0];
-      Schedule schedule = (Schedule) arr[1];
-      Post post = (Post) arr[2];
-      ReservationRes response = new ReservationRes();
-      response.setId(reservation.getId());
-      response.setDate(schedule.getDate());
-      response.setEndTime(schedule.getEndTime());
-      response.setPlace(schedule.getPlace());
-      response.setStartTime(schedule.getStartTime());
-      response.setTitle(post.getTitle());
-      response.setHashtags(getTags(post.getPostHashtags()));
-      response.setImgUrl(post.getImageUrl());
+    reservations.forEach(reservation -> {
+      Optional<Schedule> schedule = scheduleRepository.findById(reservation.getSchedule().getId());
+      Optional<Post> post = postRepository.findById(schedule.get().getPost().getId());
+      ReservationRes response = ReservationMapper.INSTANCE.toResDto(reservation, post.get(),
+          schedule.get());
+      response.setHashtags(getTags(post.get().getPostHashtags()));
       responseList.add(response);
-    }
+    });
     return responseList;
   }
 
@@ -62,14 +64,6 @@ public class ReservationService {
       tags[i++] = tag.getHashTag().getTag();
     });
     return tags;
-  }
-
-  public List<Reservation> getUserReservation(Integer userId) {
-    List<Reservation> reservations = reservationRepository.findByUserId(userId);
-    if (reservations.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
-    }
-    return reservations;
   }
 
   public Reservation getReservation(Integer reservationId) {
@@ -98,12 +92,9 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    Reservation createdReservation = new Reservation();
-    createdReservation.setSchedule(schedule.get());
-    createdReservation.setUser(user.get());
-    createdReservation.setMessage(reservationDto.getMessage());
+    Reservation createdReservation = ReservationMapper.INSTANCE
+        .toEntity(reservationDto, user.get(), schedule.get());
     createdReservation.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-
     return reservationRepository.save(createdReservation);
   }
 
