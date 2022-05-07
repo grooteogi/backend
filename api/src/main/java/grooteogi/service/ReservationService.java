@@ -44,7 +44,8 @@ public class ReservationService {
       ReservationRes response = new ReservationRes();
       response.setId(reservation.getId());
       response.setDate(schedule.getDate());
-      response.setRegion(schedule.getRegion());
+      response.setEndTime(schedule.getEndTime());
+      response.setPlace(schedule.getPlace());
       response.setStartTime(schedule.getStartTime());
       response.setTitle(post.getTitle());
       response.setHashtags(getTags(post.getPostHashtags()));
@@ -107,6 +108,10 @@ public class ReservationService {
   }
 
   public void deleteReservation(Integer reservationId) {
-    reservationRepository.deleteById(reservationId);
+    Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+    if (reservation.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+    }
+    reservationRepository.delete(reservation.get());
   }
 }

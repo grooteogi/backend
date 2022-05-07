@@ -13,6 +13,7 @@ public class ReservationRes {
   private String[] hashtags;
   private String date;
   private String startTime;
-  private String region;
+  private String endTime;
+  private String place;
 
 }
