@@ -50,7 +50,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @WebMvcTest(ReservationController.class)
-public class ReservationControllerTest {
+public class ReservationDocumentationTests {
 
   @Autowired
   private MockMvc mockMvc;
@@ -71,10 +71,13 @@ public class ReservationControllerTest {
   @MockBean
   private SecurityContext securityContext;
 
-  User hostUser, particiUser;
+  User hostUser;
+  User particiUser;
   Post post;
   Schedule schedule;
   List<Schedule> schedules;
+  ReservationDto.Request request;
+  Reservation response;
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -124,69 +127,6 @@ public class ReservationControllerTest {
   }
 
   @Test
-  @DisplayName("예약생성")
-  public void createReservation() throws Exception {
-    // given
-    ReservationDto.Request request = reservationReq();
-    Reservation response = reservationEntity();
-
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
-
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(response);
-
-    String json = objectMapper.writeValueAsString(request);
-
-    // when
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    // then
-    resultActions.andExpect(status().isOk())
-        .andDo(print());
-
-  }
-
-  private ReservationDto.Request reservationReq() {
-    return ReservationDto.Request
-        .builder()
-        .message("msg")
-        .scheduleId(1)
-        .build();
-  }
-
-  private ReservationDto.Response reservationRes() {
-    return ReservationDto.Response
-        .builder()
-        .reservationId(1)
-        .date(schedule.getDate())
-        .endTime(schedule.getEndTime())
-        .place(schedule.getPlace())
-        .startTime(schedule.getStartTime())
-        .imgUrl(post.getImageUrl())
-        .title(post.getTitle())
-        .hashtags(null)
-        .build();
-  }
-
-  private Reservation reservationEntity() {
-    Reservation reservation = new Reservation();
-    reservation.setId(1);
-    reservation.setMessage("msg");
-    reservation.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-    reservation.setHostUser(hostUser);
-    reservation.setSchedule(schedule);
-    reservation.setParticipateUser(particiUser);
-
-    return reservation;
-  }
-
-  @Test
   @DisplayName("예약조회")
   public void getReservation() throws Exception {
     // given
@@ -195,32 +135,13 @@ public class ReservationControllerTest {
     String reservationId = "1";
 
     ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/reservation/{reservationId}", reservationId)
+        RestDocumentationRequestBuilders
+            .get("/reservation/{reservationId}", reservationId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
         .andDo(print());
     verify(reservationService).getReservation(1);
-  }
-
-  @Test
-  @DisplayName("예약삭제")
-  public void deleteReservation() throws Exception {
-    //given
-    int reservationId = anyInt();
-
-    //when
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.delete("/reservation/{reservationId}", reservationId)
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    //then
-    resultActions.andExpect(status().isOk())
-        .andDo(print());
-
-    verify(reservationService).deleteReservation(reservationId);
   }
 
   @Test
@@ -239,7 +160,8 @@ public class ReservationControllerTest {
     given(reservationService.getHostReservation(anyInt())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/reservation/host").characterEncoding("uft-8")
+        RestDocumentationRequestBuilders
+            .get("/reservation/host").characterEncoding("uft-8")
             .accept(MediaType.APPLICATION_JSON)
     );
 
@@ -266,7 +188,8 @@ public class ReservationControllerTest {
     given(reservationService.getUserReservation(anyInt())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/reservation/apply").characterEncoding("uft-8")
+        RestDocumentationRequestBuilders
+            .get("/reservation/apply").characterEncoding("uft-8")
             .accept(MediaType.APPLICATION_JSON)
     );
 
@@ -276,5 +199,87 @@ public class ReservationControllerTest {
     verify(reservationService).getUserReservation(anyInt());
   }
 
+  @Test
+  @DisplayName("예약생성")
+  public void createReservation() throws Exception {
+    // given
+    request = reservationReq();
+    response = reservationEntity();
 
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    given(reservationService.createReservation(eq(request), anyInt())).willReturn(response);
+
+    String json = objectMapper.writeValueAsString(request);
+
+    // when
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    // then
+    resultActions.andExpect(status().isOk())
+        .andDo(print());
+
+  }
+
+  @Test
+  @DisplayName("예약삭제")
+  public void deleteReservation() throws Exception {
+    //given
+    int reservationId = anyInt();
+
+    //when
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .delete("/reservation/{reservationId}", reservationId)
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    //then
+    resultActions.andExpect(status().isOk())
+        .andDo(print());
+
+    verify(reservationService).deleteReservation(reservationId);
+  }
+
+  private Reservation reservationEntity() {
+    Reservation reservation = new Reservation();
+    reservation.setId(1);
+    reservation.setMessage("msg");
+    reservation.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
+    reservation.setHostUser(hostUser);
+    reservation.setSchedule(schedule);
+    reservation.setParticipateUser(particiUser);
+
+    return reservation;
+  }
+
+  private ReservationDto.Request reservationReq() {
+    return ReservationDto.Request
+        .builder()
+        .message("msg")
+        .scheduleId(1)
+        .build();
+  }
+
+  private ReservationDto.Response reservationRes() {
+    return ReservationDto.Response
+        .builder()
+        .reservationId(1)
+        .date(schedule.getDate())
+        .endTime(schedule.getEndTime())
+        .place(schedule.getPlace())
+        .startTime(schedule.getStartTime())
+        .imgUrl(post.getImageUrl())
+        .title(post.getTitle())
+        .hashtags(null)
+        .build();
+  }
 }
