@@ -1,5 +1,7 @@
 package grooteogi.dto;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
@@ -22,9 +24,9 @@ public class ReservationDto {
     private String imgUrl;
     private String title;
     private List<String> hashtags;
-    private String date;
-    private String startTime;
-    private String endTime;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private String place;
   }
 }

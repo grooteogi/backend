@@ -23,8 +23,8 @@ import grooteogi.enums.LoginType;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,11 +104,11 @@ public class ReservationDocumentationTests {
     schedules = new ArrayList<>();
     schedule = new Schedule();
     schedule.setId(1);
-    schedule.setDate("2022-05-07");
+    schedule.setDate(LocalDate.now());
     schedule.setRegion("인천");
     schedule.setPlace("부평역");
-    schedule.setStartTime("16:00");
-    schedule.setEndTime("17:00");
+    schedule.setStartTime(LocalTime.of(14,00));
+    schedule.setEndTime(LocalTime.of(15,00));
     schedules.add(schedule);
 
     post = new Post();
