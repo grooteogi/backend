@@ -13,8 +13,6 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,7 +94,6 @@ public class ReservationService {
 
     Reservation createdReservation = ReservationMapper.INSTANCE.toEntity(request, user.get(),
         schedule.get());
-    createdReservation.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
     return reservationRepository.save(createdReservation);
   }
 

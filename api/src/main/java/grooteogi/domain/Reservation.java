@@ -27,7 +27,7 @@ public class Reservation {
   private String message;
 
   @CreationTimestamp
-  private Timestamp createDate;
+  private Timestamp createAt;
 
   @ManyToOne
   @JsonBackReference

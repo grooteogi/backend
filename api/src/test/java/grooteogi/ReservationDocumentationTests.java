@@ -253,7 +253,6 @@ public class ReservationDocumentationTests {
     Reservation reservation = new Reservation();
     reservation.setId(1);
     reservation.setMessage("msg");
-    reservation.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
     reservation.setHostUser(hostUser);
     reservation.setSchedule(schedule);
     reservation.setParticipateUser(particiUser);

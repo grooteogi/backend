@@ -23,7 +23,7 @@ public class UserHashtag {
   private int id;
 
   @CreationTimestamp
-  private Timestamp registered;
+  private Timestamp createAt;
 
   @ManyToOne
   @JsonBackReference
