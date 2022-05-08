@@ -1,4 +1,4 @@
-package grooteogi.controller;
+package grooteogi;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
+import grooteogi.controller.ReservationController;
 import grooteogi.domain.Post;
 import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
@@ -24,7 +25,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -60,7 +59,7 @@ public class ReservationControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  protected MockHttpSession session;
+//  protected MockHttpSession session;
 
   User hostUser, particiUser;
   Post post;
@@ -74,8 +73,8 @@ public class ReservationControllerTest {
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
 
-    session = new MockHttpSession();
-    session.setAttribute("id", 1);
+//    session = new MockHttpSession();
+//    session.setAttribute("id", 1);
 //    session.setAttribute("email", "groot22@example.com");
 
     // 예약을 위해 필요한 도메인
@@ -133,8 +132,6 @@ public class ReservationControllerTest {
   @Test
   public void 예약생성() throws Exception {
     // given
-    final String url = "/reservation";
-
     ReservationDto.Request request = reservationReq();
     Reservation response = getReservation();
 
@@ -144,8 +141,8 @@ public class ReservationControllerTest {
 
     // when
     ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.post(url).characterEncoding("utf-8")
-            .session(session)
+        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
+//            .session(session)
             .content(json)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -158,10 +155,10 @@ public class ReservationControllerTest {
     verify(reservationService).createReservation(request, 1);
   }
 
-  @AfterEach
-  void clean() {
-    session.clearAttributes();
-  }
+//  @AfterEach
+//  void clean() {
+//    session.clearAttributes();
+//  }
 
   private ReservationDto.Request reservationReq() {
     return ReservationDto.Request
@@ -212,51 +209,68 @@ public class ReservationControllerTest {
         .andDo(print());
     verify(reservationService).getReservation(1);
   }
-  //  private User getHostUser() {
-//    User hostUser = new User();
-//    hostUser.setId(1);
-//    hostUser.setType(LoginType.GENERAL);
-//    hostUser.setEmail("groot@example.com");
-//    hostUser.setPassword(passwordEncoder.encode("groot1234*"));
-//    hostUser.setNickname("groot-1");
-//    return hostUser;
-//  }
-//  private User getParticiUser() {
-//    User particiUser = new User();
-//    particiUser.setId(2);
-//    particiUser.setType(LoginType.GENERAL);
-//    particiUser.setEmail("groot22@example.com");
-//    particiUser.setPassword(passwordEncoder.encode("groot1234*"));
-//    particiUser.setNickname("groot-2");
-//    return particiUser;
-//  }
-//  private Schedule getSchedule() {
-//    Schedule schedule = new Schedule();
-//    schedule.setId(1);
-//    schedule.setDate("2022-05-07");
-//    schedule.setRegion("인천");
-//    schedule.setPlace("부평역");
-//    schedule.setStartTime("16:00");
-//    schedule.setEndTime("17:00");
-//    Post post = getPost();
-//    schedule.setPost(post);
-//    return schedule;
-//  }
-//  private Post getPost() {
-//    User hostUser = getHostUser();
-//    Post post = new Post();
-//    post.setUser(hostUser);
-//    post.setPostHashtags(null);
-//    List<Schedule> schedules = new ArrayList<>();
-//    Schedule schedule = getSchedule();
-//    schedules.add(schedule);
-//    post.setSchedules(schedules);
-//    post.setViews(0);
-//    post.setTitle("제목이다.");
-//    post.setContent("내용이다");
-//    post.setCredit(CreditType.DIRECT);
-//    post.setImageUrl("이미지 주소다");
-//    return post;
-//  }
+
+  @Test
+  public void 예약삭제() throws Exception {
+    //given
+    int reservationId = anyInt();
+
+    //when
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders.delete("/reservation/{reservationId}", reservationId)
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    //then
+    resultActions.andExpect(status().isOk())
+        .andDo(print());
+
+    verify(reservationService).deleteReservation(reservationId);
+  }
+
+  @Test
+  public void 호스트유저예약조회() throws Exception {
+    // given
+    int hostUserId = anyInt();
+    List<ReservationDto.Response> responses = new ArrayList<>();
+    ReservationDto.Response response = reservationRes();
+    responses.add(response);
+    // when
+    given(reservationService.getHostReservation(hostUserId)).willReturn(responses);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders.get("/reservation/host").characterEncoding("uft-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    // then
+    resultActions.andExpect(status().isOk()).andDo(print());
+
+    verify(reservationService).getHostReservation(hostUserId);
+
+  }
+
+  @Test
+  public void 참가자유저예약조회() throws Exception {
+    // given
+    int particiUserId = anyInt();
+    List<ReservationDto.Response> responses = new ArrayList<>();
+    ReservationDto.Response response = reservationRes();
+    responses.add(response);
+    // when
+    given(reservationService.getUserReservation(particiUserId)).willReturn(responses);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders.get("/reservation/apply").characterEncoding("uft-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    // then
+    resultActions.andExpect(status().isOk()).andDo(print());
+
+    verify(reservationService).getUserReservation(particiUserId);
+  }
+
 
 }
