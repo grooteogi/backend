@@ -107,8 +107,8 @@ public class ReservationDocumentationTests {
     schedule.setDate(LocalDate.now());
     schedule.setRegion("인천");
     schedule.setPlace("부평역");
-    schedule.setStartTime(LocalTime.of(14,00));
-    schedule.setEndTime(LocalTime.of(15,00));
+    schedule.setStartTime(LocalTime.of(14, 00));
+    schedule.setEndTime(LocalTime.of(15, 00));
     schedules.add(schedule);
 
     post = new Post();
