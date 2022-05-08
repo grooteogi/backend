@@ -2,7 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.ProfileDto;
-import grooteogi.dto.UserDto.Password;
+import grooteogi.dto.UserDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
 import grooteogi.utils.Session;
@@ -56,7 +56,7 @@ public class UserController {
   }
 
   @PatchMapping("/password")
-  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody Password request) {
+  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody UserDto.Password request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     userService.modifyUserPw(session.getId(), request);

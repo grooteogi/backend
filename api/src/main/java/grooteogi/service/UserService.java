@@ -3,7 +3,7 @@ package grooteogi.service;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.ProfileDto;
-import grooteogi.dto.UserDto.Password;
+import grooteogi.dto.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -82,7 +82,7 @@ public class UserService {
     return userRepository.save(user.get());
   }
 
-  public void modifyUserPw(Integer userId, Password request) {
+  public void modifyUserPw(Integer userId, UserDto.Password request) {
     Optional<User> user = userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
