@@ -7,11 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserHashtagDto {
-
-  @NotBlank(message = "user id를 입력하세요.")
-  private Integer userId;
-
   @NotBlank(message = "hashtag를 입력하세요.")
   private String[] hashtags;
-
 }

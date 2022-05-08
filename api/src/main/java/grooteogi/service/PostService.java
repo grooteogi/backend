@@ -1,8 +1,10 @@
 package grooteogi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
 import grooteogi.exception.ApiException;
@@ -11,11 +13,11 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import grooteogi.response.CursorResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +32,6 @@ public class PostService {
   private final PostHashtagRepository postHashtagRepository;
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
-
-  public List<Post> getAllPost() {
-    return this.postRepository.findAll();
-  }
 
   public Post getPost(int postId) {
 
@@ -58,6 +56,7 @@ public class PostService {
     createdPost.setUser(user.get());
     createdPost.setTitle(postDto.getTitle());
     createdPost.setContent(postDto.getContent());
+    createdPost.setCredit(postDto.getCredit());
     createdPost.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setImageUrl(postDto.getImageUrl());
@@ -74,6 +73,21 @@ public class PostService {
       createdPostHashtag.setPost(createdPost);
 
       createdPost.getPostHashtags().add(createdPostHashtag);
+    });
+
+    // Schedule 저장
+    ObjectMapper mapper = new ObjectMapper();
+    Arrays.stream(postDto.getSchedules()).forEach(schedule -> {
+      Map<String, Object> map = mapper.convertValue(schedule, Map.class);
+      Schedule createdSchedule = new Schedule();
+      createdSchedule.setDate((String) map.get("date"));
+      createdSchedule.setRegion((String) map.get("region"));
+      createdSchedule.setPlace((String) map.get("place"));
+      createdSchedule.setStartTime((String) map.get("startTime"));
+      createdSchedule.setEndTime((String) map.get("endTime"));
+      createdSchedule.setPost(createdPost);
+
+      createdPost.getSchedules().add(createdSchedule);
     });
 
     this.postRepository.save(createdPost);
@@ -140,33 +154,24 @@ public class PostService {
     return this.postRepository.findAll();
   }
 
-  public CursorResult<Post> search(String search, Integer cursorId, String type,
+  public List<Post> search(String search, String type,
       Pageable page) {
     final List<Post> posts;
     if (search == null) {
-      posts = searchAllPosts(cursorId, page, type);
+      posts = searchAllPosts(page, type);
     } else {
-      posts = searchPosts(search, cursorId, page, type);
+      posts = searchPosts(search, page, type);
     }
-    final Integer lastIdOfList = posts.isEmpty() ? null : posts.get(posts.size() - 1).getId();
-    return new CursorResult<>(posts, hasNext(lastIdOfList));
+    return posts;
   }
 
-  private List<Post> searchAllPosts(Integer cursorId, Pageable page, String type) {
-    return cursorId == 0 ? this.postRepository.findAllByOrderByIdDesc(page) :
-        this.postRepository.findByIdLessThanOrderByIdDesc(cursorId, page);
+
+  public List<Post> searchAllPosts(Pageable page, String type) {
+    return this.postRepository.findAllByPage(page);
   }
 
-  private List<Post> searchPosts(String search, Integer cursorId, Pageable page, String type) {
-    return cursorId == 0 ? this.postRepository
-        .findByTitleContainingOrContentContainingOrderByIdDesc(search, search, page) :
-        this.postRepository.findBySearchOrderByIdDesc(search, search, cursorId, page);
+  private List<Post> searchPosts(String search, Pageable page, String type) {
+    return this.postRepository.findBySearch(search, search, page);
   }
 
-  private Boolean hasNext(Integer lastIdOfList) {
-    if (lastIdOfList == null) {
-      return false;
-    }
-    return this.postRepository.existsByIdLessThan(lastIdOfList);
-  }
 }

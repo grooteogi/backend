@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,10 +27,6 @@ public class UserHashtagService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-  public List<UserHashtag> getAllUserHashtag() {
-    return this.userHashtagRepository.findAll();
-  }
-
   public List<UserHashtag> getUserHashtag(int userId) {
     List<UserHashtag> userHashtag = userHashtagRepository.findByUserId(userId);
     if (userHashtag.isEmpty()) {
@@ -38,8 +35,8 @@ public class UserHashtagService {
     return this.userHashtagRepository.findByUserId(userId);
   }
 
-  public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto) {
-    Optional<User> user = this.userRepository.findById(userHashtagDto.getUserId());
+  public List<UserHashtag> saveUserHashtag(UserHashtagDto userHashtagDto, Integer userId) {
+    Optional<User> user = this.userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
@@ -66,11 +63,11 @@ public class UserHashtagService {
       this.userHashtagRepository.save(userHashtag);
     });
 
-    return this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
+    return this.userHashtagRepository.findByUserId(userId);
   }
 
-  public List<UserHashtag> modifyUserHashtag(UserHashtagDto userHashtagDto) {
-    Optional<User> user = this.userRepository.findById(userHashtagDto.getUserId());
+  public List<UserHashtag> modifyUserHashtag(UserHashtagDto userHashtagDto, Integer userId) {
+    Optional<User> user = this.userRepository.findById(userId);
     String[] hashtags = userHashtagDto.getHashtags();
 
     if (user.isEmpty()) {
@@ -88,7 +85,7 @@ public class UserHashtagService {
         modifyHashtagList.add(this.hashtagRepository.findByTag(name)));
 
     List<UserHashtag> beforeUserHashtagList =
-        this.userHashtagRepository.findByUserId(userHashtagDto.getUserId());
+        this.userHashtagRepository.findByUserId(userId);
 
     beforeUserHashtagList.forEach(beforeUserHashtag -> {
       Hashtag beforeHashtag = beforeUserHashtag.getHashtag();
@@ -138,4 +135,23 @@ public class UserHashtagService {
 
     return this.userHashtagRepository.findByUserId(userId);
   }
+
+  public List<UserHashtag> search(Integer userId, Pageable page) {
+    final List<UserHashtag> userHashtags;
+    if (userId == null) {
+      userHashtags = searchAllUserHashtags(page);
+    } else {
+      userHashtags = searchUserhashtags(userId, page);
+    }
+    return userHashtags;
+  }
+
+  private List<UserHashtag> searchUserhashtags(Integer userId, Pageable page) {
+    return this.userHashtagRepository.findByUserIdAndPage(userId, page);
+  }
+
+  public List<UserHashtag> searchAllUserHashtags(Pageable page) {
+    return this.userHashtagRepository.findAllByPage(page);
+  }
+
 }

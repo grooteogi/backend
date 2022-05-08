@@ -25,6 +25,7 @@ public enum ApiExceptionEnum {
   EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.INSUFFICIENT_SPACE_ON_RESOURCE,
       "만료된 토큰입니다. 회원가입을 다시 시도하십시오."), //419
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."),
+  MALFORED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "위조된 토큰입니다."),
   S3_UPLOAD_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
   DUPLICATION_VALUE_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 값입니다."),
   USERINFO_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저 프로필 정보를 찾을 수 없습니다."),
@@ -32,6 +33,10 @@ public enum ApiExceptionEnum {
   USERHASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 사용자 해시태그가 없습니다."),
   POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
   HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다."),
+  DUPLICATION_RESERVATION_EXCEPTION(HttpStatus.CONFLICT, "신청 불가능한 일정입니다."),
+  SCHEDULE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
+  RESERVATION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "예약이 존재하지 않습니다."),
+  INVALID_CODE_EXCEPTION(HttpStatus.NOT_FOUND, "인증코드를 다시 확인해주세요."),
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다.");
 
   private final HttpStatus httpStatus;

@@ -29,4 +29,12 @@ public class ApiExceptionAdvice {
         ExceptionResponse.builder().status(HttpStatus.BAD_REQUEST.value()).message(e.getMessage())
             .build());
   }
+
+  @ExceptionHandler(NullPointerException.class)
+  public ResponseEntity<ExceptionResponse> notFoundExceptionHandler(
+      ConstraintViolationException e) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+        ExceptionResponse.builder().status(HttpStatus.NOT_FOUND.value()).message(e.getMessage())
+            .build());
+  }
 }

@@ -15,7 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.controller.UserController;
 import grooteogi.domain.User;
-import grooteogi.dto.user.PwDto;
+import grooteogi.dto.UserDto;
+import grooteogi.dto.UserDto.Password;
 import grooteogi.enums.LoginType;
 import grooteogi.service.UserService;
 import java.util.ArrayList;
@@ -178,9 +179,8 @@ public class UserDocumentationTests {
 
   @DisplayName("비밀번호 변경")
   @Test
-  void UpdatePassword() throws Exception {
-    PwDto pwDto = new PwDto();
-    pwDto.setPassword("groot1234*");
+  void updatePassword() throws Exception {
+    UserDto.Password password = new Password("groot1234*");
     int userId = anyInt();
 
     User testUser = getTestUser();
@@ -188,7 +188,7 @@ public class UserDocumentationTests {
 
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders.patch("/user/{userId}/password", userId)
-            .characterEncoding("utf-8").content(objectMapper.writeValueAsString(pwDto))
+            .characterEncoding("utf-8").content(objectMapper.writeValueAsString(password))
             .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
 
     result.andExpect(status().isOk()).andDo(print()).andDo(
