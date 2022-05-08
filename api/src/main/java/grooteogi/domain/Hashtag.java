@@ -30,7 +30,7 @@ public class Hashtag {
   private String tag;
 
   @CreationTimestamp
-  private Timestamp registered;
+  private Timestamp createAt;
 
   @Column(length = 100, nullable = false, columnDefinition = "int default 0")
   private int count;

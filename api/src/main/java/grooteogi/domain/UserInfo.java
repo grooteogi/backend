@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -32,8 +33,8 @@ public class UserInfo {
   private String imageUrl;
 
   @CreationTimestamp
-  private Timestamp registered;
+  private Timestamp createAt;
 
-  @CreationTimestamp
-  private Timestamp modified;
+  @UpdateTimestamp
+  private Timestamp updateAt;
 }

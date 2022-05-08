@@ -9,8 +9,6 @@ import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.UserHashtagRepository;
 import grooteogi.repository.UserRepository;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,15 +48,14 @@ public class UserHashtagService {
         throw new ApiException(ApiExceptionEnum.HASHTAG_NOT_FOUND_EXCEPTION);
       }
 
-      if (this.userHashtagRepository.findByUserIdAndHashtagId(
-          user.get().getId(), hashtag.getId()) != null) {
+      if (this.userHashtagRepository.findByUserIdAndHashtagId(user.get().getId(), hashtag.getId())
+          != null) {
         throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
       }
 
       userHashtag.setUser(user.get());
       hashtag.setCount(hashtag.getCount() + 1);
       userHashtag.setHashtag(hashtag);
-      userHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
 
       this.userHashtagRepository.save(userHashtag);
     });
@@ -81,11 +78,10 @@ public class UserHashtagService {
 
     List<Hashtag> modifyHashtagList = new ArrayList<>();
 
-    Arrays.stream(hashtags).forEach(name ->
-        modifyHashtagList.add(this.hashtagRepository.findByTag(name)));
+    Arrays.stream(hashtags)
+        .forEach(name -> modifyHashtagList.add(this.hashtagRepository.findByTag(name)));
 
-    List<UserHashtag> beforeUserHashtagList =
-        this.userHashtagRepository.findByUserId(userId);
+    List<UserHashtag> beforeUserHashtagList = this.userHashtagRepository.findByUserId(userId);
 
     beforeUserHashtagList.forEach(beforeUserHashtag -> {
       Hashtag beforeHashtag = beforeUserHashtag.getHashtag();
@@ -103,7 +99,6 @@ public class UserHashtagService {
 
       userHashtag.setUser(user.get());
       userHashtag.setHashtag(hashtag);
-      userHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
 
       this.userHashtagRepository.save(userHashtag);
     });

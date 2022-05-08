@@ -1,6 +1,7 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.sql.Timestamp;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -24,6 +27,12 @@ public class Review {
 
   @Column(length = 200)
   private String comment;
+
+  @CreationTimestamp
+  private Timestamp createAt;
+
+  @UpdateTimestamp
+  private Timestamp updateAt;
 
   @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinColumn(name = "reserve_id")

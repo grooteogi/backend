@@ -23,6 +23,7 @@ import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -46,10 +47,10 @@ public class Post {
   private int views;
 
   @CreationTimestamp
-  private Timestamp createDate;
+  private Timestamp createAt;
 
-  @CreationTimestamp
-  private Timestamp modifiedDate;
+  @UpdateTimestamp
+  private Timestamp updateAt;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

@@ -13,8 +13,6 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +55,6 @@ public class PostService {
     createdPost.setTitle(request.getTitle());
     createdPost.setContent(request.getContent());
     createdPost.setCredit(request.getCredit());
-    createdPost.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
-    createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setImageUrl(request.getImageUrl());
 
     //Post Hashtag 저장
@@ -69,7 +65,6 @@ public class PostService {
       hashtag.setCount(hashtag.getCount() + 1);
 
       createdPostHashtag.setHashTag(hashtag);
-      createdPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       createdPostHashtag.setPost(createdPost);
 
       createdPost.getPostHashtags().add(createdPostHashtag);
@@ -103,7 +98,6 @@ public class PostService {
     modifiedPost.get().setTitle(request.getTitle());
     modifiedPost.get().setContent(request.getContent());
     modifiedPost.get().setImageUrl(request.getImageUrl());
-    modifiedPost.get().setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
 
     //hashtag count - 1
     List<PostHashtag> postHashtagList = modifiedPost.get().getPostHashtags();
@@ -126,7 +120,6 @@ public class PostService {
       hashtag.setCount(hashtag.getCount() + 1);
 
       modifiedPostHashtag.setHashTag(hashtag);
-      modifiedPostHashtag.setRegistered(Timestamp.valueOf(LocalDateTime.now()));
       modifiedPostHashtag.setPost(modifiedPost.get());
 
       modifiedPost.get().getPostHashtags().add(modifiedPostHashtag);

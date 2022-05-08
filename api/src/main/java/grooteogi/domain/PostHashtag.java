@@ -23,7 +23,7 @@ public class PostHashtag {
   private int id;
 
   @CreationTimestamp
-  private Timestamp registered;
+  private Timestamp createAt;
 
   @ManyToOne
   @JoinColumn(name = "post_id")

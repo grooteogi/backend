@@ -19,6 +19,7 @@ import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -43,10 +44,10 @@ public class User {
   private String email;
 
   @CreationTimestamp
-  private Timestamp modified;
+  private Timestamp createAt;
 
-  @CreationTimestamp
-  private Timestamp registered;
+  @UpdateTimestamp
+  private Timestamp updateAt;
 
   @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinColumn(name = "user_info_id")

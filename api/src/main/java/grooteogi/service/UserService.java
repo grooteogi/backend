@@ -8,8 +8,6 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.Validator;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +67,6 @@ public class UserService {
     }
 
     BeanUtils.copyProperties(request, userInfo);
-    userInfo.setModified(Timestamp.valueOf(LocalDateTime.now()));
     user.get().setUserInfo(userInfo);
 
     if (!user.get().getNickname().equals(request.getNickname())
@@ -78,7 +75,6 @@ public class UserService {
     }
     user.get().setNickname(request.getNickname());
 
-    user.get().setModified(Timestamp.valueOf(LocalDateTime.now()));
     return userRepository.save(user.get());
   }
 
@@ -94,7 +90,6 @@ public class UserService {
 
     validator.confirmPasswordVerification(request.getPassword());
     user.get().setPassword(passwordEncoder.encode(request.getPassword()));
-    user.get().setModified(Timestamp.valueOf(LocalDateTime.now()));
     userRepository.save(user.get());
   }
 }
