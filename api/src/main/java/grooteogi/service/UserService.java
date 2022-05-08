@@ -2,8 +2,8 @@ package grooteogi.service;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
-import grooteogi.dto.user.ProfileDto;
-import grooteogi.dto.user.PwDto;
+import grooteogi.dto.ProfileDto;
+import grooteogi.dto.UserDto.Password;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -58,7 +58,7 @@ public class UserService {
     return user.get();
   }
 
-  public User modifyUserProfile(Integer userId, ProfileDto profileDto) {
+  public User modifyUserProfile(Integer userId, ProfileDto.Request request) {
     Optional<User> user = userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
@@ -68,32 +68,32 @@ public class UserService {
       userInfo = new UserInfo();
     }
 
-    BeanUtils.copyProperties(profileDto, userInfo);
+    BeanUtils.copyProperties(request, userInfo);
     userInfo.setModified(Timestamp.valueOf(LocalDateTime.now()));
     user.get().setUserInfo(userInfo);
 
-    if (!user.get().getNickname().equals(profileDto.getNickname())
-        && userRepository.existsByNickname(profileDto.getNickname())) {
+    if (!user.get().getNickname().equals(request.getNickname())
+        && userRepository.existsByNickname(request.getNickname())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
-    user.get().setNickname(profileDto.getNickname());
+    user.get().setNickname(request.getNickname());
 
     user.get().setModified(Timestamp.valueOf(LocalDateTime.now()));
     return userRepository.save(user.get());
   }
 
-  public void modifyUserPw(Integer userId, PwDto pwDto) {
+  public void modifyUserPw(Integer userId, Password request) {
     Optional<User> user = userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
 
-    if (passwordEncoder.matches(pwDto.getPassword(), user.get().getPassword())) {
+    if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    validator.confirmPasswordVerification(pwDto.getPassword());
-    user.get().setPassword(passwordEncoder.encode(pwDto.getPassword()));
+    validator.confirmPasswordVerification(request.getPassword());
+    user.get().setPassword(passwordEncoder.encode(request.getPassword()));
     user.get().setModified(Timestamp.valueOf(LocalDateTime.now()));
     userRepository.save(user.get());
   }

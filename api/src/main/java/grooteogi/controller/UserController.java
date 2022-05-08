@@ -1,8 +1,8 @@
 package grooteogi.controller;
 
 import grooteogi.domain.User;
-import grooteogi.dto.user.ProfileDto;
-import grooteogi.dto.user.PwDto;
+import grooteogi.dto.ProfileDto;
+import grooteogi.dto.UserDto.Password;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
 import grooteogi.utils.Session;
@@ -48,18 +48,18 @@ public class UserController {
   }
 
   @PatchMapping("/profile")
-  public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto profileDto) {
+  public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto.Request request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    User user = userService.modifyUserProfile(session.getId(), profileDto);
+    User user = userService.modifyUserProfile(session.getId(), request);
     return ResponseEntity.ok(BasicResponse.builder().data(user).build());
   }
 
   @PatchMapping("/password")
-  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody PwDto pwDto) {
+  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody Password request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    userService.modifyUserPw(session.getId(), pwDto);
+    userService.modifyUserPw(session.getId(), request);
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify user password success").build());
   }
