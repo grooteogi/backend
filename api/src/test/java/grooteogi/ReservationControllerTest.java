@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -21,11 +22,13 @@ import grooteogi.enums.CreditType;
 import grooteogi.enums.LoginType;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
+import grooteogi.utils.Session;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,8 +64,12 @@ public class ReservationControllerTest {
   private PasswordEncoder passwordEncoder;
   @Autowired
   private ObjectMapper objectMapper;
-
-//  protected MockHttpSession session;
+  @MockBean
+  private Session session;
+  @MockBean
+  private Authentication authentication;
+  @MockBean
+  private SecurityContext securityContext;
 
   User hostUser, particiUser;
   Post post;
@@ -73,11 +83,7 @@ public class ReservationControllerTest {
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
 
-//    session = new MockHttpSession();
-//    session.setAttribute("id", 1);
-//    session.setAttribute("email", "groot22@example.com");
-
-    // 예약을 위해 필요한 도메인
+    // domain for test
     hostUser = new User();
     hostUser.setId(1);
     hostUser.setType(LoginType.GENERAL);
@@ -116,24 +122,17 @@ public class ReservationControllerTest {
     post.setCredit(CreditType.DIRECT);
     post.setImageUrl("이미지 주소다");
   }
-  /*
-   * given
-   * 테스트를 위해 주어진 상태
-   * 테스트 대상에게 주어진 조건
-   * 테스트가 동작하기 위해 주어진 환경
-   * when
-   * 테스트 대상에게 가해진 어떠한 상태
-   * 테스트 대상에게 주어진 어떠한 조건
-   * 테스트 대상의 상태를 변경시키기 위한 환경
-   * then
-   * 앞선 과정의 결과
-   * */
 
   @Test
-  public void 예약생성() throws Exception {
+  @DisplayName("예약생성")
+  public void createReservation() throws Exception {
     // given
     ReservationDto.Request request = reservationReq();
-    Reservation response = getReservation();
+    Reservation response = reservationEntity();
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
     given(reservationService.createReservation(eq(request), anyInt())).willReturn(response);
 
@@ -142,7 +141,6 @@ public class ReservationControllerTest {
     // when
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
-//            .session(session)
             .content(json)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -152,13 +150,7 @@ public class ReservationControllerTest {
     resultActions.andExpect(status().isOk())
         .andDo(print());
 
-    verify(reservationService).createReservation(request, 1);
   }
-
-//  @AfterEach
-//  void clean() {
-//    session.clearAttributes();
-//  }
 
   private ReservationDto.Request reservationReq() {
     return ReservationDto.Request
@@ -172,17 +164,17 @@ public class ReservationControllerTest {
     return ReservationDto.Response
         .builder()
         .reservationId(1)
-        .date("2022-05-07")
-        .endTime(null)
+        .date(schedule.getDate())
+        .endTime(schedule.getEndTime())
+        .place(schedule.getPlace())
+        .startTime(schedule.getStartTime())
+        .imgUrl(post.getImageUrl())
+        .title(post.getTitle())
         .hashtags(null)
-        .imgUrl(null)
-        .place(null)
-        .startTime(null)
-        .title(null)
         .build();
   }
 
-  private Reservation getReservation() {
+  private Reservation reservationEntity() {
     Reservation reservation = new Reservation();
     reservation.setId(1);
     reservation.setMessage("msg");
@@ -194,10 +186,11 @@ public class ReservationControllerTest {
     return reservation;
   }
 
-    @Test
-  public void 예약조회() throws Exception {
+  @Test
+  @DisplayName("예약조회")
+  public void getReservation() throws Exception {
     // given
-    Reservation reservation = getReservation();
+    Reservation reservation = reservationEntity();
     given(reservationService.getReservation(1)).willReturn(reservation);
     String reservationId = "1";
 
@@ -211,7 +204,8 @@ public class ReservationControllerTest {
   }
 
   @Test
-  public void 예약삭제() throws Exception {
+  @DisplayName("예약삭제")
+  public void deleteReservation() throws Exception {
     //given
     int reservationId = anyInt();
 
@@ -230,14 +224,19 @@ public class ReservationControllerTest {
   }
 
   @Test
-  public void 호스트유저예약조회() throws Exception {
+  @DisplayName("호스트유저 예약조회")
+  public void getHostReservation() throws Exception {
     // given
-    int hostUserId = anyInt();
     List<ReservationDto.Response> responses = new ArrayList<>();
     ReservationDto.Response response = reservationRes();
     responses.add(response);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
     // when
-    given(reservationService.getHostReservation(hostUserId)).willReturn(responses);
+    given(reservationService.getHostReservation(anyInt())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders.get("/reservation/host").characterEncoding("uft-8")
@@ -247,19 +246,24 @@ public class ReservationControllerTest {
     // then
     resultActions.andExpect(status().isOk()).andDo(print());
 
-    verify(reservationService).getHostReservation(hostUserId);
+    verify(reservationService).getHostReservation(anyInt());
 
   }
 
   @Test
-  public void 참가자유저예약조회() throws Exception {
+  @DisplayName("참가자유저 예약조회")
+  public void getUserReservation() throws Exception {
     // given
-    int particiUserId = anyInt();
     List<ReservationDto.Response> responses = new ArrayList<>();
     ReservationDto.Response response = reservationRes();
     responses.add(response);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
     // when
-    given(reservationService.getUserReservation(particiUserId)).willReturn(responses);
+    given(reservationService.getUserReservation(anyInt())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders.get("/reservation/apply").characterEncoding("uft-8")
@@ -269,7 +273,7 @@ public class ReservationControllerTest {
     // then
     resultActions.andExpect(status().isOk()).andDo(print());
 
-    verify(reservationService).getUserReservation(particiUserId);
+    verify(reservationService).getUserReservation(anyInt());
   }
 
 
