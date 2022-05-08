@@ -2,28 +2,32 @@ package grooteogi.dto;
 
 import grooteogi.enums.CreditType;
 import javax.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
+
 public class PostDto {
 
-  @NotBlank(message = "user id를 입력하세요.")
-  private Integer userId;
+  @Data
+  @Builder
+  public static class Request {
 
-  @NotBlank(message = "제목을 입력하세요.")
-  private String title;
+    @NotBlank(message = "user id를 입력하세요.")
+    private Integer userId;
 
-  @NotBlank(message = "내용을 입력하세요.")
-  private String content;
+    @NotBlank(message = "제목을 입력하세요.")
+    private String title;
 
-  private CreditType credit;
+    @NotBlank(message = "내용을 입력하세요.")
+    private String content;
 
-  private String imageUrl;
+    private CreditType credit;
 
-  private String[] hashtags;
+    private String imageUrl;
 
-  private Object[] schedules;
+    private String[] hashtags;
+
+    private Object[] schedules;
+  }
 
 }

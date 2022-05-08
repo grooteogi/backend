@@ -47,22 +47,22 @@ public class PostService {
     return post.get();
   }
 
-  public Post createPost(PostDto postDto) {
+  public Post createPost(PostDto.Request request) {
     //변수 정의
     Post createdPost = new Post();
-    Optional<User> user = this.userRepository.findById(postDto.getUserId());
+    Optional<User> user = this.userRepository.findById(request.getUserId());
 
     //Post 저장
     createdPost.setUser(user.get());
-    createdPost.setTitle(postDto.getTitle());
-    createdPost.setContent(postDto.getContent());
-    createdPost.setCredit(postDto.getCredit());
+    createdPost.setTitle(request.getTitle());
+    createdPost.setContent(request.getContent());
+    createdPost.setCredit(request.getCredit());
     createdPost.setCreateDate(Timestamp.valueOf(LocalDateTime.now()));
     createdPost.setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
-    createdPost.setImageUrl(postDto.getImageUrl());
+    createdPost.setImageUrl(request.getImageUrl());
 
     //Post Hashtag 저장
-    Arrays.stream(postDto.getHashtags()).forEach(name -> {
+    Arrays.stream(request.getHashtags()).forEach(name -> {
       PostHashtag createdPostHashtag = new PostHashtag();
       Hashtag hashtag = this.hashtagRepository.findByTag(name);
 
@@ -77,7 +77,7 @@ public class PostService {
 
     // Schedule 저장
     ObjectMapper mapper = new ObjectMapper();
-    Arrays.stream(postDto.getSchedules()).forEach(schedule -> {
+    Arrays.stream(request.getSchedules()).forEach(schedule -> {
       Map<String, Object> map = mapper.convertValue(schedule, Map.class);
       Schedule createdSchedule = new Schedule();
       createdSchedule.setDate((String) map.get("date"));
@@ -96,13 +96,13 @@ public class PostService {
   }
 
   @Transactional
-  public Post modifyPost(PostDto modifiedDto, int postId) {
+  public Post modifyPost(PostDto.Request request, int postId) {
     Optional<Post> modifiedPost = this.postRepository.findById(postId);
 
     //Post 데이터 처리
-    modifiedPost.get().setTitle(modifiedDto.getTitle());
-    modifiedPost.get().setContent(modifiedDto.getContent());
-    modifiedPost.get().setImageUrl(modifiedDto.getImageUrl());
+    modifiedPost.get().setTitle(request.getTitle());
+    modifiedPost.get().setContent(request.getContent());
+    modifiedPost.get().setImageUrl(request.getImageUrl());
     modifiedPost.get().setModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
 
     //hashtag count - 1
@@ -117,7 +117,7 @@ public class PostService {
     modifiedPost.get().getPostHashtags().clear();
 
     //PostHashtag 저장
-    String[] hashtags = modifiedDto.getHashtags();
+    String[] hashtags = request.getHashtags();
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();

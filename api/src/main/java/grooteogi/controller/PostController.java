@@ -42,15 +42,15 @@ public class PostController {
   }
 
   @PostMapping
-  public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto postDto) {
-    Post createdPost = this.postService.createPost(postDto);
+  public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto.Request request) {
+    Post createdPost = this.postService.createPost(request);
     return ResponseEntity.ok(BasicResponse.builder().data(createdPost).build());
   }
 
   @PutMapping("/{postId}")
-  public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto modifiedDto,
+  public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    Post modifiedPost = this.postService.modifyPost(modifiedDto, postId);
+    Post modifiedPost = this.postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 
