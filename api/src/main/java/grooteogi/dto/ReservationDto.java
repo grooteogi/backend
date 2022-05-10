@@ -1,6 +1,5 @@
 package grooteogi.dto;
 
-import java.time.LocalTime;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
@@ -20,7 +19,7 @@ public class ReservationDto {
   @Builder
   public static class Response {
     private int reservationId;
-    private String imgUrl;
+    private String imageUrl;
     private String title;
     private List<String> hashtags;
     private String date;
