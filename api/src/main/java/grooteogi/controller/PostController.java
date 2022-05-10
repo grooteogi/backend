@@ -31,32 +31,33 @@ public class PostController {
       @RequestParam(name = "page", defaultValue = "1") Integer page,
       @RequestParam(name = "type", required = false) String type) {
 
-    List<Post> posts = postService.search(search, type, PageRequest.of(page - 1, 20));
+    List<PostDto.Response> posts =
+        postService.search(search, type, PageRequest.of(page - 1, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
-    Post post = postService.getPost(postId);
+    PostDto.Response post = postService.getPost(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto.Request request) {
-    Post createdPost = this.postService.createPost(request);
+    PostDto.Response createdPost = this.postService.createPost(request);
     return ResponseEntity.ok(BasicResponse.builder().data(createdPost).build());
   }
 
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    Post modifiedPost = this.postService.modifyPost(request, postId);
+    PostDto.Response modifiedPost = this.postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
-    List<Post> deletePost = this.postService.deletePost(postId);
+    List<PostDto.Response> deletePost = this.postService.deletePost(postId);
     return ResponseEntity.ok(
         BasicResponse.builder().count(deletePost.size()).data(deletePost).build());
   }

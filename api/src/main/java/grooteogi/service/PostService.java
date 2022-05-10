@@ -1,6 +1,5 @@
 package grooteogi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
@@ -9,15 +8,15 @@ import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.PostMapper;
+import grooteogi.mapper.ScheduleMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import java.sql.Date;
-import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class PostService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
 
-  public Post getPost(int postId) {
+  public PostDto.Response getPost(int postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
@@ -42,67 +41,48 @@ public class PostService {
     //조회수 증가
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
-    this.postRepository.save(post.get());
-
-    return post.get();
+    Post updatePost = this.postRepository.save(post.get());
+    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(updatePost);
+    return response;
   }
 
-  public Post createPost(PostDto.Request request) {
+  public PostDto.Response createPost(PostDto.Request request) {
     //변수 정의
-    Post createdPost = new Post();
     Optional<User> user = this.userRepository.findById(request.getUserId());
 
-    //Post 저장
-    createdPost.setUser(user.get());
-    createdPost.setTitle(request.getTitle());
-    createdPost.setContent(request.getContent());
-    createdPost.setCredit(request.getCredit());
-    createdPost.setImageUrl(request.getImageUrl());
-
     //Post Hashtag 저장
+    List<PostHashtag> postHashtags = new ArrayList<>();
     Arrays.stream(request.getHashtags()).forEach(name -> {
-      PostHashtag createdPostHashtag = new PostHashtag();
       Hashtag hashtag = this.hashtagRepository.findByTag(name);
-
       hashtag.setCount(hashtag.getCount() + 1);
+      PostHashtag createdPostHashtag = PostHashtag.builder()
+          .hashTag(hashtag)
+          .build();
 
-      createdPostHashtag.setHashTag(hashtag);
-      createdPostHashtag.setPost(createdPost);
-
-      createdPost.getPostHashtags().add(createdPostHashtag);
+      postHashtags.add(createdPostHashtag);
     });
 
     // Schedule 저장
-    ObjectMapper mapper = new ObjectMapper();
-    Arrays.stream(request.getSchedules()).forEach(schedule -> {
-      Map<String, Object> map = mapper.convertValue(schedule, Map.class);
-      Schedule createdSchedule = new Schedule();
-      createdSchedule.setDate((Date) map.get("date"));
-      createdSchedule.setRegion((String) map.get("region"));
-      createdSchedule.setPlace((String) map.get("place"));
-      createdSchedule.setStartTime((Time) map.get("startTime"));
-      createdSchedule.setEndTime((Time) map.get("endTime"));
-      createdSchedule.setPost(createdPost);
+    List<Schedule> schedules = new ArrayList<>();
+    request.getSchedules().forEach(schedule -> {
+      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
 
-      createdPost.getSchedules().add(createdSchedule);
+      schedules.add(createdSchedule);
     });
 
-    this.postRepository.save(createdPost);
+    Post created = this.postRepository
+        .save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
+    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(created);
 
-    return createdPost;
+    return response;
   }
 
   @Transactional
-  public Post modifyPost(PostDto.Request request, int postId) {
-    Optional<Post> modifiedPost = this.postRepository.findById(postId);
-
-    //Post 데이터 처리
-    modifiedPost.get().setTitle(request.getTitle());
-    modifiedPost.get().setContent(request.getContent());
-    modifiedPost.get().setImageUrl(request.getImageUrl());
+  public PostDto.Response modifyPost(PostDto.Request request, int postId) {
+    Optional<Post> post = this.postRepository.findById(postId);
 
     //hashtag count - 1
-    List<PostHashtag> postHashtagList = modifiedPost.get().getPostHashtags();
+    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
     postHashtagList.forEach(postHashtag -> {
       Hashtag beforeHashtag = postHashtag.getHashTag();
@@ -110,7 +90,7 @@ public class PostService {
       this.postHashtagRepository.delete(postHashtag);
     });
 
-    modifiedPost.get().getPostHashtags().clear();
+    post.get().getPostHashtags().clear();
 
     //PostHashtag 저장
     String[] hashtags = request.getHashtags();
@@ -122,15 +102,17 @@ public class PostService {
       hashtag.setCount(hashtag.getCount() + 1);
 
       modifiedPostHashtag.setHashTag(hashtag);
-      modifiedPostHashtag.setPost(modifiedPost.get());
+      modifiedPostHashtag.setPost(post.get());
 
-      modifiedPost.get().getPostHashtags().add(modifiedPostHashtag);
+      post.get().getPostHashtags().add(modifiedPostHashtag);
     });
 
-    return modifiedPost.get();
+    Post modifiedPost = postRepository.save(PostMapper.INSTANCE.toModify(post.get(), request));
+    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
+    return response;
   }
 
-  public List<Post> deletePost(int postId) {
+  public List<PostDto.Response> deletePost(int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
 
     if (post.isEmpty()) {
@@ -146,12 +128,15 @@ public class PostService {
 
     this.postRepository.delete(post.get());
 
-    return this.postRepository.findAll();
+    List<PostDto.Response> responses = new ArrayList<>();
+    this.postRepository.findAll().forEach(result -> responses
+        .add(PostMapper.INSTANCE.toResponseDto(result)));
+    return responses;
   }
 
-  public List<Post> search(String search, String type,
+  public List<PostDto.Response> search(String search, String type,
       Pageable page) {
-    final List<Post> posts;
+    final List<PostDto.Response> posts;
     if (search == null) {
       posts = searchAllPosts(page, type);
     } else {
@@ -161,12 +146,18 @@ public class PostService {
   }
 
 
-  public List<Post> searchAllPosts(Pageable page, String type) {
-    return this.postRepository.findAllByPage(page);
+  public List<PostDto.Response> searchAllPosts(Pageable page, String type) {
+    List<PostDto.Response> responses = new ArrayList<>();
+    this.postRepository.findAllByPage(page).forEach(result -> responses
+        .add(PostMapper.INSTANCE.toResponseDto(result)));
+    return responses;
   }
 
-  private List<Post> searchPosts(String search, Pageable page, String type) {
-    return this.postRepository.findBySearch(search, search, page);
+  private List<PostDto.Response> searchPosts(String search, Pageable page, String type) {
+    List<PostDto.Response> responses = new ArrayList<>();
+    this.postRepository.findBySearch(search, search, page).forEach(result -> responses
+        .add(PostMapper.INSTANCE.toResponseDto(result)));
+    return responses;
   }
 
 }
