@@ -1,8 +1,8 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Date;
+import java.sql.Time;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,13 +22,13 @@ public class Schedule {
   private int id;
 
   @Column(nullable = false, length = 10)
-  private LocalDate date;
+  private Date date;
 
   @Column(nullable = false, length = 10)
-  private LocalTime startTime;
+  private Time startTime;
 
   @Column(nullable = false, length = 10)
-  private LocalTime endTime;
+  private Time endTime;
 
   @Column(nullable = false, length = 10)
   private String region;

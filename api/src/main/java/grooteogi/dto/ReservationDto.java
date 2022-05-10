@@ -1,6 +1,5 @@
 package grooteogi.dto;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -24,9 +23,9 @@ public class ReservationDto {
     private String imgUrl;
     private String title;
     private List<String> hashtags;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private String date;
+    private String startTime;
+    private String endTime;
     private String place;
   }
 }
