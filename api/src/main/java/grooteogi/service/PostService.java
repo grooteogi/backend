@@ -13,8 +13,8 @@ import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.UserRepository;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -77,11 +77,11 @@ public class PostService {
     Arrays.stream(request.getSchedules()).forEach(schedule -> {
       Map<String, Object> map = mapper.convertValue(schedule, Map.class);
       Schedule createdSchedule = new Schedule();
-      createdSchedule.setDate((LocalDate) map.get("date"));
+      createdSchedule.setDate((Date) map.get("date"));
       createdSchedule.setRegion((String) map.get("region"));
       createdSchedule.setPlace((String) map.get("place"));
-      createdSchedule.setStartTime((LocalTime) map.get("startTime"));
-      createdSchedule.setEndTime((LocalTime) map.get("endTime"));
+      createdSchedule.setStartTime((Time) map.get("startTime"));
+      createdSchedule.setEndTime((Time) map.get("endTime"));
       createdSchedule.setPost(createdPost);
 
       createdPost.getSchedules().add(createdSchedule);
