@@ -2,6 +2,8 @@ package grooteogi;
 
 import static grooteogi.ApiDocumentUtils.getDocumentRequest;
 import static grooteogi.ApiDocumentUtils.getDocumentResponse;
+import static grooteogi.ApiDocumentUtils.getPost;
+import static grooteogi.ApiDocumentUtils.getPostHashtags;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -19,21 +21,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
 import grooteogi.controller.ReservationController;
-import grooteogi.domain.Hashtag;
-import grooteogi.domain.Post;
-import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
-import grooteogi.enums.CreditType;
-import grooteogi.enums.LoginType;
 import grooteogi.mapper.ReservationMapper;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.sql.Date;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,14 +76,7 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  User hostUser;
-  User participateUser;
-  Post post;
   Schedule schedule;
-  List<Schedule> schedules;
-  ReservationDto.Request request;
-  Reservation reservation;
-  List<PostHashtag> tags;
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -98,59 +86,16 @@ public class ReservationDocumentationTests {
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
 
     // domain for test
-    hostUser = User.builder()
-        .email("groot@hello.com")
-        .nickname("host")
-        .password(passwordEncoder.encode("groot1234*"))
-        .type(LoginType.GENERAL)
-        .build();
+    schedule = ApiDocumentUtils.getSchedule();
+    schedule.setPost(ApiDocumentUtils.getPost());
 
-    participateUser = User.builder()
-        .email("groot2@hello.com")
-        .nickname("participant")
-        .password(passwordEncoder.encode("groot1234*"))
-        .type(LoginType.GENERAL)
-        .build();
-
-    schedules = new ArrayList<>();
-    schedule = Schedule.builder()
-        .date(Date.valueOf("2022-05-07"))
-        .startTime(Time.valueOf("11:00:00"))
-        .endTime(Time.valueOf("12:00:00"))
-        .region("서대문구")
-        .place("명지대")
-        .build();
-    schedules.add(schedule);
-
-    tags = new ArrayList<>();
-    PostHashtag tag = PostHashtag.builder()
-        .hashTag(Hashtag.builder().tag("해시태그").build())
-        .build();
-    tags.add(tag);
-
-    post = Post.builder()
-        .content("내용이다.")
-        .title("제목이다")
-        .credit(CreditType.DIRECT)
-        .imageUrl("이미지 주소다")
-        .postHashtags(tags)
-        .build();
-
-    schedule.setPost(post);
-
-    reservation = Reservation.builder()
-        .schedule(schedule)
-        .hostUser(hostUser)
-        .participateUser(participateUser)
-        .message("msg")
-        .build();
   }
 
   @Test
   @DisplayName("예약조회")
   public void getReservation() throws Exception {
     // given
-    given(reservationService.getReservation(1)).willReturn(reservationRes());
+    given(reservationService.getReservation(1)).willReturn(getResponse());
 
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -186,7 +131,7 @@ public class ReservationDocumentationTests {
   public void getHostReservation() throws Exception {
     // given
     List<ReservationDto.Response> responses = new ArrayList<>();
-    ReservationDto.Response response = reservationRes();
+    ReservationDto.Response response = getResponse();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -231,7 +176,7 @@ public class ReservationDocumentationTests {
   public void getUserReservation() throws Exception {
     // given
     List<ReservationDto.Response> responses = new ArrayList<>();
-    ReservationDto.Response response = reservationRes();
+    ReservationDto.Response response = getResponse();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -275,13 +220,13 @@ public class ReservationDocumentationTests {
   @DisplayName("예약생성")
   public void createReservation() throws Exception {
     // given
-    request = reservationReq();
+    ReservationDto.Request request = getRequest();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(reservationRes());
+    given(reservationService.createReservation(eq(request), anyInt())).willReturn(getResponse());
 
     String json = objectMapper.writeValueAsString(request);
 
@@ -343,7 +288,7 @@ public class ReservationDocumentationTests {
     verify(reservationService).deleteReservation(reservationId);
   }
 
-  private ReservationDto.Request reservationReq() {
+  private ReservationDto.Request getRequest() {
     return ReservationDto.Request
         .builder()
         .message("msg")
@@ -351,12 +296,23 @@ public class ReservationDocumentationTests {
         .build();
   }
 
-  private ReservationDto.Response reservationRes() {
+  private ReservationDto.Response getResponse() {
     List<String> stringTags = new ArrayList<>();
-    tags.forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getTag()));
+    getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getTag()));
     ReservationDto.Response response = ReservationMapper
-        .INSTANCE.toResponseDto(reservation, post, schedule);
+        .INSTANCE.toResponseDto(getEntity(), getPost(), schedule);
     response.setHashtags(stringTags);
     return response;
+  }
+
+  private Reservation getEntity() {
+    return Reservation.builder()
+        .schedule(schedule)
+        .hostUser(User.builder()
+            .build())
+        .participateUser(User.builder()
+            .build())
+        .message("msg")
+        .build();
   }
 }
