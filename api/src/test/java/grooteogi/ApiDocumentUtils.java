@@ -9,6 +9,7 @@ import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
+import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.CreditType;
 import java.sql.Date;
 import java.sql.Time;
@@ -62,5 +63,25 @@ public interface ApiDocumentUtils {
         .postHashtags(getPostHashtags())
         .schedules(getSchedules())
         .build();
+  }
+
+  static String[] getPostHashtagStrings() {
+    return new String[] {"해시태그", "문자열"};
+  }
+
+  static ScheduleDto.Request getScheduleReq() {
+    return ScheduleDto.Request.builder()
+        .date("2022-05-07")
+        .startTime("11:00:00")
+        .endTime("12:00:00")
+        .region("서대문구")
+        .place("명지대")
+        .build();
+  }
+
+  static List<ScheduleDto.Request> getScheduleReqs() {
+    List<ScheduleDto.Request> schedules = new ArrayList<>();
+    schedules.add(getScheduleReq());
+    return schedules;
   }
 }
