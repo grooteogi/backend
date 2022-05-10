@@ -22,8 +22,6 @@ import grooteogi.enums.LoginType;
 import grooteogi.service.PostService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,11 +89,11 @@ public class PostDocumentationTests {
     schedules = new ArrayList<>();
     schedule = new Schedule();
     schedule.setId(1);
-    schedule.setDate(LocalDate.now());
+    schedule.setDate("2022-05-07");
     schedule.setRegion("인천");
     schedule.setPlace("부평역");
-    schedule.setStartTime(LocalTime.of(14,00));
-    schedule.setEndTime(LocalTime.of(15,00));
+    schedule.setStartTime("14:00");
+    schedule.setEndTime("15:00");
     schedules.add(schedule);
   }
 
