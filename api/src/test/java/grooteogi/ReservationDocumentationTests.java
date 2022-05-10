@@ -220,7 +220,8 @@ public class ReservationDocumentationTests {
   @DisplayName("예약생성")
   public void createReservation() throws Exception {
     // given
-    ReservationDto.Request request = getRequest();
+    final ReservationDto.Request request =
+        ReservationDto.Request.builder().scheduleId(1).message("msg").build();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
@@ -286,14 +287,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("message").description("응답 메세지")))
         );
     verify(reservationService).deleteReservation(reservationId);
-  }
-
-  private ReservationDto.Request getRequest() {
-    return ReservationDto.Request
-        .builder()
-        .message("msg")
-        .scheduleId(1)
-        .build();
   }
 
   private ReservationDto.Response getResponse() {

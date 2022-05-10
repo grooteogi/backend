@@ -37,11 +37,13 @@ public interface ApiDocumentUtils {
         .place("명지대")
         .build();
   }
+
   static List<Schedule> getSchedules() {
     List<Schedule> schedules = new ArrayList<>();
     schedules.add(getSchedule());
     return schedules;
   }
+
   static List<PostHashtag> getPostHashtags() {
     List<PostHashtag> tags = new ArrayList<>();
     PostHashtag tag = PostHashtag.builder()
@@ -50,6 +52,7 @@ public interface ApiDocumentUtils {
     tags.add(tag);
     return tags;
   }
+
   static Post getPost() {
     return Post.builder()
         .content("내용이다.")
