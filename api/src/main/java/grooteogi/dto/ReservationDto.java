@@ -19,7 +19,7 @@ public class ReservationDto {
   @Builder
   public static class Response {
     private int reservationId;
-    private String imgUrl;
+    private String imageUrl;
     private String title;
     private List<String> hashtags;
     private String date;

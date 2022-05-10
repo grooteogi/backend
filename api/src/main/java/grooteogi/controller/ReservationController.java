@@ -1,6 +1,5 @@
 package grooteogi.controller;
 
-import grooteogi.domain.Reservation;
 import grooteogi.dto.ReservationDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
@@ -36,8 +35,8 @@ public class ReservationController {
 
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    Reservation reservation = reservationService.getReservation(reservationId);
-    return ResponseEntity.ok(BasicResponse.builder().data(reservation).build());
+    ReservationDto.Response response = reservationService.getReservation(reservationId);
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 
   @GetMapping("/apply")
@@ -56,7 +55,7 @@ public class ReservationController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    Reservation createdReservation = reservationService.createReservation(request,
+    ReservationDto.Response createdReservation = reservationService.createReservation(request,
         session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(createdReservation).build());
   }

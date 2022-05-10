@@ -1,6 +1,5 @@
 package grooteogi.controller;
 
-import grooteogi.domain.Post;
 import grooteogi.dto.PostDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
@@ -27,37 +26,38 @@ public class PostController {
 
   @GetMapping
   public ResponseEntity<BasicResponse> search(
-      @RequestParam(name = "search", required = false) String search,
+      @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
-      @RequestParam(name = "type", required = false) String type) {
+      @RequestParam(name = "sort", required = false) String sort) {
 
-    List<Post> posts = postService.search(search, type, PageRequest.of(page - 1, 20));
+    List<PostDto.Response> posts =
+        postService.search(keyword, sort, PageRequest.of(page - 1, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
-    Post post = postService.getPost(postId);
+    PostDto.Response post = postService.getPost(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto.Request request) {
-    Post createdPost = this.postService.createPost(request);
+    PostDto.Response createdPost = this.postService.createPost(request);
     return ResponseEntity.ok(BasicResponse.builder().data(createdPost).build());
   }
 
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    Post modifiedPost = this.postService.modifyPost(request, postId);
+    PostDto.Response modifiedPost = this.postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
-    List<Post> deletePost = this.postService.deletePost(postId);
+    postService.deletePost(postId);
     return ResponseEntity.ok(
-        BasicResponse.builder().count(deletePost.size()).data(deletePost).build());
+        BasicResponse.builder().message("delete post success").build());
   }
 }

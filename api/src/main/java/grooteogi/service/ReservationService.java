@@ -28,12 +28,16 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
 
-  public Reservation getReservation(Integer reservationId) {
+  public ReservationDto.Response getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
-    return reservation.get();
+    Schedule schedule = reservation.get().getSchedule();
+    Post post = schedule.getPost();
+    ReservationDto.Response response = ReservationMapper.INSTANCE
+        .toResponseDto(reservation.get(), post, schedule);
+    return response;
   }
 
   public List<ReservationDto.Response> getHostReservation(int userId) {
@@ -70,7 +74,7 @@ public class ReservationService {
     return tags;
   }
 
-  public Reservation createReservation(ReservationDto.Request request, int userId) {
+  public ReservationDto.Response createReservation(ReservationDto.Request request, int userId) {
 
     Optional<Reservation> reservation = reservationRepository.findByScheduleId(
         request.getScheduleId());
@@ -92,9 +96,11 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    Reservation createdReservation = ReservationMapper.INSTANCE.toEntity(request, user.get(),
-        schedule.get());
-    return reservationRepository.save(createdReservation);
+    Reservation createdReservation =
+        reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
+        schedule.get()));
+    Post post = schedule.get().getPost();
+    return ReservationMapper.INSTANCE.toResponseDto(createdReservation, post, schedule.get());
   }
 
   public void deleteReservation(Integer reservationId) {

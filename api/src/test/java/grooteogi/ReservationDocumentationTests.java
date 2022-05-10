@@ -1,30 +1,34 @@
 package grooteogi;
 
+import static grooteogi.ApiDocumentUtils.getDocumentRequest;
+import static grooteogi.ApiDocumentUtils.getDocumentResponse;
+import static grooteogi.ApiDocumentUtils.getPost;
+import static grooteogi.ApiDocumentUtils.getPostHashtags;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
 import grooteogi.controller.ReservationController;
-import grooteogi.domain.Post;
 import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
-import grooteogi.enums.CreditType;
-import grooteogi.enums.LoginType;
+import grooteogi.mapper.ReservationMapper;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +42,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,13 +76,7 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  User hostUser;
-  User particiUser;
-  Post post;
   Schedule schedule;
-  List<Schedule> schedules;
-  ReservationDto.Request request;
-  Reservation response;
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -87,60 +86,43 @@ public class ReservationDocumentationTests {
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
 
     // domain for test
-    hostUser = new User();
-    hostUser.setId(1);
-    hostUser.setType(LoginType.GENERAL);
-    hostUser.setEmail("groot@example.com");
-    hostUser.setPassword(passwordEncoder.encode("groot1234*"));
-    hostUser.setNickname("groot-1");
+    schedule = ApiDocumentUtils.getSchedule();
+    schedule.setPost(ApiDocumentUtils.getPost());
 
-    particiUser = new User();
-    particiUser.setId(2);
-    particiUser.setType(LoginType.GENERAL);
-    particiUser.setEmail("groot22@example.com");
-    particiUser.setPassword(passwordEncoder.encode("groot1234*"));
-    particiUser.setNickname("groot-2");
-
-    schedules = new ArrayList<>();
-    schedule = new Schedule();
-    schedule.setId(1);
-    schedule.setDate("2022-05-07");
-    schedule.setRegion("인천");
-    schedule.setPlace("부평역");
-    schedule.setStartTime("16:00");
-    schedule.setEndTime("17:00");
-    schedules.add(schedule);
-
-    post = new Post();
-    post.setId(1);
-    post.setUser(hostUser);
-    post.setPostHashtags(null);
-
-    schedule.setPost(post);
-
-    post.setSchedules(schedules);
-    post.setViews(0);
-    post.setTitle("제목이다.");
-    post.setContent("내용이다");
-    post.setCredit(CreditType.DIRECT);
-    post.setImageUrl("이미지 주소다");
   }
 
   @Test
   @DisplayName("예약조회")
   public void getReservation() throws Exception {
     // given
-    Reservation reservation = reservationEntity();
-    given(reservationService.getReservation(1)).willReturn(reservation);
-    String reservationId = "1";
+    given(reservationService.getReservation(1)).willReturn(getResponse());
 
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/reservation/{reservationId}", reservationId)
+            .get("/reservation/{reservationId}", 1)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print()).andDo(
+            document("get-reservation", getDocumentRequest(), getDocumentResponse(),
+                responseFields(fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("data.reservationId").description("아이디"),
+                    fieldWithPath("data.imageUrl").type(JsonFieldType.STRING)
+                        .description("이미지 주소"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING)
+                        .description("포스트 제목"),
+                    fieldWithPath("data.hashtags").type(JsonFieldType.ARRAY)
+                        .description("포스트 해시태그"),
+                    fieldWithPath("data.date").type(JsonFieldType.STRING)
+                        .description("약속 날짜"),
+                    fieldWithPath("data.startTime").type(JsonFieldType.STRING)
+                        .description("약속 시작 시간"),
+                    fieldWithPath("data.endTime").type(JsonFieldType.STRING)
+                        .description("약속 끝 시간"),
+                    fieldWithPath("data.place").type(JsonFieldType.STRING)
+                        .description("약속 장소")))
+        );
+
     verify(reservationService).getReservation(1);
   }
 
@@ -149,7 +131,7 @@ public class ReservationDocumentationTests {
   public void getHostReservation() throws Exception {
     // given
     List<ReservationDto.Response> responses = new ArrayList<>();
-    ReservationDto.Response response = reservationRes();
+    ReservationDto.Response response = getResponse();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -166,8 +148,25 @@ public class ReservationDocumentationTests {
     );
 
     // then
-    resultActions.andExpect(status().isOk()).andDo(print());
-
+    resultActions.andExpect(status().isOk()).andDo(print()).andDo(
+        document("get-host-reservation", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("data.[].reservationId").description("아이디"),
+                fieldWithPath("data.[].imageUrl").type(JsonFieldType.STRING)
+                    .description("이미지 주소"),
+                fieldWithPath("data.[].title").type(JsonFieldType.STRING)
+                    .description("포스트 제목"),
+                fieldWithPath("data.[].hashtags").type(JsonFieldType.ARRAY)
+                    .description("포스트 해시태그"),
+                fieldWithPath("data.[].date").type(JsonFieldType.STRING)
+                    .description("약속 날짜"),
+                fieldWithPath("data.[].startTime").type(JsonFieldType.STRING)
+                    .description("약속 시작 시간"),
+                fieldWithPath("data.[].endTime").type(JsonFieldType.STRING)
+                    .description("약속 끝 시간"),
+                fieldWithPath("data.[].place").type(JsonFieldType.STRING)
+                    .description("약속 장소")))
+    );
     verify(reservationService).getHostReservation(anyInt());
 
   }
@@ -177,7 +176,7 @@ public class ReservationDocumentationTests {
   public void getUserReservation() throws Exception {
     // given
     List<ReservationDto.Response> responses = new ArrayList<>();
-    ReservationDto.Response response = reservationRes();
+    ReservationDto.Response response = getResponse();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -194,7 +193,25 @@ public class ReservationDocumentationTests {
     );
 
     // then
-    resultActions.andExpect(status().isOk()).andDo(print());
+    resultActions.andExpect(status().isOk()).andDo(print()).andDo(
+        document("get-participate-reservation", getDocumentRequest(), getDocumentResponse(),
+            responseFields(fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("data.[].reservationId").description("아이디"),
+                fieldWithPath("data.[].imageUrl").type(JsonFieldType.STRING)
+                    .description("이미지 주소"),
+                fieldWithPath("data.[].title").type(JsonFieldType.STRING)
+                    .description("포스트 제목"),
+                fieldWithPath("data.[].hashtags").type(JsonFieldType.ARRAY)
+                    .description("포스트 해시태그"),
+                fieldWithPath("data.[].date").type(JsonFieldType.STRING)
+                    .description("약속 날짜"),
+                fieldWithPath("data.[].startTime").type(JsonFieldType.STRING)
+                    .description("약속 시작 시간"),
+                fieldWithPath("data.[].endTime").type(JsonFieldType.STRING)
+                    .description("약속 끝 시간"),
+                fieldWithPath("data.[].place").type(JsonFieldType.STRING)
+                    .description("약속 장소")))
+    );
 
     verify(reservationService).getUserReservation(anyInt());
   }
@@ -203,14 +220,14 @@ public class ReservationDocumentationTests {
   @DisplayName("예약생성")
   public void createReservation() throws Exception {
     // given
-    request = reservationReq();
-    response = reservationEntity();
+    final ReservationDto.Request request =
+        ReservationDto.Request.builder().scheduleId(1).message("msg").build();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(response);
+    given(reservationService.createReservation(eq(request), anyInt())).willReturn(getResponse());
 
     String json = objectMapper.writeValueAsString(request);
 
@@ -224,7 +241,27 @@ public class ReservationDocumentationTests {
 
     // then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print()).andDo(
+            document("create-reservation", getDocumentRequest(), getDocumentResponse(),
+                requestFields(fieldWithPath("scheduleId").description("스케쥴 아이디"),
+                    fieldWithPath("message").description("메세지")),
+                responseFields(fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("data.reservationId").description("아이디"),
+                    fieldWithPath("data.imageUrl").type(JsonFieldType.STRING)
+                        .description("이미지 주소"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING)
+                        .description("포스트 제목"),
+                    fieldWithPath("data.hashtags").type(JsonFieldType.ARRAY)
+                        .description("포스트 해시태그"),
+                    fieldWithPath("data.date").type(JsonFieldType.STRING)
+                        .description("약속 날짜"),
+                    fieldWithPath("data.startTime").type(JsonFieldType.STRING)
+                        .description("약속 시작 시간"),
+                    fieldWithPath("data.endTime").type(JsonFieldType.STRING)
+                        .description("약속 끝 시간"),
+                    fieldWithPath("data.place").type(JsonFieldType.STRING)
+                        .description("약속 장소")))
+        );
 
   }
 
@@ -244,41 +281,31 @@ public class ReservationDocumentationTests {
 
     //then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
-
+        .andDo(print()).andDo(
+            document("delete-reservation", getDocumentRequest(), getDocumentResponse(),
+                responseFields(fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")))
+        );
     verify(reservationService).deleteReservation(reservationId);
   }
 
-  private Reservation reservationEntity() {
-    Reservation reservation = new Reservation();
-    reservation.setId(1);
-    reservation.setMessage("msg");
-    reservation.setHostUser(hostUser);
-    reservation.setSchedule(schedule);
-    reservation.setParticipateUser(particiUser);
-
-    return reservation;
+  private ReservationDto.Response getResponse() {
+    List<String> stringTags = new ArrayList<>();
+    getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getTag()));
+    ReservationDto.Response response = ReservationMapper
+        .INSTANCE.toResponseDto(getEntity(), getPost(), schedule);
+    response.setHashtags(stringTags);
+    return response;
   }
 
-  private ReservationDto.Request reservationReq() {
-    return ReservationDto.Request
-        .builder()
+  private Reservation getEntity() {
+    return Reservation.builder()
+        .schedule(schedule)
+        .hostUser(User.builder()
+            .build())
+        .participateUser(User.builder()
+            .build())
         .message("msg")
-        .scheduleId(1)
-        .build();
-  }
-
-  private ReservationDto.Response reservationRes() {
-    return ReservationDto.Response
-        .builder()
-        .reservationId(1)
-        .date(schedule.getDate())
-        .endTime(schedule.getEndTime())
-        .place(schedule.getPlace())
-        .startTime(schedule.getStartTime())
-        .imgUrl(post.getImageUrl())
-        .title(post.getTitle())
-        .hashtags(null)
         .build();
   }
 }
