@@ -1,6 +1,7 @@
 package grooteogi.dto;
 
 import grooteogi.enums.CreditType;
+import java.util.List;
 import javax.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,26 @@ public class PostDto {
 
     private String[] hashtags;
 
-    private Object[] schedules;
+    private List<ScheduleDto.Request> schedules;
   }
 
+  @Data
+  @Builder
+  public static class Response {
+
+    private String title;
+
+    private String content;
+
+    private String imageUrl;
+
+    private int views;
+
+    private CreditType credit;
+
+    private String nickname;
+
+    private String date;
+
+  }
 }
