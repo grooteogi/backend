@@ -1,6 +1,5 @@
 package grooteogi.controller;
 
-import grooteogi.domain.Post;
 import grooteogi.dto.PostDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
@@ -27,12 +26,12 @@ public class PostController {
 
   @GetMapping
   public ResponseEntity<BasicResponse> search(
-      @RequestParam(name = "search", required = false) String search,
+      @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
-      @RequestParam(name = "type", required = false) String type) {
+      @RequestParam(name = "sort", required = false) String sort) {
 
     List<PostDto.Response> posts =
-        postService.search(search, type, PageRequest.of(page - 1, 20));
+        postService.search(keyword, sort, PageRequest.of(page - 1, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
@@ -57,8 +56,8 @@ public class PostController {
 
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
-    List<PostDto.Response> deletePost = this.postService.deletePost(postId);
+    postService.deletePost(postId);
     return ResponseEntity.ok(
-        BasicResponse.builder().count(deletePost.size()).data(deletePost).build());
+        BasicResponse.builder().message("delete post success").build());
   }
 }

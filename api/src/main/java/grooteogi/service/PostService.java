@@ -70,8 +70,8 @@ public class PostService {
       schedules.add(createdSchedule);
     });
 
-    Post created = this.postRepository
-        .save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
+    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules);
+    postRepository.save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
     PostDto.Response response = PostMapper.INSTANCE.toResponseDto(created);
 
     return response;
@@ -107,12 +107,13 @@ public class PostService {
       post.get().getPostHashtags().add(modifiedPostHashtag);
     });
 
-    Post modifiedPost = postRepository.save(PostMapper.INSTANCE.toModify(post.get(), request));
+    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
+    postRepository.save(modifiedPost);
     PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
     return response;
   }
 
-  public List<PostDto.Response> deletePost(int postId) {
+  public void deletePost(int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
 
     if (post.isEmpty()) {
@@ -127,35 +128,30 @@ public class PostService {
     });
 
     this.postRepository.delete(post.get());
-
-    List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findAll().forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
-    return responses;
   }
 
-  public List<PostDto.Response> search(String search, String type,
+  public List<PostDto.Response> search(String keyword, String sort,
       Pageable page) {
     final List<PostDto.Response> posts;
-    if (search == null) {
-      posts = searchAllPosts(page, type);
+    if (keyword == null) {
+      posts = searchAllPosts(page, sort);
     } else {
-      posts = searchPosts(search, page, type);
+      posts = searchPosts(keyword, page, sort);
     }
     return posts;
   }
 
 
-  public List<PostDto.Response> searchAllPosts(Pageable page, String type) {
+  public List<PostDto.Response> searchAllPosts(Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
     this.postRepository.findAllByPage(page).forEach(result -> responses
         .add(PostMapper.INSTANCE.toResponseDto(result)));
     return responses;
   }
 
-  private List<PostDto.Response> searchPosts(String search, Pageable page, String type) {
+  private List<PostDto.Response> searchPosts(String keyword, Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findBySearch(search, search, page).forEach(result -> responses
+    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
         .add(PostMapper.INSTANCE.toResponseDto(result)));
     return responses;
   }
