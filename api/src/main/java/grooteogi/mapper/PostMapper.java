@@ -9,9 +9,11 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", uses = DateMapper.class)
+@Mapper(componentModel = "spring", uses = DateMapper.class,
+    unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);

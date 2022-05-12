@@ -20,4 +20,10 @@ public class ScheduleDto {
     private String place;
 
   }
+
+  @Data
+  @Builder
+  public static class Response {
+
+  }
 }

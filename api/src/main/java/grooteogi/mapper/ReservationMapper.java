@@ -8,9 +8,10 @@ import grooteogi.dto.ReservationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReservationMapper extends BasicMapper<ReservationDto, Reservation> {
 
   ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
@@ -19,7 +20,8 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "id", ignore = true),
       @Mapping(source = "schedule", target = "schedule"),
       @Mapping(source = "user", target = "participateUser"),
-      @Mapping(source = "schedule.post.user", target = "hostUser")
+      @Mapping(source = "schedule.post.user", target = "hostUser"),
+      @Mapping(target = "type", ignore = true)
   })
   Reservation toEntity(ReservationDto.Request dto, User user, Schedule schedule);
 
