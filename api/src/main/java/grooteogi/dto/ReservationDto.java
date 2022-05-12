@@ -27,4 +27,10 @@ public class ReservationDto {
     private String endTime;
     private String place;
   }
+
+  @Data
+  @Builder
+  public static class SmsCode {
+    private String code;
+  }
 }
