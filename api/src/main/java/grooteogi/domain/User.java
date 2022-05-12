@@ -3,7 +3,6 @@ package grooteogi.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import grooteogi.enums.LoginType;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -41,7 +40,7 @@ public class User {
   private LoginType type;
 
   @Column(length = 40, nullable = false)
-  private String nickname = "groot";
+  private String nickname;
 
   @Column(length = 255)
   private String password;
@@ -61,18 +60,18 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Post> posts = new ArrayList<>();
+  private List<Post> posts;
 
   @OneToMany(mappedBy = "hostUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Reservation> hostReserves = new ArrayList<>();
+  private List<Reservation> hostReserves;
 
   @OneToMany(mappedBy = "participateUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Reservation> participateReserves = new ArrayList<>();
+  private List<Reservation> participateReserves;
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<Heart> hearts = new ArrayList<>();
+  private List<Heart> hearts;
 
 }
