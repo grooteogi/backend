@@ -2,20 +2,21 @@ package grooteogi.repository;
 
 import grooteogi.domain.Hashtag;
 import java.util.List;
-import org.springframework.data.domain.Pageable;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface HashtagRepository extends JpaRepository<Hashtag, Integer> {
 
+  @Query(value = "select * from hashtag order by count desc limit :size", nativeQuery = true)
+  List<Hashtag> findByCount(Integer size);
 
-  @Query(value = "select * from hashtag where hashtag_type = :type "
-      + "order by count desc ", nativeQuery = true)
-  List<Hashtag> findByTypeAndPage(@Param("type") String type, Pageable page);
+  @Query(value = "select * from hashtag where name LIKE %:keyword% order by count desc",
+      nativeQuery = true)
+  List<Hashtag> findAllByName(String keyword);
 
-  @Query(value = "select * from hashtag order by count desc", nativeQuery = true)
-  List<Hashtag> findAllByPage(Pageable page);
+  @Query(value = "select * from hashtag where name=:keyword", nativeQuery = true)
+  Optional<Hashtag> findByName(String keyword);
 
-  Hashtag findByTag(String tag);
+
 }
