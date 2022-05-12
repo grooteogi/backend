@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import grooteogi.enums.CreditType;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -70,20 +69,20 @@ public class Post {
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<PostHashtag> postHashtags = new ArrayList<>();
+  private List<PostHashtag> postHashtags;
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<Schedule> schedules = new ArrayList<>();
+  private List<Schedule> schedules;
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
       CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<Heart> hearts = new ArrayList<>();
+  private List<Heart> hearts;
 
   @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
     CascadeType.REMOVE}, fetch = FetchType.LAZY)
   @JsonManagedReference
-  private List<Review> reviews = new ArrayList<>();
+  private List<Review> reviews;
 }

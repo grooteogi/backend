@@ -1,9 +1,12 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import grooteogi.enums.ReservationType;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,6 +34,10 @@ public class Reservation {
 
   @Column(length = 200)
   private String message;
+
+  @Enumerated(EnumType.ORDINAL)
+  @Column(nullable = false)
+  private ReservationType type;
 
   @CreationTimestamp
   private Timestamp createAt;
