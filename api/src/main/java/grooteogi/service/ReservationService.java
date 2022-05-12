@@ -57,13 +57,7 @@ public class ReservationService {
     }
     List<ReservationDto.Responses> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
-      /*
-      * 1. DB에 저장된 Reservation을 다 불러와
-      * 2. reservation의 스케줄을 꺼낸다.
-      * 3. 스케쥴에서 date를 꺼낸다.
-      * 4. date가 현재 날짜를 기준으로 계산
-      * 5. reservation의 상태를 [ 완료 ]로 바꾼다.
-      * */
+
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
@@ -105,7 +99,7 @@ public class ReservationService {
 
     Reservation createdReservation =
         reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
-        schedule.get(), ReservationType.UNCANCELED));
+            schedule.get(), ReservationType.UNCANCELED));
     return ReservationMapper.INSTANCE.toResponseDto(createdReservation);
   }
 
@@ -115,5 +109,17 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
     reservationRepository.delete(reservation.get());
+  }
+
+  public ReservationDto.Response modifyStatus(Integer reservationId) {
+
+    Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+
+    if (reservation.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    }
+    reservation.get().setStatus(ReservationType.CANCELED);
+    reservationRepository.save(reservation.get());
+    return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
   }
 }

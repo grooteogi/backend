@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,5 +65,11 @@ public class ReservationController {
   public ResponseEntity<BasicResponse> deleteReservation(@PathVariable Integer reservationId) {
     this.reservationService.deleteReservation(reservationId);
     return ResponseEntity.ok(BasicResponse.builder().message("delete reservation success").build());
+  }
+
+  @PatchMapping("/{reservationId}")
+  public ResponseEntity<BasicResponse> modifyStatus(@PathVariable Integer reservationId) {
+    ReservationDto.Response response = this.reservationService.modifyStatus(reservationId);
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 }
