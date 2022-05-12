@@ -61,10 +61,6 @@ public class User {
 
   @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JsonManagedReference
-  private List<UserHashtag> userHashtags = new ArrayList<>();
-
-  @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-  @JsonManagedReference
   private List<Post> posts = new ArrayList<>();
 
   @OneToMany(mappedBy = "hostUser", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
