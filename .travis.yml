@@ -1,3 +1,4 @@
+---
 branches:
   only:
     - develop
@@ -12,4 +13,6 @@ notifications:
   email:
     recipients:
       - support@grooteogi.net
-script: "./gradlew clean build"
+script:
+  - "cd ./api"
+  - "./gradlew clean build"
