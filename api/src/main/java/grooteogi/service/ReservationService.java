@@ -28,42 +28,41 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
 
-  public ReservationDto.Response getReservation(Integer reservationId) {
+  public ReservationDto.Responses getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    ReservationDto.Response response = ReservationMapper.INSTANCE
-        .toResponseDto(reservation.get(), post, schedule);
-    return response;
+    ReservationDto.Responses responses = ReservationMapper.INSTANCE
+        .toResponseDtos(reservation.get(), post, schedule);
+    return responses;
   }
 
-  public List<ReservationDto.Response> getHostReservation(int userId) {
+  public List<ReservationDto.Responses> getHostReservation(int userId) {
     List<Reservation> reservations = reservationRepository.findByHostUserId(userId);
     return getReservationDto(reservations);
   }
 
-  public List<ReservationDto.Response> getUserReservation(Integer userId) {
+  public List<ReservationDto.Responses> getUserReservation(Integer userId) {
     List<Reservation> reservations = reservationRepository.findByParticipateUserId(userId);
     return getReservationDto(reservations);
   }
 
-  private List<ReservationDto.Response> getReservationDto(List<Reservation> reservations) {
+  private List<ReservationDto.Responses> getReservationDto(List<Reservation> reservations) {
     if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
-    List<ReservationDto.Response> responseList = new ArrayList<>();
+    List<ReservationDto.Responses> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
-      ReservationDto.Response response = ReservationMapper.INSTANCE.toResponseDto(reservation, post,
-          schedule);
-      response.setHashtags(getTags(post.getPostHashtags()));
-      responseList.add(response);
+      ReservationDto.Responses responses =
+          ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
+      responseList.add(responses);
     });
     return responseList;
   }
@@ -99,8 +98,7 @@ public class ReservationService {
     Reservation createdReservation =
         reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
         schedule.get()));
-    Post post = schedule.get().getPost();
-    return ReservationMapper.INSTANCE.toResponseDto(createdReservation, post, schedule.get());
+    return ReservationMapper.INSTANCE.toResponseDto(createdReservation);
   }
 
   public void deleteReservation(Integer reservationId) {

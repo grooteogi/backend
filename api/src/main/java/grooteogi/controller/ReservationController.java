@@ -28,14 +28,14 @@ public class ReservationController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    List<ReservationDto.Response> reservationList = reservationService.getHostReservation(
+    List<ReservationDto.Responses> reservationList = reservationService.getHostReservation(
         session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    ReservationDto.Response response = reservationService.getReservation(reservationId);
+    ReservationDto.Responses response = reservationService.getReservation(reservationId);
     return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 
@@ -44,7 +44,7 @@ public class ReservationController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    List<ReservationDto.Response> reservations = reservationService.getUserReservation(
+    List<ReservationDto.Responses> reservations = reservationService.getUserReservation(
         session.getId());
     return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
   }

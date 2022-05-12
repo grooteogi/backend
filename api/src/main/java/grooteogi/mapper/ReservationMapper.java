@@ -25,11 +25,16 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
   })
   Reservation toEntity(ReservationDto.Request dto, User user, Schedule schedule);
 
+  @Mapping(target = "reservationId", source = "reservation.id")
+  ReservationDto.Response toResponseDto(Reservation reservation);
+
   @Mappings({
       @Mapping(target = "date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", dateFormat = "HH:mm:ss"),
       @Mapping(target = "endTime", dateFormat = "HH:mm:ss"),
-      @Mapping(source = "post.imageUrl", target = "imageUrl")
+      @Mapping(target = "postId", source = "post.id"),
+      @Mapping(target = "hashtags", source = "post.postHashtags"),
+      @Mapping(target = "status", source = "reservation.status")
   })
-  ReservationDto.Response toResponseDto(Reservation reservation, Post post, Schedule schedule);
+  ReservationDto.Responses toResponseDtos(Reservation reservation, Post post, Schedule schedule);
 }
