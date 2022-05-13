@@ -14,6 +14,8 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,14 +43,69 @@ public class ReservationService {
     return responses;
   }
 
-  public List<ReservationDto.Responses> getHostReservation(int userId) {
-    List<Reservation> reservations = reservationRepository.findByHostUserId(userId);
-    return getReservationDto(reservations);
+  public List<ReservationDto.Responses> getHostReservation(int userId, String sort) {
+    // CANCEL 여부 확인
+    ReservationType status =
+        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
+    List<Reservation> reservations =
+        reservationRepository.findByHostUserIdAndStatusOrderByIdDesc(userId, status);
+
+    // DATE 필터링
+    List<ReservationDto.Responses> responses = (status.getValue() == 0)
+        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
+    return responses;
   }
 
-  public List<ReservationDto.Responses> getUserReservation(Integer userId) {
-    List<Reservation> reservations = reservationRepository.findByParticipateUserId(userId);
-    return getReservationDto(reservations);
+  public List<ReservationDto.Responses> getUserReservation(Integer userId, String sort) {
+    // CANCEL 여부 확인
+    ReservationType status =
+        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
+    List<Reservation> reservations =
+        reservationRepository.findByParticipateUserIdAndStatusOrderByIdDesc(userId, status);
+    
+    // DATE 필터링
+    List<ReservationDto.Responses> responses = (status.getValue() == 0)
+        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
+    return responses;
+  }
+
+  private List<ReservationDto.Responses> getSortedReservationDto(
+      List<Reservation> reservations, String sort) {
+
+    if (reservations.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    }
+    List<ReservationDto.Responses> responseList = new ArrayList<>();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String ss= sdf.format(new java.util.Date());
+    Date now = Date.valueOf(ss);
+    reservations.forEach(reservation -> {
+      Schedule schedule = reservation.getSchedule();
+      Post post = schedule.getPost();
+      Date date = schedule.getDate();
+      if (sort.equals("PROCEED")) {
+        if (date.before(now)) {
+          ReservationDto.Responses responses =
+              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
+          responses.setHashtags(getTags(post.getPostHashtags()));
+          responseList.add(responses);
+        }
+      } else if (sort.equals("COMPLETE")) {
+        if (date.after(now)) {
+          ReservationDto.Responses responses =
+              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
+          responses.setHashtags(getTags(post.getPostHashtags()));
+          responseList.add(responses);
+        }
+      } else {
+        ReservationDto.Responses responses =
+            ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
+        responses.setHashtags(getTags(post.getPostHashtags()));
+        responseList.add(responses);
+      }
+
+    });
+    return responseList;
   }
 
   private List<ReservationDto.Responses> getReservationDto(List<Reservation> reservations) {

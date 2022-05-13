@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,12 +26,13 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @GetMapping("/host")
-  public ResponseEntity<BasicResponse> getHostReservation() {
+  public ResponseEntity<BasicResponse> getHostReservation(
+      @RequestParam(name = "sort", required = false) String sort)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
     List<ReservationDto.Responses> reservationList = reservationService.getHostReservation(
-        session.getId());
+        session.getId(), sort);
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
@@ -41,12 +43,13 @@ public class ReservationController {
   }
 
   @GetMapping("/apply")
-  public ResponseEntity<BasicResponse> getUserReservation() {
+  public ResponseEntity<BasicResponse> getUserReservation(
+      @RequestParam(name = "sort", required = false) String sort)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
     List<ReservationDto.Responses> reservations = reservationService.getUserReservation(
-        session.getId());
+        session.getId(), sort);
     return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
   }
 

@@ -8,8 +8,9 @@ import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.JpaContext;
 import grooteogi.mapper.PostMapper;
-import grooteogi.mapper.ScheduleMapper;
+import grooteogi.mapper.SourceTargetMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
@@ -64,17 +65,24 @@ public class PostService {
 
     // Schedule 저장
     List<Schedule> schedules = new ArrayList<>();
-    request.getSchedules().forEach(schedule -> {
-      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
+//    request.getSchedules().forEach(schedule -> {
+//      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
+//
+//      System.out.println("@@@@@@@@@@@@@@@@@@@" + createdSchedule.getDate());
+//      schedules.add(createdSchedule);
+//    });
+//    System.out.println(schedules.get(0).getDate() + " @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@!!!!!!!!!!!");
+//    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, request.getSchedules());
+    JpaContext jpaContext = new JpaContext(null);
+    Post post = SourceTargetMapper.MAPPER.toEntity( request, jpaContext);
+    System.out.println(post.getSchedules().size());
+    postRepository.save(post);
 
-      schedules.add(createdSchedule);
-    });
+//    created.getSchedules().forEach(schedule -> System.out.println("->>>>  " +schedule.getDate()));
+//    Post saved = postRepository.save(created);
+//    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(saved);
 
-    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules);
-    postRepository.save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(created);
-
-    return response;
+    return null;
   }
 
   @Transactional

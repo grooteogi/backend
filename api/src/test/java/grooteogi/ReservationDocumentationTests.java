@@ -3,6 +3,7 @@ package grooteogi;
 import static grooteogi.ApiDocumentUtils.getPost;
 import static grooteogi.ApiDocumentUtils.getPostHashtags;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -114,7 +115,7 @@ public class ReservationDocumentationTests {
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
     // when
-    given(reservationService.getHostReservation(anyInt())).willReturn(responses);
+    given(reservationService.getHostReservation(anyInt(), anyString())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -124,7 +125,7 @@ public class ReservationDocumentationTests {
 
     // then
     resultActions.andExpect(status().isOk()).andDo(print());
-    verify(reservationService).getHostReservation(anyInt());
+    verify(reservationService).getHostReservation(anyInt(), anyString());
 
   }
 
@@ -141,7 +142,7 @@ public class ReservationDocumentationTests {
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
     // when
-    given(reservationService.getUserReservation(anyInt())).willReturn(responses);
+    given(reservationService.getUserReservation(anyInt(), anyString())).willReturn(responses);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -152,7 +153,7 @@ public class ReservationDocumentationTests {
     // then
     resultActions.andExpect(status().isOk()).andDo(print());
 
-    verify(reservationService).getUserReservation(anyInt());
+    verify(reservationService).getUserReservation(anyInt(), anyString());
   }
 
   @Test

@@ -1,33 +1,32 @@
 package grooteogi.mapper;
 
+import grooteogi.domain.Post;
 import grooteogi.domain.Schedule;
+import grooteogi.dto.PostDto;
 import grooteogi.dto.ScheduleDto;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(
-    unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ScheduleMapper extends BasicMapper<ScheduleDto, Schedule>  {
+@Mapper
+public interface SourceTargetMapper {
 
-  ScheduleMapper INSTANCE = Mappers.getMapper(ScheduleMapper.class);
+  SourceTargetMapper MAPPER = Mappers.getMapper(SourceTargetMapper.class);
 
-
-
+  Post toEntity(PostDto.Request s, @Context JpaContext ctx);
 
   @Mappings({
       @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),
-      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
+      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss"),
+      @Mapping(target = "post", ignore = true)
   })
-  List<Schedule> toEntities(List<ScheduleDto.Request> dto);
-
+  Schedule toEntity(ScheduleDto.Request dto, @Context JpaContext ctx);
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")
