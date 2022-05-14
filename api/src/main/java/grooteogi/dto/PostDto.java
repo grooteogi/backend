@@ -29,22 +29,7 @@ public class PostDto {
     private String[] hashtags;
 
     private List<ScheduleDto.Request> schedules;
-
-//    public List<ScheduleDto.Request> getSchedules() {
-//      return schedules;
-//    }
-//
-//    public void setSchedules(List<ScheduleDto.Request> schedules) {
-//      this.schedules = schedules;
-//    }
-//
-//    public void addSchedule(ScheduleDto.Request scheduleDto) {
-//      if (schedules == null) {
-//        schedules = new ArrayList<>();
-//      }
-//
-//      schedules.add(scheduleDto);
-//    }
+    
   }
 
   @Data

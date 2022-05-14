@@ -62,7 +62,7 @@ public class ReservationService {
         (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
     List<Reservation> reservations =
         reservationRepository.findByParticipateUserIdAndStatusOrderByIdDesc(userId, status);
-    
+
     // DATE 필터링
     List<ReservationDto.Responses> responses = (status.getValue() == 0)
         ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
@@ -77,7 +77,7 @@ public class ReservationService {
     }
     List<ReservationDto.Responses> responseList = new ArrayList<>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String ss= sdf.format(new java.util.Date());
+    String ss = sdf.format(new java.util.Date());
     Date now = Date.valueOf(ss);
     reservations.forEach(reservation -> {
       Schedule schedule = reservation.getSchedule();
