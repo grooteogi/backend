@@ -1,6 +1,5 @@
 package grooteogi.controller;
 
-import grooteogi.domain.Hashtag;
 import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.HashtagService;
@@ -30,7 +29,7 @@ public class HashtagController {
   @GetMapping("/search")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "keyword", required = false) String keyword) {
-    List<Hashtag> hashtag = hashtagService.search(keyword);
+    HashtagDto.Response hashtag = hashtagService.search(keyword);
     return ResponseEntity.ok(BasicResponse.builder().data(hashtag).build());
   }
 

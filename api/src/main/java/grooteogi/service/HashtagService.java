@@ -22,13 +22,17 @@ public class HashtagService {
   public HashtagDto.Response createHashtag(HashtagDto.Request request) {
     Hashtag createdHashtag = new Hashtag();
 
-    if (this.hashtagRepository.findByName(request.getName()) != null) {
+
+    Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(request.getName());
+
+    if (!findHashtag.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    //새로운 해시태그는 성격만 작성 가능
-    createdHashtag = hashtagRepository.save(HashtagMapper.INSTANCE.toEntity(request));
 
+    //새로운 해시태그는 성격만 작성 가능
+    createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
+    hashtagRepository.save(createdHashtag);
 
     return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
 
@@ -40,25 +44,23 @@ public class HashtagService {
 
     List<HashtagDto.Response> responseList = new ArrayList<>();
 
-    hashtags.forEach(hashtag -> {
-      responseList.add(HashtagMapper.INSTANCE.toResponseDto(hashtag));
-    });
+    System.out.println("매퍼 시작 전");
+    hashtags.forEach(hashtag -> responseList.add(HashtagMapper.INSTANCE.toResponseDto(hashtag)));
 
     return responseList;
   }
 
-  public List<Hashtag> search(String keyword) {
+  public HashtagDto.Response search(String keyword) {
     Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(keyword);
 
 
     if (findHashtag.isEmpty()) {
       Hashtag createdHashtag = Hashtag.builder().name(keyword).build();
       hashtagRepository.save(createdHashtag);
+      return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
     }
 
-    List<Hashtag> hashtags = this.hashtagRepository.findAllByName(keyword);
-
-    return hashtags;
+    return HashtagMapper.INSTANCE.toResponseDto(findHashtag.get());
   }
 
 

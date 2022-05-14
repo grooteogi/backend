@@ -15,6 +15,7 @@ public class HashtagDto {
   public static class Request {
     @NotNull
     private String name;
+    private int id;
   }
 
   @Data
