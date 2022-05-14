@@ -10,8 +10,6 @@ import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.PostDto.Response;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import grooteogi.mapper.PostMapper;
-import grooteogi.mapper.ScheduleMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
@@ -44,8 +42,8 @@ public class PostService {
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
     Post updatePost = this.postRepository.save(post.get());
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(updatePost);
-    return response;
+    //PostDto.Response response = PostMapper.INSTANCE.toResponseDto(updatePost);
+    return null;
   }
 
   public Response createPost(Request request) {
@@ -67,16 +65,18 @@ public class PostService {
     // Schedule 저장
     List<Schedule> schedules = new ArrayList<>();
     request.getSchedules().forEach(schedule -> {
-      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
+      //Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
 
-      schedules.add(createdSchedule);
+      //schedules.add(createdSchedule);
     });
 
-    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules);
-    postRepository.save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
-    Response response = PostMapper.INSTANCE.toResponseDto(created);
+    // Post created = PostMapper.INSTANCE.toEntity
+    //(request, user.get(), postHashtags, schedules);
+    // postRepository.save(
+    // PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
+    // Response response = PostMapper.INSTANCE.toResponseDto(created);
 
-    return response;
+    return null;
   }
 
   @Transactional
@@ -109,10 +109,10 @@ public class PostService {
       post.get().getPostHashtags().add(modifiedPostHashtag);
     });
 
-    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
-    postRepository.save(modifiedPost);
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
-    return response;
+    //Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
+    //postRepository.save(modifiedPost);
+    //PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
+    return null;
   }
 
   public void deletePost(int postId) {
@@ -146,15 +146,15 @@ public class PostService {
 
   public List<PostDto.Response> searchAllPosts(Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findAllByPage(page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
-    return responses;
+    //this.postRepository.findAllByPage(page).forEach(result -> responses
+    //.add(PostMapper.INSTANCE.toResponseDto(result)));
+    return null;
   }
 
   private List<PostDto.Response> searchPosts(String keyword, Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
+    //this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
+    //.add(PostMapper.INSTANCE.toResponseDto(result)));
     return responses;
   }
 

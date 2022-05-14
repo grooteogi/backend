@@ -8,7 +8,6 @@ import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import grooteogi.mapper.ReservationMapper;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
@@ -35,9 +34,9 @@ public class ReservationService {
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    ReservationDto.Response response = ReservationMapper.INSTANCE
-        .toResponseDto(reservation.get(), post, schedule);
-    return response;
+    // ReservationDto.Response response = ReservationMapper.INSTANCE
+    //    .toResponseDto(reservation.get(), post, schedule);
+    return null;
   }
 
   public List<ReservationDto.Response> getHostReservation(int userId) {
@@ -60,12 +59,12 @@ public class ReservationService {
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
-      ReservationDto.Response response = ReservationMapper.INSTANCE.toResponseDto(reservation, post,
-          schedule);
-      response.setHashtags(getTags(post.getPostHashtags()));
-      responseList.add(response);
+      //ReservationDto.Response response =
+      //ReservationMapper.INSTANCE.toResponseDto(reservation, post, schedule);
+      //response.setHashtags(getTags(post.getPostHashtags()));
+      //responseList.add(response);
     });
-    return responseList;
+    return null;
   }
 
   private List<String> getTags(List<PostHashtag> postHashtags) {
@@ -96,11 +95,11 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    Reservation createdReservation =
-        reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
-        schedule.get()));
+    //Reservation createdReservation =
+    //reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
+    //schedule.get()));
     Post post = schedule.get().getPost();
-    return ReservationMapper.INSTANCE.toResponseDto(createdReservation, post, schedule.get());
+    return null;
   }
 
   public void deleteReservation(Integer reservationId) {
