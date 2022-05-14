@@ -6,14 +6,14 @@ import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.ScheduleDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import grooteogi.mapper.JpaContext;
 import grooteogi.mapper.PostMapper;
-import grooteogi.mapper.SourceTargetMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
+import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +32,7 @@ public class PostService {
   private final PostHashtagRepository postHashtagRepository;
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
+  private final ScheduleRepository scheduleRepository;
 
   public PostDto.Response getPost(int postId) {
 
@@ -47,11 +48,21 @@ public class PostService {
     return response;
   }
 
+  private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
+    List<Schedule> schedules = PostMapper.INSTANCE.toScheduleEntities(requests);
+
+    schedules.forEach(schedule -> {
+      scheduleRepository.save(schedule);
+    });
+    return schedules;
+  }
+
   public PostDto.Response createPost(PostDto.Request request) {
-    //변수 정의
+
+    List<Schedule> requests = createSchedule(request.getSchedules());
+
     Optional<User> user = this.userRepository.findById(request.getUserId());
 
-    //Post Hashtag 저장
     List<PostHashtag> postHashtags = new ArrayList<>();
     Arrays.stream(request.getHashtags()).forEach(name -> {
       Hashtag hashtag = this.hashtagRepository.findByTag(name);
@@ -63,26 +74,18 @@ public class PostService {
       postHashtags.add(createdPostHashtag);
     });
 
-    // Schedule 저장
-    List<Schedule> schedules = new ArrayList<>();
-//    request.getSchedules().forEach(schedule -> {
-//      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
-//
-//      System.out.println("@@@@@@@@@@@@@@@@@@@" + createdSchedule.getDate());
-//      schedules.add(createdSchedule);
-//    });
-//    System.out.println(schedules.get(0).getDate() + " @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@!!!!!!!!!!!");
-//    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, request.getSchedules());
-    JpaContext jpaContext = new JpaContext(null);
-    Post post = SourceTargetMapper.MAPPER.toEntity( request, jpaContext);
-    System.out.println(post.getSchedules().size());
-    postRepository.save(post);
+    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags);
+    createdPost.setSchedules(requests);
 
-//    created.getSchedules().forEach(schedule -> System.out.println("->>>>  " +schedule.getDate()));
-//    Post saved = postRepository.save(created);
-//    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(saved);
+    Post savedPost = postRepository.save(createdPost);
 
-    return null;
+    requests.forEach(schedule -> {
+      schedule.setPost(savedPost);
+      scheduleRepository.save(schedule);
+    });
+
+    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(savedPost);
+    return response;
   }
 
   @Transactional
@@ -135,6 +138,12 @@ public class PostService {
       hashtag.get().setCount(hashtag.get().getCount() - 1);
     });
 
+    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
+
+    if (schedules.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+    }
+    schedules.forEach(schedule -> scheduleRepository.delete(schedule));
     this.postRepository.delete(post.get());
   }
 

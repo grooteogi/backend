@@ -2,39 +2,49 @@ package grooteogi.mapper;
 
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
-@Mapper( componentModel = "spring",
-    collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
+@Mapper(componentModel = "spring")
 public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
-  Post toEntity(PostDto.Request dto, User user,
-      List<PostHashtag> postHashtags, List<ScheduleDto.Request> schedules);
+  @Mapping(source = "dto.title", target = "title")
+  @Mapping(source = "dto.content", target = "content")
+  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.imageUrl", target = "imageUrl")
+  @Mapping(source = "user", target = "user")
+  Post toEntity(Request dto, User user, List<PostHashtag> postHashtags);
 
+  @Mapping(source = "post.id", target = "postId")
   PostDto.Response toResponseDto(Post post);
 
   @Mappings({
-      @Mapping(source = "dto.title", target = "title"),
-      @Mapping(source = "dto.content", target = "content"),
-      @Mapping(source = "dto.imageUrl", target = "imageUrl"),
-      @Mapping(source = "dto.credit", target = "credit"),
-      @Mapping(source = "post.schedules", target = "schedules"),
-      @Mapping(source = "post.postHashtags", target = "postHashtags")
+      @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
+      @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),
+      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
   })
-  Post toModify(Post post, PostDto.Request dto);
+  Schedule toScheduleEntity(ScheduleDto.Request dto);
+
+  @Mappings({
+      @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
+      @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),
+      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
+  })
+  List<Schedule> toScheduleEntities(List<ScheduleDto.Request> dto);
+
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")
@@ -66,19 +76,10 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
     }
   }
 
-//  default Schedule toEntity(ScheduleDto.Request request) {
-//    if (request == null) {
-//      return null;
-//    }
-//
-//    ScheduleBuilder schedule = Schedule.builder();
-//
-//    schedule.date(asDate(request.getDate()));
-//    schedule.startTime(adTime(request.getStartTime()));
-//    schedule.endTime(adTime(request.getEndTime()));
-//    schedule.region(request.getRegion());
-//    schedule.place(request.getPlace());
-//
-//    return schedule.build();
-//  }
+  @Mapping(source = "dto.title", target = "title")
+  @Mapping(source = "dto.content", target = "content")
+  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.imageUrl", target = "imageUrl")
+  @Mapping(source = "post.schedules", target = "schedules")
+  Post toModify(Post post, PostDto.Request dto);
 }

@@ -1,7 +1,6 @@
 package grooteogi.dto;
 
 import grooteogi.enums.CreditType;
-import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -31,40 +30,28 @@ public class PostDto {
 
     private List<ScheduleDto.Request> schedules;
 
-    public List<ScheduleDto.Request> getSchedules() {
-      return schedules;
-    }
-
-    public void setSchedules(List<ScheduleDto.Request> schedules) {
-      this.schedules = schedules;
-    }
-
-    public void addSchedule(ScheduleDto.Request scheduleDto) {
-      if (schedules == null) {
-        schedules = new ArrayList<>();
-      }
-
-      schedules.add(scheduleDto);
-    }
+//    public List<ScheduleDto.Request> getSchedules() {
+//      return schedules;
+//    }
+//
+//    public void setSchedules(List<ScheduleDto.Request> schedules) {
+//      this.schedules = schedules;
+//    }
+//
+//    public void addSchedule(ScheduleDto.Request scheduleDto) {
+//      if (schedules == null) {
+//        schedules = new ArrayList<>();
+//      }
+//
+//      schedules.add(scheduleDto);
+//    }
   }
 
   @Data
   @Builder
   public static class Response {
 
-    private String title;
-
-    private String content;
-
-    private String imageUrl;
-
-    private int views;
-
-    private CreditType credit;
-
-    private String nickname;
-
-    private String date;
+    private Integer postId;
 
   }
 }
