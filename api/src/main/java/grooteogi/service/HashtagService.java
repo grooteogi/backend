@@ -2,14 +2,14 @@ package grooteogi.service;
 
 import grooteogi.domain.Hashtag;
 import grooteogi.dto.hashtag.HashtagDto;
-import grooteogi.enums.HashtagType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.HashtagMapper;
 import grooteogi.repository.HashtagRepository;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,32 +19,46 @@ public class HashtagService {
   private final HashtagRepository hashtagRepository;
 
 
-  public Hashtag createHashtag(HashtagDto hashtagDto) {
+  public HashtagDto.Response createHashtag(HashtagDto.Request request) {
     Hashtag createdHashtag = new Hashtag();
 
-    if (this.hashtagRepository.findByTag(hashtagDto.getTag()) != null) {
+
+    Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(request.getName());
+
+    if (!findHashtag.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    //새로운 해시태그는 성격만 작성 가능
-    createdHashtag.setHashtagType(HashtagType.PERSONALITY);
-    createdHashtag.setTag(hashtagDto.getTag());
+    createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
+    hashtagRepository.save(createdHashtag);
 
-    return this.hashtagRepository.save(createdHashtag);
+    return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
+
   }
 
-  public List<Hashtag> search(Pageable page, String type) {
-    final List<Hashtag> hashtags;
+  public List<HashtagDto.Response> getHashtag() {
 
-    if (type == null) {
-      hashtags = this.hashtagRepository.findAllByPage(page);
-    } else if (!type.toLowerCase(Locale.ROOT).equals("personality")
-        && !type.toLowerCase(Locale.ROOT).equals("concern")) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
-    } else {
-      type = type.toLowerCase(Locale.ROOT);
-      hashtags = this.hashtagRepository.findByTypeAndPage(type, page);
+    List<Hashtag> hashtags = hashtagRepository.findByCount(10);
+
+    List<HashtagDto.Response> responseList = new ArrayList<>();
+
+    hashtags.forEach(hashtag -> responseList.add(HashtagMapper.INSTANCE.toResponseDto(hashtag)));
+
+    return responseList;
+  }
+
+  public HashtagDto.Response search(String keyword) {
+    Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(keyword);
+
+
+    if (findHashtag.isEmpty()) {
+      Hashtag createdHashtag = Hashtag.builder().name(keyword).build();
+      hashtagRepository.save(createdHashtag);
+      return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
     }
-    return hashtags;
+
+    return HashtagMapper.INSTANCE.toResponseDto(findHashtag.get());
   }
+
+
 }

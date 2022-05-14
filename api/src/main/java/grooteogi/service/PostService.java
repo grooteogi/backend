@@ -6,6 +6,8 @@ import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.PostDto.Request;
+import grooteogi.dto.PostDto.Response;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.PostMapper;
@@ -46,14 +48,14 @@ public class PostService {
     return response;
   }
 
-  public PostDto.Response createPost(PostDto.Request request) {
+  public Response createPost(Request request) {
     //변수 정의
     Optional<User> user = this.userRepository.findById(request.getUserId());
 
     //Post Hashtag 저장
     List<PostHashtag> postHashtags = new ArrayList<>();
     Arrays.stream(request.getHashtags()).forEach(name -> {
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
+      Hashtag hashtag = this.hashtagRepository.findByName(name).get();
       hashtag.setCount(hashtag.getCount() + 1);
       PostHashtag createdPostHashtag = PostHashtag.builder()
           .hashTag(hashtag)
@@ -72,7 +74,7 @@ public class PostService {
 
     Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules);
     postRepository.save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(created);
+    Response response = PostMapper.INSTANCE.toResponseDto(created);
 
     return response;
   }
@@ -97,7 +99,7 @@ public class PostService {
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
+      Hashtag hashtag = this.hashtagRepository.findByName(name).get();
 
       hashtag.setCount(hashtag.getCount() + 1);
 

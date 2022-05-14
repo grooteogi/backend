@@ -48,7 +48,7 @@ public interface ApiDocumentUtils {
   static List<PostHashtag> getPostHashtags() {
     List<PostHashtag> tags = new ArrayList<>();
     PostHashtag tag = PostHashtag.builder()
-        .hashTag(Hashtag.builder().tag("해시태그").build())
+        .hashTag(Hashtag.builder().name("해시태그").build())
         .build();
     tags.add(tag);
     return tags;
