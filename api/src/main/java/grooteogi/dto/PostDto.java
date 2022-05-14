@@ -29,25 +29,14 @@ public class PostDto {
     private String[] hashtags;
 
     private List<ScheduleDto.Request> schedules;
+    
   }
 
   @Data
   @Builder
   public static class Response {
 
-    private String title;
-
-    private String content;
-
-    private String imageUrl;
-
-    private int views;
-
-    private CreditType credit;
-
-    private String nickname;
-
-    private String date;
+    private Integer postId;
 
   }
 }

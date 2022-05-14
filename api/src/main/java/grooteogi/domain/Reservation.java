@@ -37,7 +37,7 @@ public class Reservation {
 
   @Enumerated(EnumType.ORDINAL)
   @Column(nullable = false)
-  private ReservationType type;
+  private ReservationType status;
 
   @CreationTimestamp
   private Timestamp createAt;
