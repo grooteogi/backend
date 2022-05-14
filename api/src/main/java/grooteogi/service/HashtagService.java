@@ -44,7 +44,6 @@ public class HashtagService {
 
     List<HashtagDto.Response> responseList = new ArrayList<>();
 
-    System.out.println("매퍼 시작 전");
     hashtags.forEach(hashtag -> responseList.add(HashtagMapper.INSTANCE.toResponseDto(hashtag)));
 
     return responseList;
