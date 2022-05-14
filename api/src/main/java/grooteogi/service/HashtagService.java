@@ -29,8 +29,6 @@ public class HashtagService {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-
-    //새로운 해시태그는 성격만 작성 가능
     createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
     hashtagRepository.save(createdHashtag);
 
