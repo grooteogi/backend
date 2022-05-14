@@ -207,7 +207,7 @@ public class ReservationDocumentationTests {
 
   private ReservationDto.Responses getResponses() {
     List<String> stringTags = new ArrayList<>();
-    getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getTag()));
+    getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getName()));
     ReservationDto.Responses response = ReservationMapper
         .INSTANCE.toResponseDtos(getEntity(), getPost(), schedule);
     response.setHashtags(stringTags);

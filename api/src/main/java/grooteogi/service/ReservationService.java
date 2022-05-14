@@ -128,7 +128,7 @@ public class ReservationService {
 
   private List<String> getTags(List<PostHashtag> postHashtags) {
     List<String> tags = new ArrayList<>();
-    postHashtags.forEach(postHashtag -> tags.add(postHashtag.getHashTag().getTag()));
+    postHashtags.forEach(postHashtag -> tags.add(postHashtag.getHashTag().getName()));
     return tags;
   }
 

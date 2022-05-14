@@ -65,13 +65,14 @@ public class PostService {
 
     List<PostHashtag> postHashtags = new ArrayList<>();
     Arrays.stream(request.getHashtags()).forEach(name -> {
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
-      hashtag.setCount(hashtag.getCount() + 1);
-      PostHashtag createdPostHashtag = PostHashtag.builder()
-          .hashTag(hashtag)
-          .build();
-
-      postHashtags.add(createdPostHashtag);
+      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
+      hashtag.ifPresent(tag -> {
+        tag.setCount(tag.getCount() + 1);
+        PostHashtag createdPostHashtag = PostHashtag.builder()
+            .hashTag(tag)
+            .build();
+        postHashtags.add(createdPostHashtag);
+      });
     });
 
     Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags);
@@ -108,14 +109,15 @@ public class PostService {
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
+      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
 
-      hashtag.setCount(hashtag.getCount() + 1);
+      hashtag.ifPresent(tag -> {
+        tag.setCount(tag.getCount() + 1);
+        modifiedPostHashtag.setHashTag(tag);
+        modifiedPostHashtag.setPost(post.get());
 
-      modifiedPostHashtag.setHashTag(hashtag);
-      modifiedPostHashtag.setPost(post.get());
-
-      post.get().getPostHashtags().add(modifiedPostHashtag);
+        post.get().getPostHashtags().add(modifiedPostHashtag);
+      });
     });
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
@@ -172,5 +174,4 @@ public class PostService {
         .add(PostMapper.INSTANCE.toResponseDto(result)));
     return responses;
   }
-
 }
