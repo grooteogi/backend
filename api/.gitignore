@@ -9,4 +9,4 @@ build/
 /src/main/resources/application-prod.yml
 
 ### env ###
-/config/dev.env
+/config/local.env
