@@ -1,7 +1,6 @@
 package grooteogi.utils;
 
 import java.util.HashMap;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -22,7 +21,7 @@ public class SmsClient {
   public void certifiedPhoneNumber(String phoneNumber, String cerNum) {
     Message coolsms = new Message(apiKey, apiSecret);
 
-    HashMap<String, String> params = new HashMap<String, String>();
+    HashMap<String, String> params = new HashMap<>();
     params.put("to", phoneNumber);
     params.put("from", "발송할 번호 입력");
     params.put("type", "SMS");
@@ -30,7 +29,7 @@ public class SmsClient {
     params.put("app_version", "test app 1.2");
 
     try {
-      JSONObject obj = (JSONObject) coolsms.send(params);
+      JSONObject obj = coolsms.send(params);
       System.out.println(obj.toString());
     } catch (CoolsmsException e) {
       System.out.println(e.getMessage());

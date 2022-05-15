@@ -6,7 +6,6 @@ import grooteogi.service.ReservationService;
 import grooteogi.utils.Session;
 import grooteogi.utils.SmsClient;
 import java.util.List;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
 
   private final ReservationService reservationService;
-  private final SmsClient smsClient;
 
   @GetMapping("/host")
   public ResponseEntity<BasicResponse> getHostReservation() {
@@ -70,19 +68,9 @@ public class ReservationController {
     return ResponseEntity.ok(BasicResponse.builder().message("delete reservation success").build());
   }
 
-  @GetMapping("/send-sms")
+  @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
-
-    Random rand = new Random();
-    StringBuilder numStr = new StringBuilder();
-    for (int i = 0; i < 4; i++) {
-      String ran = Integer.toString(rand.nextInt(10));
-      numStr.append(ran);
-    }
-
-    smsClient.certifiedPhoneNumber(phoneNumber, numStr.toString());
-    ReservationDto.SmsCode smsCode = ReservationDto.SmsCode.builder()
-        .code(numStr.toString()).build();
-    return ResponseEntity.ok(BasicResponse.builder().data(smsCode).build());
+    ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 }

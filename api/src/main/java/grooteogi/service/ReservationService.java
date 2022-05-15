@@ -13,9 +13,11 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.SmsClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public class ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+
+  private final SmsClient smsClient;
 
   public ReservationDto.Response getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -109,5 +113,19 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
     reservationRepository.delete(reservation.get());
+  }
+
+  public ReservationDto.SmsCode sendSms(String phoneNumber) {
+
+    Random rand = new Random();
+    StringBuilder numStr = new StringBuilder();
+    for (int i = 0; i < 4; i++) {
+      String ran = Integer.toString(rand.nextInt(10));
+      numStr.append(ran);
+    }
+
+    smsClient.certifiedPhoneNumber(phoneNumber, numStr.toString());
+    return ReservationDto.SmsCode.builder()
+        .code(numStr.toString()).build();
   }
 }
