@@ -1,7 +1,14 @@
 spring:
   origin:
     url: "http://localhost:3000"
+  datasource:
+    url: jdbc:mysql://localhost:3305/test_db
+    username: test
+    password: test_pw
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  redis:
+    host: localhost
+    port: 6378

@@ -2,9 +2,10 @@ spring:
   origin:
     url: "http://localhost:3000"
   datasource:
-    url: jdbc:mysql://localhost:3305/test_db
-    username: test
-    password: test_pw
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://dev-grtg.crhh1uzij006.ap-northeast-2.rds.amazonaws.com:3306/grtg
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

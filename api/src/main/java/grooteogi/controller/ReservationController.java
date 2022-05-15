@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,28 +27,30 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @GetMapping("/host")
-  public ResponseEntity<BasicResponse> getHostReservation() {
+  public ResponseEntity<BasicResponse> getHostReservation(
+      @RequestParam(name = "sort", required = false) String sort)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    List<ReservationDto.Response> reservationList = reservationService.getHostReservation(
-        session.getId());
+    List<ReservationDto.Responses> reservationList = reservationService.getHostReservation(
+        session.getId(), sort);
     return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
   }
 
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    ReservationDto.Response response = reservationService.getReservation(reservationId);
+    ReservationDto.Responses response = reservationService.getReservation(reservationId);
     return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 
   @GetMapping("/apply")
-  public ResponseEntity<BasicResponse> getUserReservation() {
+  public ResponseEntity<BasicResponse> getUserReservation(
+      @RequestParam(name = "sort", required = false) String sort)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    List<ReservationDto.Response> reservations = reservationService.getUserReservation(
-        session.getId());
+    List<ReservationDto.Responses> reservations = reservationService.getUserReservation(
+        session.getId(), sort);
     return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
   }
 
@@ -68,6 +71,12 @@ public class ReservationController {
     return ResponseEntity.ok(BasicResponse.builder().message("delete reservation success").build());
   }
 
+  @PatchMapping("/{reservationId}")
+  public ResponseEntity<BasicResponse> modifyStatus(@PathVariable Integer reservationId) {
+    ReservationDto.Response response = this.reservationService.modifyStatus(reservationId);
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+  }
+  
   @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
     ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);

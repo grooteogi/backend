@@ -6,13 +6,14 @@ import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.ScheduleDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.PostMapper;
-import grooteogi.mapper.ScheduleMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
+import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class PostService {
   private final PostHashtagRepository postHashtagRepository;
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
+  private final ScheduleRepository scheduleRepository;
 
   public PostDto.Response getPost(int postId) {
 
@@ -46,34 +48,44 @@ public class PostService {
     return response;
   }
 
+  private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
+    List<Schedule> schedules = PostMapper.INSTANCE.toScheduleEntities(requests);
+
+    schedules.forEach(schedule -> {
+      scheduleRepository.save(schedule);
+    });
+    return schedules;
+  }
+
   public PostDto.Response createPost(PostDto.Request request) {
-    //변수 정의
+
+    List<Schedule> requests = createSchedule(request.getSchedules());
+
     Optional<User> user = this.userRepository.findById(request.getUserId());
 
-    //Post Hashtag 저장
     List<PostHashtag> postHashtags = new ArrayList<>();
     Arrays.stream(request.getHashtags()).forEach(name -> {
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
-      hashtag.setCount(hashtag.getCount() + 1);
-      PostHashtag createdPostHashtag = PostHashtag.builder()
-          .hashTag(hashtag)
-          .build();
-
-      postHashtags.add(createdPostHashtag);
+      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
+      hashtag.ifPresent(tag -> {
+        tag.setCount(tag.getCount() + 1);
+        PostHashtag createdPostHashtag = PostHashtag.builder()
+            .hashTag(tag)
+            .build();
+        postHashtags.add(createdPostHashtag);
+      });
     });
 
-    // Schedule 저장
-    List<Schedule> schedules = new ArrayList<>();
-    request.getSchedules().forEach(schedule -> {
-      Schedule createdSchedule = ScheduleMapper.INSTANCE.toEntity(schedule);
+    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags);
+    createdPost.setSchedules(requests);
 
-      schedules.add(createdSchedule);
+    Post savedPost = postRepository.save(createdPost);
+
+    requests.forEach(schedule -> {
+      schedule.setPost(savedPost);
+      scheduleRepository.save(schedule);
     });
 
-    Post created = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules);
-    postRepository.save(PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags, schedules));
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(created);
-
+    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(savedPost);
     return response;
   }
 
@@ -97,14 +109,15 @@ public class PostService {
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Hashtag hashtag = this.hashtagRepository.findByTag(name);
+      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
 
-      hashtag.setCount(hashtag.getCount() + 1);
+      hashtag.ifPresent(tag -> {
+        tag.setCount(tag.getCount() + 1);
+        modifiedPostHashtag.setHashTag(tag);
+        modifiedPostHashtag.setPost(post.get());
 
-      modifiedPostHashtag.setHashTag(hashtag);
-      modifiedPostHashtag.setPost(post.get());
-
-      post.get().getPostHashtags().add(modifiedPostHashtag);
+        post.get().getPostHashtags().add(modifiedPostHashtag);
+      });
     });
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
@@ -127,6 +140,12 @@ public class PostService {
       hashtag.get().setCount(hashtag.get().getCount() - 1);
     });
 
+    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
+
+    if (schedules.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+    }
+    schedules.forEach(schedule -> scheduleRepository.delete(schedule));
     this.postRepository.delete(post.get());
   }
 
@@ -155,5 +174,4 @@ public class PostService {
         .add(PostMapper.INSTANCE.toResponseDto(result)));
     return responses;
   }
-
 }

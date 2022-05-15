@@ -17,15 +17,23 @@ public class ReservationDto {
 
   @Data
   @Builder
-  public static class Response {
-    private int reservationId;
-    private String imageUrl;
+  public static class Responses {
     private String title;
-    private List<String> hashtags;
     private String date;
     private String startTime;
     private String endTime;
+    private String region;
     private String place;
+    private List<String> hashtags;
+    private int postId;
+    private String imageUrl;
+    private String status;
+  }
+
+  @Data
+  @Builder
+  public static class Response {
+    private int reservationId;
   }
 
   @Data

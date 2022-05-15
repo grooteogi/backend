@@ -1,6 +1,8 @@
 package grooteogi.dto.hashtag;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +10,21 @@ import lombok.Setter;
 @Setter
 public class HashtagDto {
 
-  @NotBlank(message = "추가할 해시태그를 입력해주세요.")
-  private String tag;
+  @Data
+  @Builder
+  public static class Request {
+    @NotNull
+    private String name;
+    private int id;
+  }
+
+  @Data
+  @Builder
+  public static class Response {
+
+    private int hashtagId;
+    private String name;
+
+  }
 
 }
