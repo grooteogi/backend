@@ -102,7 +102,7 @@ public class ReservationService {
 
     Reservation createdReservation =
         reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
-        schedule.get()));
+            schedule.get()));
     Post post = schedule.get().getPost();
     return ReservationMapper.INSTANCE.toResponseDto(createdReservation, post, schedule.get());
   }
@@ -118,14 +118,10 @@ public class ReservationService {
   public ReservationDto.SmsCode sendSms(String phoneNumber) {
 
     Random rand = new Random();
-    StringBuilder numStr = new StringBuilder();
-    for (int i = 0; i < 4; i++) {
-      String ran = Integer.toString(rand.nextInt(10));
-      numStr.append(ran);
-    }
+    String numStr = String.format("%04d", rand.nextInt(10000));
 
-    smsClient.certifiedPhoneNumber(phoneNumber, numStr.toString());
+    smsClient.certifiedPhoneNumber(phoneNumber, numStr);
     return ReservationDto.SmsCode.builder()
-        .code(numStr.toString()).build();
+        .code(numStr).build();
   }
 }
