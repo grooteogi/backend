@@ -49,3 +49,4 @@ custom:
   sms:
     api-key: ${SMS_API_KEY}
     api-secret: ${SMS_API_SECRET}
+    source: ${SMS_SOURCE}

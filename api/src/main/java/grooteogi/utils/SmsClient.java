@@ -18,15 +18,17 @@ public class SmsClient {
   @Value("${custom.sms.api-secret}")
   private String apiSecret;
 
+  @Value("${custom.sms.source}")
+  private String from;
+
   public void certifiedPhoneNumber(String phoneNumber, String cerNum) {
     Message coolsms = new Message(apiKey, apiSecret);
 
     HashMap<String, String> params = new HashMap<>();
     params.put("to", phoneNumber);
-    params.put("from", "발송할 번호 입력");
+    params.put("from", from);
     params.put("type", "SMS");
     params.put("text", "휴대폰인증 테스트 메시지 : 인증번호는" + "[" + cerNum + "]" + "입니다.");
-    params.put("app_version", "test app 1.2");
 
     try {
       JSONObject obj = coolsms.send(params);
