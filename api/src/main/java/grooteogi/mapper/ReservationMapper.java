@@ -60,9 +60,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
     if (date == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-      String ss = sdf.format(new java.util.Date());
-      return Date.valueOf(ss);
+      return java.sql.Date.valueOf(date);
     }
   }
 
@@ -75,9 +73,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
     if (time == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-      String ss = sdf.format(new java.util.Date());
-      return Time.valueOf(ss);
+      return java.sql.Time.valueOf(time);
     }
   }
 }
