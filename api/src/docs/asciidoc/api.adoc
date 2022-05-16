@@ -12,10 +12,10 @@
 include::{snippets}/get-all-user/http-request.adoc[]
 
 ==== Response
-include::{snippets}/get-all-user/http-response.adoc[]
+include::{snippets}/get-all-user/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-all-user/response-fields.adoc[]
+include::{snippets}/get-all-user/createResponse-fields.adoc[]
 
 === Get User
 
@@ -26,10 +26,10 @@ include::{snippets}/get-user/http-request.adoc[]
 include::{snippets}/get-user/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/get-user/http-response.adoc[]
+include::{snippets}/get-user/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-user/response-fields.adoc[]
+include::{snippets}/get-user/createResponse-fields.adoc[]
 
 == Auth API
 
@@ -42,10 +42,10 @@ include::{snippets}/auth-register/http-request.adoc[]
 include::{snippets}/auth-register/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/auth-register/http-response.adoc[]
+include::{snippets}/auth-register/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/auth-register/response-fields.adoc[]
+include::{snippets}/auth-register/createResponse-fields.adoc[]
 
 === Withdrawal
 
@@ -53,33 +53,33 @@ include::{snippets}/auth-register/response-fields.adoc[]
 include::{snippets}/auth-withdrawal/http-request.adoc[]
 
 ==== Response
-include::{snippets}/auth-withdrawal/http-response.adoc[]
+include::{snippets}/auth-withdrawal/http-createResponse.adoc[]
 
 == Reservation API
 
 === Get Reservation
 
 ==== Response
-include::{snippets}/get-reservation/http-response.adoc[]
+include::{snippets}/get-reservation/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-reservation/response-fields.adoc[]
+include::{snippets}/get-reservation/createResponse-fields.adoc[]
 
 === Get Host User Reservation
 
 ==== Response
-include::{snippets}/get-host-reservation/http-response.adoc[]
+include::{snippets}/get-host-reservation/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-host-reservation/response-fields.adoc[]
+include::{snippets}/get-host-reservation/createResponse-fields.adoc[]
 
 === Get Participate User Reservation
 
 ==== Response
-include::{snippets}/get-participate-reservation/http-response.adoc[]
+include::{snippets}/get-participate-reservation/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-participate-reservation/response-fields.adoc[]
+include::{snippets}/get-participate-reservation/createResponse-fields.adoc[]
 
 === Create Reservation
 
@@ -87,10 +87,10 @@ include::{snippets}/get-participate-reservation/response-fields.adoc[]
 include::{snippets}/create-reservation/http-request.adoc[]
 
 ==== Response
-include::{snippets}/create-reservation/http-response.adoc[]
+include::{snippets}/create-reservation/http-createResponse.adoc[]
 
 ==== Response Fields
-include::{snippets}/create-reservation/response-fields.adoc[]
+include::{snippets}/create-reservation/createResponse-fields.adoc[]
 
 === Delete Reservation
 
@@ -98,4 +98,4 @@ include::{snippets}/create-reservation/response-fields.adoc[]
 include::{snippets}/delete-reservation/http-request.adoc[]
 
 ==== Response
-include::{snippets}/delete-reservation/http-response.adoc[]
+include::{snippets}/delete-reservation/http-createResponse.adoc[]
