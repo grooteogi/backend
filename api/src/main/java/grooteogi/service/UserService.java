@@ -4,8 +4,10 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
+import grooteogi.dto.auth.AuthDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.UserMapper;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.Validator;
 import java.util.List;
@@ -36,11 +38,16 @@ public class UserService {
     return user.get();
   }
 
-  public User getUserByEmail(String email) {
-    Optional<User> user = userRepository.findByEmail(email);
+  public User getUserByEmail(AuthDto.Request request) {
+
+    User requestUser = UserMapper.INSTANCE.toEntity(request);
+
+    Optional<User> user = userRepository.findByEmail(requestUser.getEmail());
+
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
     }
+
     return user.get();
   }
 
