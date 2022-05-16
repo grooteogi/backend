@@ -28,7 +28,26 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   Post toEntity(Request dto, User user);
 
   @Mapping(source = "post.id", target = "postId")
-  PostDto.Response toResponseDto(Post post);
+  @Mapping(source = "post.title", target = "title")
+  @Mapping(source = "post.content", target = "content")
+  @Mapping(source = "post.imageUrl", target = "imageUrl")
+  @Mapping(source = "post.createAt", target = "createAt")
+  @Mapping(source = "post.credit", target = "creditType")
+  @Mapping(source = "post.hearts", target = "likes", ignore = true)
+  @Mapping(source = "post.user", target = "mentor", ignore = true)
+  @Mapping(source = "post.reviews", target = "reviews")
+  @Mapping(source = "post.schedules", target = "schedules")
+  PostDto.DetailResponse toDetailResponse(Post post);
+
+  @Mapping(source = "post.id", target = "postId")
+  PostDto.CreateResponse toCreateResponseDto(Post post);
+
+  @Mapping(source = "post.id", target = "postId")
+  @Mapping(source = "post.title", target = "title")
+  @Mapping(source = "post.content", target = "content")
+  @Mapping(source = "post.imageUrl", target = "imageUrl")
+  @Mapping(source = "post.postHashtags", target = "hashtags", ignore = true)
+  PostDto.SearchResponse toSearchResponseDto(Post post);
 
   @Mappings({
       @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
@@ -43,6 +62,15 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
       @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
   })
   List<Schedule> toScheduleEntities(List<ScheduleDto.Request> dto);
+
+
+  @Mapping(source = "schedules.id", target = "scheduleId")
+  @Mapping(source = "schedules.date", target = "date", dateFormat = "yyyy-MM-dd")
+  @Mapping(source = "schedules.startTime", target = "startTime", dateFormat = "HH:mm:ss")
+  @Mapping(source = "schedules.endTime", target = "endTime", dateFormat = "HH:mm:ss")
+  @Mapping(source = "schedules.region", target = "region")
+  @Mapping(source = "schedules.place", target = "place")
+  List<ScheduleDto.Response> toScheduleResponses(List<Schedule> schedules);
 
 
   default String asStringDate(Date date) {

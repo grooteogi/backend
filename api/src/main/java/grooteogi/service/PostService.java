@@ -34,7 +34,7 @@ public class PostService {
   private final HashtagRepository hashtagRepository;
   private final ScheduleRepository scheduleRepository;
 
-  public PostDto.Response getPost(int postId) {
+  public PostDto.DetailResponse getPost(int postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
@@ -44,7 +44,7 @@ public class PostService {
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
     Post updatePost = this.postRepository.save(post.get());
-    return PostMapper.INSTANCE.toResponseDto(updatePost);
+    return PostMapper.INSTANCE.toDetailResponse(updatePost);
   }
 
   private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
@@ -52,6 +52,14 @@ public class PostService {
 
     scheduleRepository.saveAll(schedules);
     return schedules;
+  }
+
+  private List<String> getPostHashtags(List<PostHashtag> postHashtags) {
+    List<String> response = new ArrayList<>();
+    postHashtags.forEach(postHashtag -> {
+      response.add(postHashtag.getHashTag().getName());
+    });
+    return response;
   }
 
   private List<PostHashtag> createPostHashtag(String[] postHashtags) {
@@ -70,7 +78,7 @@ public class PostService {
     return postHashtagList;
   }
 
-  public PostDto.Response createPost(PostDto.Request request) {
+  public PostDto.CreateResponse createPost(PostDto.Request request) {
 
     List<Schedule> requests = createSchedule(request.getSchedules());
 
@@ -94,11 +102,11 @@ public class PostService {
       postHashtagRepository.save(postHashtag);
     });
 
-    return PostMapper.INSTANCE.toResponseDto(savedPost);
+    return PostMapper.INSTANCE.toCreateResponseDto(savedPost);
   }
 
   @Transactional
-  public PostDto.Response modifyPost(PostDto.Request request, int postId) {
+  public PostDto.DetailResponse modifyPost(PostDto.Request request, int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
 
     //hashtag count - 1
@@ -130,7 +138,7 @@ public class PostService {
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
     postRepository.save(modifiedPost);
-    return PostMapper.INSTANCE.toResponseDto(modifiedPost);
+    return PostMapper.INSTANCE.toDetailResponse(modifiedPost);
   }
 
   public void deletePost(int postId) {
@@ -156,9 +164,9 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.Response> search(String keyword, String sort,
+  public List<PostDto.SearchResponse> search(String keyword, String sort,
       Pageable page) {
-    final List<PostDto.Response> posts;
+    final List<PostDto.SearchResponse> posts;
     if (keyword == null) {
       posts = searchAllPosts(page, sort);
     } else {
@@ -168,17 +176,30 @@ public class PostService {
   }
 
 
-  public List<PostDto.Response> searchAllPosts(Pageable page, String sort) {
-    List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findAllByPage(page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
+  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String sort) {
+    List<PostDto.SearchResponse> responses = new ArrayList<>();
+    this.postRepository.findAllByPage(page).forEach(result -> {
+      PostDto.SearchResponse response = PostMapper.INSTANCE.toSearchResponseDto(result);
+      response.setHashtags(getPostHashtags(result.getPostHashtags()));
+      responses.add(response);
+    });
     return responses;
   }
 
-  private List<PostDto.Response> searchPosts(String keyword, Pageable page, String sort) {
-    List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
+  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String sort) {
+    List<PostDto.SearchResponse> responses = new ArrayList<>();
+    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> {
+      PostDto.SearchResponse response = PostMapper.INSTANCE.toSearchResponseDto(result);
+      response.setHashtags(getPostHashtags(result.getPostHashtags()));
+      responses.add(response);
+    });
     return responses;
   }
+
+  /*
+  * TODO: DetailResponse when modify and create post
+  *  we need to define UserDto.Response for getUserDto()
+  *  how to calculate likes in DetailResponse
+  *  we need to define ReviewDto.Response for getReviewDto()
+  * */
 }

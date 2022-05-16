@@ -1,5 +1,6 @@
 package grooteogi.dto;
 
+import grooteogi.domain.Review;
 import grooteogi.enums.CreditType;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -34,9 +35,50 @@ public class PostDto {
 
   @Data
   @Builder
-  public static class Response {
+  public static class CreateResponse {
 
     private Integer postId;
 
+  }
+
+  @Data
+  @Builder
+  public static class SearchResponse {
+
+    private int postId;
+
+    private String title;
+
+    private String content;
+
+    private String imageUrl;
+
+    private List<String> hashtags;
+
+  }
+
+  @Data
+  @Builder
+  public static class DetailResponse {
+
+    private int postId;
+
+    private String title;
+
+    private String content;
+
+    private String imageUrl;
+
+    private String createAt;
+
+    private CreditType creditType;
+
+    private int likes;
+
+    private UserDto.Response mentor;
+
+    private List<Review> reviews;
+
+    private List<ScheduleDto.Response> schedules;
   }
 }

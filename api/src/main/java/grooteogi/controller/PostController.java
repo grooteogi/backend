@@ -30,27 +30,27 @@ public class PostController {
       @RequestParam(name = "page", defaultValue = "1") Integer page,
       @RequestParam(name = "sort", required = false) String sort) {
 
-    List<PostDto.Response> posts =
+    List<PostDto.SearchResponse> posts =
         postService.search(keyword, sort, PageRequest.of(page - 1, 20));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
-    PostDto.Response post = postService.getPost(postId);
+    PostDto.DetailResponse post = postService.getPost(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto.Request request) {
-    PostDto.Response createdPost = this.postService.createPost(request);
+    PostDto.CreateResponse createdPost = this.postService.createPost(request);
     return ResponseEntity.ok(BasicResponse.builder().data(createdPost).build());
   }
 
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    PostDto.Response modifiedPost = this.postService.modifyPost(request, postId);
+    PostDto.DetailResponse modifiedPost = this.postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 
