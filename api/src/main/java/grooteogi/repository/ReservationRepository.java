@@ -11,19 +11,24 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
   Optional<Reservation> findByScheduleId(Integer scheduleId);
 
   @Query(
-      value = "select * from reservation where host_user_id =:userId and status = 0 order by id desc",
+      value = "select * from reservation where host_user_id =:userId and"
+          + " status = 0 order by id desc",
       nativeQuery = true
   )
   List<Reservation> findByHostReservation(Integer userId);
 
   @Query(
-      value = "select * from reservation, schedule where host_user_id =:userId and reservation.schedule_id = schedule.id and status = 1 and schedule.date > CURRENT_DATE order by reservation.id desc",
+      value = "select * from reservation, schedule where host_user_id =:userId and "
+          + "reservation.schedule_id = schedule.id and status = 1 and "
+          + "schedule.date > CURRENT_DATE order by reservation.id desc",
       nativeQuery = true
   )
   List<Reservation> findByHostProceed(Integer userId);
 
   @Query(
-      value = "select * from reservation, schedule where host_user_id =:userId and reservation.schedule_id = schedule.id and status = 1 and schedule.date < CURRENT_DATE order by reservation.id desc",
+      value = "select * from reservation, schedule where host_user_id =:userId and "
+          + "reservation.schedule_id = schedule.id and status = 1 and "
+          + "schedule.date < CURRENT_DATE order by reservation.id desc",
       nativeQuery = true
   )
   List<Reservation> findByHostComplete(Integer userId);
@@ -41,25 +46,31 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
   List<Reservation> findByPart(Integer userId);
 
   @Query(
-      value = "select * from reservation, schedule where participate_user_id =:userId and reservation.schedule_id = schedule.id and status = 1 and schedule.date > CURRENT_DATE order by reservation.id desc",
+      value = "select * from reservation, schedule where participate_user_id =:userId and"
+          + " reservation.schedule_id = schedule.id and status = 1 and"
+          + " schedule.date > CURRENT_DATE order by reservation.id desc",
       nativeQuery = true
   )
   List<Reservation> findByPartProceed(Integer userId);
 
   @Query(
-      value = "select * from reservation, schedule where participate_user_id =:userId and reservation.schedule_id = schedule.id and status = 1 and schedule.date < CURRENT_DATE order by reservation.id desc",
+      value = "select * from reservation, schedule where participate_user_id =:userId and"
+          + " reservation.schedule_id = schedule.id and status = 1 and "
+          + "schedule.date < CURRENT_DATE order by reservation.id desc",
       nativeQuery = true
   )
   List<Reservation> findByPartComplete(Integer userId);
 
   @Query(
-      value = "select * from reservation where participate_user_id =:userId and status = 0 order by id desc",
+      value = "select * from reservation where participate_user_id =:userId and"
+          + " status = 0 order by id desc",
       nativeQuery = true
   )
   List<Reservation> findByPartReservation(Integer userId);
 
   @Query(
-      value = "select * from reservation, schedule where reservation.schedule_id = schedule.id and reservation.id =:id and status = 1 and schedule.date > CURRENT_DATE ",
+      value = "select * from reservation, schedule where reservation.schedule_id = schedule.id and"
+          + " reservation.id =:id and status = 1 and schedule.date > CURRENT_DATE ",
       nativeQuery = true
   )
   Optional<Reservation> findByUncanceld(@Param("id") Integer id);
