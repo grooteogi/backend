@@ -31,7 +31,7 @@ public class PostController {
       @RequestParam(name = "sort", required = false) String sort) {
 
     List<PostDto.SearchResponse> posts =
-        postService.search(keyword, sort, PageRequest.of(page - 1, 20));
+        postService.search(keyword, sort, PageRequest.of(page - 1, 12));
     return ResponseEntity.ok(BasicResponse.builder().data(posts).build());
   }
 
