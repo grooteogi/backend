@@ -1,7 +1,6 @@
 package grooteogi.mapper;
 
 import grooteogi.domain.Post;
-import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
@@ -26,7 +25,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "dto.credit", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "user", target = "user")
-  Post toEntity(Request dto, User user, List<PostHashtag> postHashtags);
+  Post toEntity(Request dto, User user);
 
   @Mapping(source = "post.id", target = "postId")
   PostDto.Response toResponseDto(Post post);
@@ -55,9 +54,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
     if (date == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-      String ss = sdf.format(new java.util.Date());
-      return Date.valueOf(ss);
+      return java.sql.Date.valueOf(date);
     }
   }
 
@@ -70,9 +67,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
     if (time == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-      String ss = sdf.format(new java.util.Date());
-      return Time.valueOf(ss);
+      return java.sql.Time.valueOf(time);
     }
   }
 
