@@ -2,13 +2,14 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.OauthDto;
+import grooteogi.dto.auth.AuthDto;
 import grooteogi.dto.auth.EmailCodeDto;
-import grooteogi.dto.auth.LoginDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.UserMapper;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
@@ -41,27 +42,32 @@ public class AuthController {
   private final OauthClient oauthClient;
 
   @PostMapping("/auth/login")
-  public ResponseEntity<BasicResponse> login(@RequestBody LoginDto loginDto) {
-    User user = userService.getUserByEmail(loginDto.getEmail());
-    Token token = authService.login(user, loginDto);
+  public ResponseEntity<BasicResponse> login(@RequestBody AuthDto.Request request) {
+
+    User user = userService.getUserByEmail(request);
+    Token token = authService.login(user, request);
+
+    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
 
     HttpHeaders responseHeaders = setHeader(token, true);
 
-    return new ResponseEntity<>(BasicResponse.builder().data(user).build(), responseHeaders,
+    return new ResponseEntity<>(BasicResponse.builder().data(response).build(), responseHeaders,
         HttpStatus.OK);
   }
 
   @PostMapping("/auth/register")
-  public ResponseEntity<BasicResponse> register(@Valid @RequestBody UserDto userDto,
+  public ResponseEntity<BasicResponse> register(@Valid @RequestBody AuthDto.Request request,
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    User user = authService.register(userDto);
+    User user = authService.register(request);
 
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
+    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
+
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 
   @DeleteMapping("/auth/withdrawal")
@@ -88,7 +94,7 @@ public class AuthController {
 
   @PostMapping("/auth/email")
   public ResponseEntity<BasicResponse> checkVerifyEmail(
-      @RequestBody EmailCodeDto emailCodeRequest) {
+      @RequestBody EmailCodeDto.Request emailCodeRequest) {
     authService.checkVerifyEmail(emailCodeRequest);
 
     return ResponseEntity.ok(

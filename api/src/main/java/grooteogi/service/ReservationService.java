@@ -14,9 +14,13 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.SmsClient;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,8 @@ public class ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+
+  private final SmsClient smsClient;
 
   public ReservationDto.Responses getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -155,5 +161,15 @@ public class ReservationService {
     reservation.get().setStatus(ReservationType.CANCELED);
     reservationRepository.save(reservation.get());
     return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
+  }
+  
+  public ReservationDto.SmsCode sendSms(String phoneNumber) {
+
+    Random rand = new Random();
+    String numStr = String.format("%04d", rand.nextInt(10000));
+
+    smsClient.certifiedPhoneNumber(phoneNumber, numStr);
+    return ReservationDto.SmsCode.builder()
+        .code(numStr).build();
   }
 }
