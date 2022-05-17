@@ -1,6 +1,5 @@
 package grooteogi.dto;
 
-import grooteogi.domain.Review;
 import grooteogi.enums.CreditType;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -8,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 
+@SuppressWarnings("checkstyle:Indentation")
 public class PostDto {
 
   @Data
@@ -30,7 +30,7 @@ public class PostDto {
     private String[] hashtags;
 
     private List<ScheduleDto.Request> schedules;
-    
+
   }
 
   @Data
@@ -71,14 +71,30 @@ public class PostDto {
 
     private String createAt;
 
+    private String[] hashtags;
+
     private CreditType creditType;
 
-    private int likes;
+    private LikeDto.Response likes;
 
     private UserDto.Response mentor;
 
-    private List<Review> reviews;
+  }
 
-    private List<ScheduleDto.Response> schedules;
+  @Data
+  @Builder
+  public static class ReviewResponse {
+
+    private int reviewId;
+
+    private int score;
+
+    private String nickname;
+
+    private String imageUrl;
+
+    private String createAt;
+
+    private String text;
   }
 }

@@ -20,5 +20,11 @@ public class UserDto {
   @Builder
   public static class Response {
 
+    private int userId;
+
+    private String nickname;
+
+    private String imageUrl;
+
   }
 }
