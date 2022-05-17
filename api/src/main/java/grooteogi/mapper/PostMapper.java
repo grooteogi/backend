@@ -1,11 +1,15 @@
 package grooteogi.mapper;
 
 import grooteogi.domain.Post;
+import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
+import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
+import grooteogi.dto.UserDto;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -33,9 +37,18 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.imageUrl", target = "imageUrl")
   @Mapping(source = "post.createAt", target = "createAt")
   @Mapping(source = "post.credit", target = "creditType")
-  @Mapping(source = "post.hearts", target = "likes")
-  @Mapping(source = "post.user", target = "mentor")
-  PostDto.DetailResponse toDetailResponse(Post post);
+  @Mapping(source = "post.hearts", target = "likes", ignore = true)
+  @Mapping(source = "post.user", target = "mentor", ignore = true)
+  Response toDetailResponse(Post post);
+
+  @Mapping(source = "review.id", target = "reviewId")
+  @Mapping(source = "review.score", target = "score")
+  @Mapping(source = "review.text", target = "text")
+  @Mapping(source = "review.createAt", target = "createAt")
+  @Mapping(source = "user.nickname", target = "nickname")
+  @Mapping(source = "userInfo.imageUrl", target = "imageUrl")
+  PostDto.ReviewResponse toReviewResponse(Review review, User user,
+      UserInfo userInfo);
 
   @Mapping(source = "post.id", target = "postId")
   PostDto.CreateResponse toCreateResponseDto(Post post);
@@ -103,4 +116,9 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "post.schedules", target = "schedules")
   Post toModify(Post post, PostDto.Request dto);
+
+  @Mapping(source = "user.id", target = "userId")
+  @Mapping(source = "user.nickname", target = "nickname")
+  @Mapping(source = "userInfo.imageUrl", target = "imageUrl")
+  UserDto.Response toUserResponse(User user, UserInfo userInfo);
 }
