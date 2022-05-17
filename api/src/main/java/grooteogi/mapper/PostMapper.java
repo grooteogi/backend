@@ -33,10 +33,8 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.imageUrl", target = "imageUrl")
   @Mapping(source = "post.createAt", target = "createAt")
   @Mapping(source = "post.credit", target = "creditType")
-  @Mapping(source = "post.hearts", target = "likes", ignore = true)
-  @Mapping(source = "post.user", target = "mentor", ignore = true)
-  @Mapping(source = "post.reviews", target = "reviews")
-  @Mapping(source = "post.schedules", target = "schedules")
+  @Mapping(source = "post.hearts", target = "likes")
+  @Mapping(source = "post.user", target = "mentor")
   PostDto.DetailResponse toDetailResponse(Post post);
 
   @Mapping(source = "post.id", target = "postId")
