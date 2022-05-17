@@ -59,7 +59,7 @@ public class PostDto {
 
   @Data
   @Builder
-  public static class DetailResponse {
+  public static class Response {
 
     private int postId;
 
