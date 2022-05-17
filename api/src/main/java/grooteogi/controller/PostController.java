@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 import grooteogi.dto.PostDto;
+import grooteogi.dto.ScheduleDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
 import java.util.List;
@@ -36,9 +37,21 @@ public class PostController {
   }
 
   @GetMapping("/{postId}")
-  public ResponseEntity<BasicResponse> getPost(@PathVariable int postId) {
-    PostDto.DetailResponse post = postService.getPost(postId);
+  public ResponseEntity<BasicResponse> getPostResponse(@PathVariable int postId) {
+    PostDto.Response post = postService.getPostResponse(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(post).build());
+  }
+
+  @GetMapping("/schedule/{postId}")
+  public ResponseEntity<BasicResponse> getSchedulesResponse(@PathVariable int postId) {
+    List<ScheduleDto.Response> schedulesResponse = postService.getSchedulesResponse(postId);
+    return ResponseEntity.ok(BasicResponse.builder().data(schedulesResponse).build());
+  }
+
+  @GetMapping("/review/{postId}")
+  public ResponseEntity<BasicResponse> getReviewsResponse(@PathVariable int postId) {
+    List<PostDto.ReviewResponse> reviewResponses = postService.getReviewsResponse(postId);
+    return ResponseEntity.ok(BasicResponse.builder().data(reviewResponses).build());
   }
 
   @PostMapping
@@ -50,7 +63,7 @@ public class PostController {
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    PostDto.DetailResponse modifiedPost = this.postService.modifyPost(request, postId);
+    PostDto.Response modifiedPost = this.postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder().data(modifiedPost).build());
   }
 

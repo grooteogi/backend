@@ -5,7 +5,9 @@ import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -13,6 +15,7 @@ import grooteogi.mapper.PostMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
+import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
@@ -33,8 +36,9 @@ public class PostService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
   private final ScheduleRepository scheduleRepository;
+  private final ReviewRepository reviewRepository;
 
-  public PostDto.DetailResponse getPost(int postId) {
+  public PostDto.Response getPostResponse(int postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
@@ -44,7 +48,12 @@ public class PostService {
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
     Post updatePost = this.postRepository.save(post.get());
-    return PostMapper.INSTANCE.toDetailResponse(updatePost);
+
+    PostDto.Response result = PostMapper.INSTANCE.toDetailResponse(updatePost);
+
+    User user = post.get().getUser();
+    result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
+    return result;
   }
 
   private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
@@ -56,9 +65,7 @@ public class PostService {
 
   private List<String> getPostHashtags(List<PostHashtag> postHashtags) {
     List<String> response = new ArrayList<>();
-    postHashtags.forEach(postHashtag -> {
-      response.add(postHashtag.getHashTag().getName());
-    });
+    postHashtags.forEach(postHashtag -> response.add(postHashtag.getHashTag().getName()));
     return response;
   }
 
@@ -106,10 +113,9 @@ public class PostService {
   }
 
   @Transactional
-  public PostDto.DetailResponse modifyPost(PostDto.Request request, int postId) {
+  public Response modifyPost(PostDto.Request request, int postId) {
     Optional<Post> post = this.postRepository.findById(postId);
 
-    //hashtag count - 1
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
     postHashtagList.forEach(postHashtag -> {
@@ -120,7 +126,6 @@ public class PostService {
 
     post.get().getPostHashtags().clear();
 
-    //PostHashtag 저장
     String[] hashtags = request.getHashtags();
 
     Arrays.stream(hashtags).forEach(name -> {
@@ -196,10 +201,21 @@ public class PostService {
     return responses;
   }
 
-  /*
-  * TODO: DetailResponse when modify and create post
-  *  we need to define UserDto.Response for getUserDto()
-  *  how to calculate likes in DetailResponse
-  *  we need to define ReviewDto.Response for getReviewDto()
-  * */
+  public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
+    List<Schedule> schedules = scheduleRepository.findByPostId(postId);
+    return PostMapper.INSTANCE.toScheduleResponses(schedules);
+  }
+
+  public List<PostDto.ReviewResponse> getReviewsResponse(Integer postId) {
+    List<PostDto.ReviewResponse> responses = new ArrayList<>();
+    reviewRepository.findByPostId(postId).forEach(review -> {
+      User user = review.getUser();
+      UserInfo userInfo = user.getUserInfo();
+      PostDto.ReviewResponse response =
+          PostMapper.INSTANCE.toReviewResponse(review, user, userInfo);
+      responses.add(response);
+    });
+    return responses;
+  }
+
 }
