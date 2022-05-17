@@ -9,8 +9,10 @@ import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
+import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.HashtagMapper;
 import grooteogi.mapper.PostMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
@@ -38,16 +40,16 @@ public class PostService {
   private final ScheduleRepository scheduleRepository;
   private final ReviewRepository reviewRepository;
 
-  public PostDto.Response getPostResponse(int postId) {
+  public PostDto.Response getPostResponse(Integer postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
     //조회수 증가
-    Optional<Post> post = this.postRepository.findById(postId);
+    Optional<Post> post = postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
-    Post updatePost = this.postRepository.save(post.get());
+    Post updatePost = postRepository.save(post.get());
 
     PostDto.Response result = PostMapper.INSTANCE.toDetailResponse(updatePost);
 
@@ -72,7 +74,7 @@ public class PostService {
   private List<PostHashtag> createPostHashtag(String[] postHashtags) {
     List<PostHashtag> postHashtagList = new ArrayList<>();
     Arrays.stream(postHashtags).forEach(name -> {
-      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
+      Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         PostHashtag createdPostHashtag = PostHashtag.builder()
@@ -91,7 +93,7 @@ public class PostService {
 
     List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
 
-    Optional<User> user = this.userRepository.findById(request.getUserId());
+    Optional<User> user = userRepository.findById(request.getUserId());
 
     Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get());
     createdPost.setSchedules(requests);
@@ -113,8 +115,8 @@ public class PostService {
   }
 
   @Transactional
-  public Response modifyPost(PostDto.Request request, int postId) {
-    Optional<Post> post = this.postRepository.findById(postId);
+  public Response modifyPost(PostDto.Request request, Integer postId) {
+    Optional<Post> post = postRepository.findById(postId);
 
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
@@ -130,7 +132,7 @@ public class PostService {
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
+      Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
 
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
@@ -146,8 +148,8 @@ public class PostService {
     return PostMapper.INSTANCE.toDetailResponse(modifiedPost);
   }
 
-  public void deletePost(int postId) {
-    Optional<Post> post = this.postRepository.findById(postId);
+  public void deletePost(Integer postId) {
+    Optional<Post> post = postRepository.findById(postId);
 
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
@@ -156,7 +158,7 @@ public class PostService {
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
     postHashtagList.forEach(postHashtag -> {
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(postHashtag.getHashTag().getId());
+      Optional<Hashtag> hashtag = hashtagRepository.findById(postHashtag.getHashTag().getId());
       hashtag.get().setCount(hashtag.get().getCount() - 1);
     });
 
@@ -218,4 +220,13 @@ public class PostService {
     return responses;
   }
 
+  public List<HashtagDto.Response> getHashtagsResponse(Integer postId) {
+    List<HashtagDto.Response> responses = new ArrayList<>();
+    postHashtagRepository.findByPostId(postId).forEach(postHashtag -> {
+      Hashtag hashTag = postHashtag.getHashTag();
+      HashtagDto.Response response = HashtagMapper.INSTANCE.toPostResponseDto(postHashtag, hashTag);
+      responses.add(response);
+    });
+    return responses;
+  }
 }

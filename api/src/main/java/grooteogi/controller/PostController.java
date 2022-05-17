@@ -1,7 +1,9 @@
 package grooteogi.controller;
 
+import grooteogi.domain.Hashtag;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ScheduleDto;
+import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
 import java.util.List;
@@ -42,16 +44,22 @@ public class PostController {
     return ResponseEntity.ok(BasicResponse.builder().data(post).build());
   }
 
-  @GetMapping("/schedule/{postId}")
+  @GetMapping("/{postId}/schedules")
   public ResponseEntity<BasicResponse> getSchedulesResponse(@PathVariable int postId) {
     List<ScheduleDto.Response> schedulesResponse = postService.getSchedulesResponse(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(schedulesResponse).build());
   }
 
-  @GetMapping("/review/{postId}")
+  @GetMapping("/{postId}/reviews")
   public ResponseEntity<BasicResponse> getReviewsResponse(@PathVariable int postId) {
     List<PostDto.ReviewResponse> reviewResponses = postService.getReviewsResponse(postId);
     return ResponseEntity.ok(BasicResponse.builder().data(reviewResponses).build());
+  }
+
+  @GetMapping("/{postId}/hashtags")
+  public ResponseEntity<BasicResponse> getHashtagsResponse(@PathVariable int postId) {
+    List<HashtagDto.Response> hashtagsResponse = postService.getHashtagsResponse(postId);
+    return ResponseEntity.ok(BasicResponse.builder().data(hashtagsResponse).build());
   }
 
   @PostMapping
