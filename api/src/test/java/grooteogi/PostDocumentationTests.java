@@ -16,6 +16,7 @@ import grooteogi.controller.PostController;
 import grooteogi.domain.Review;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.CreateResponse;
+import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.PostDto.SearchResponse;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.UserDto;
@@ -170,7 +171,7 @@ public class PostDocumentationTests {
     //given
     int postId = anyInt();
     PostDto.Request request = postReq();
-    PostDto.DetailResponse response = postDetailRes();
+    Response response = postDetailRes();
 
     given(postService.modifyPost(eq(request), postId)).willReturn(response);
 
@@ -190,8 +191,8 @@ public class PostDocumentationTests {
 
   }
 
-  private PostDto.DetailResponse postDetailRes() {
-    return PostDto.DetailResponse
+  private PostDto.Response postDetailRes() {
+    return PostDto.Response
         .builder()
         .postId(1)
         .title("제목입니다")
@@ -199,10 +200,7 @@ public class PostDocumentationTests {
         .imageUrl("이미지입니다")
         .createAt(String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
         .creditType(CreditType.DIRECT)
-        .likes(1)
         .mentor(userRes())
-        .reviews(reviewRes())
-        .schedules(scheduleRes())
         .build();
   }
 
@@ -234,10 +232,10 @@ public class PostDocumentationTests {
   public void getPost() throws Exception {
     // given
     int postId = anyInt();
-    PostDto.DetailResponse createResponse = postDetailRes();
+    Response createResponse = postDetailRes();
 
     // when
-    given(postService.getPost(postId)).willReturn(createResponse);
+    given(postService.getPostResponse(postId)).willReturn(createResponse);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
