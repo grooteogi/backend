@@ -15,8 +15,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(
-    unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReservationMapper extends BasicMapper<ReservationDto, Reservation> {
 
   ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
