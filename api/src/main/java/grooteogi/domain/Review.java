@@ -32,7 +32,10 @@ public class Review {
   private int id;
 
   @Column(length = 200)
-  private String comment;
+  private String text;
+
+  @Column
+  private Long score;
 
   @CreationTimestamp
   private Timestamp createAt;
@@ -48,4 +51,9 @@ public class Review {
   @JsonBackReference
   @JoinColumn(name = "post_id")
   private Post post;
+
+  @ManyToOne
+  @JsonBackReference
+  @JoinColumn(name = "user_id")
+  private User user;
 }
