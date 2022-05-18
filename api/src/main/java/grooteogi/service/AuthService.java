@@ -3,7 +3,7 @@ package grooteogi.service;
 import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
 
 import grooteogi.domain.User;
-import grooteogi.dto.auth.AuthDto;
+import grooteogi.dto.AuthDto;
 import grooteogi.dto.auth.EmailCodeDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;

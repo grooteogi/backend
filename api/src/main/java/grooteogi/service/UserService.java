@@ -4,7 +4,7 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.auth.AuthDto;
+import grooteogi.dto.AuthDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.UserMapper;

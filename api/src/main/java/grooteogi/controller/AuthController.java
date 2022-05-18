@@ -2,7 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.OauthDto;
-import grooteogi.dto.auth.AuthDto;
+import grooteogi.dto.AuthDto;
 import grooteogi.dto.auth.EmailCodeDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;

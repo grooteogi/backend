@@ -1,4 +1,4 @@
-package grooteogi.dto.auth;
+package grooteogi.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,5 +29,7 @@ public class AuthDto {
     private String nickname;
     private String imageUrl;
   }
+
+
 
 }

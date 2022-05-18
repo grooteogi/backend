@@ -2,7 +2,7 @@ package grooteogi.mapper;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
-import grooteogi.dto.auth.AuthDto;
+import grooteogi.dto.AuthDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
