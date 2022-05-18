@@ -440,15 +440,30 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Grooteogi API</h1>
 <div class="details">
-<span id="revnumber">version 0.0.1-SNAPSHOT</span>
+<span id="revnumber">version 0.4.0-alpha</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_user_api">1. User API</a>
-<ul class="sectlevel3">
-<li><a href="#_request">1.1. Request</a></li>
-<li><a href="#_response">1.2. Response</a></li>
+<ul class="sectlevel2">
+<li><a href="#_get_all_user">1.1. Get All User</a></li>
+<li><a href="#_get_user">1.2. Get User</a></li>
+</ul>
+</li>
+<li><a href="#_auth_api">2. Auth API</a>
+<ul class="sectlevel2">
+<li><a href="#_register">2.1. Register</a></li>
+<li><a href="#_withdrawal">2.2. Withdrawal</a></li>
+</ul>
+</li>
+<li><a href="#_reservation_api">3. Reservation API</a>
+<ul class="sectlevel2">
+<li><a href="#_get_reservation">3.1. Get Reservation</a></li>
+<li><a href="#_get_host_user_reservation">3.2. Get Host User Reservation</a></li>
+<li><a href="#_get_participate_user_reservation">3.3. Get Participate User Reservation</a></li>
+<li><a href="#_create_reservation">3.4. Create Reservation</a></li>
+<li><a href="#_delete_reservation">3.5. Delete Reservation</a></li>
 </ul>
 </li>
 </ul>
@@ -458,36 +473,184 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_user_api">1. User API</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_get_all_user">1.1. Get All User</h3>
 <div class="sect3">
-<h4 id="_request">1.1. Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /user HTTP/1.1
-Host: docs.api.com</code></pre>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_try_with_curl">Try with curl</h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">$ curl 'https://docs.api.com/user' -i -X GET</code></pre>
-</div>
-</div>
+<h4 id="_request">1.1.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-all-user/http-request.adoc[]</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response">1.2. Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 51
-
-{
-  "status" : 200,
-  "count" : 0,
-  "data" : [ ]
-}</code></pre>
+<h4 id="_response">1.1.2. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-all-user/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields">1.1.3. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-all-user/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_get_user">1.2. Get User</h3>
+<div class="sect3">
+<h4 id="_request_2">1.2.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-user/http-request.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_request_fields">1.2.2. Request Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-user/request-fields.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_2">1.2.3. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-user/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_2">1.2.4. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-user/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_auth_api">2. Auth API</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_register">2.1. Register</h3>
+<div class="sect3">
+<h4 id="_request_3">2.1.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-register/http-request.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_request_fields_2">2.1.2. Request Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-register/request-fields.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_3">2.1.3. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-register/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_3">2.1.4. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-register/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_withdrawal">2.2. Withdrawal</h3>
+<div class="sect3">
+<h4 id="_request_4">2.2.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-withdrawal/http-request.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_4">2.2.2. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/auth-withdrawal/http-createResponse.adoc[]</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reservation_api">3. Reservation API</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_get_reservation">3.1. Get Reservation</h3>
+<div class="sect3">
+<h4 id="_response_5">3.1.1. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-reservation/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_4">3.1.2. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-reservation/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_get_host_user_reservation">3.2. Get Host User Reservation</h3>
+<div class="sect3">
+<h4 id="_response_6">3.2.1. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-host-reservation/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_5">3.2.2. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-host-reservation/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_get_participate_user_reservation">3.3. Get Participate User Reservation</h3>
+<div class="sect3">
+<h4 id="_response_7">3.3.1. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-participate-reservation/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_6">3.3.2. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/get-participate-reservation/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_reservation">3.4. Create Reservation</h3>
+<div class="sect3">
+<h4 id="_request_5">3.4.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/create-reservation/http-request.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_8">3.4.2. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/create-reservation/http-createResponse.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_fields_7">3.4.3. Response Fields</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/create-reservation/createResponse-fields.adoc[]</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_delete_reservation">3.5. Delete Reservation</h3>
+<div class="sect3">
+<h4 id="_request_6">3.5.1. Request</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/delete-reservation/http-request.adoc[]</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_response_9">3.5.2. Response</h4>
+<div class="paragraph">
+<p>Unresolved directive in api.adoc - include::C:\Users\yhy59\Documents\GitHub\teamproject\backend\api\build\generated-snippets/delete-reservation/http-createResponse.adoc[]</p>
 </div>
 </div>
 </div>
@@ -496,8 +659,8 @@ Content-Length: 51
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-04-12 15:51:17 +0900
+Version 0.4.0-alpha<br>
+Last updated 2022-05-16 16:25:23 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

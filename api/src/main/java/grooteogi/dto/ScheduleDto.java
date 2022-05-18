@@ -25,5 +25,17 @@ public class ScheduleDto {
   @Builder
   public static class Response {
 
+    private int scheduleId;
+
+    private String date;
+
+    private String startTime;
+
+    private String endTime;
+
+    private String region;
+
+    private String place;
+
   }
 }

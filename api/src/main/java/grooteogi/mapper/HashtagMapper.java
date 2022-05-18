@@ -1,6 +1,7 @@
 package grooteogi.mapper;
 
 import grooteogi.domain.Hashtag;
+import grooteogi.domain.PostHashtag;
 import grooteogi.dto.hashtag.HashtagDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,4 +25,9 @@ public interface HashtagMapper extends BasicMapper<HashtagDto, Hashtag> {
   })
   HashtagDto.Response toResponseDto(Hashtag hashtag);
 
+  @Mappings({
+      @Mapping(source = "postHashtag.id", target = "hashtagId"),
+      @Mapping(source = "hashtag.name", target = "name")
+  })
+  HashtagDto.Response toPostResponseDto(PostHashtag postHashtag, Hashtag hashtag);
 }
