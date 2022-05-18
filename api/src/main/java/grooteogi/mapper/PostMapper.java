@@ -7,7 +7,6 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
-import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.UserDto;
 import java.sql.Date;
@@ -40,7 +39,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.credit", target = "creditType")
   @Mapping(source = "post.hearts", target = "likes", ignore = true)
   @Mapping(source = "post.user", target = "mentor", ignore = true)
-  Response toDetailResponse(Post post);
+  PostDto.Response toDetailResponse(Post post);
 
   @Mapping(source = "review.id", target = "reviewId")
   @Mapping(source = "review.score", target = "score")
@@ -82,7 +81,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "schedules.endTime", target = "endTime", dateFormat = "HH:mm:ss")
   @Mapping(source = "schedules.region", target = "region")
   @Mapping(source = "schedules.place", target = "place")
-  List<ScheduleDto.Response> toScheduleResponses(List<Schedule> schedules);
+  ScheduleDto.Response toScheduleResponses(Schedule schedules);
 
 
   default String asStringDate(Date date) {
@@ -115,7 +114,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "dto.content", target = "content")
   @Mapping(source = "dto.credit", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
-  @Mapping(source = "post.schedules", target = "schedules")
+  @Mapping(source = "post.schedules", target = "schedules", ignore = true)
   Post toModify(Post post, PostDto.Request dto);
 
   @Mapping(source = "user.id", target = "userId")
