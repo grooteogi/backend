@@ -88,7 +88,7 @@ public class AuthController {
     authService.sendVerifyEmail(email);
 
     return ResponseEntity.ok(
-        BasicResponse.builder().message("send email verification success").build());
+        BasicResponse.builder().message("send email success").build());
   }
 
   @PostMapping("/auth/email/check")
@@ -97,7 +97,7 @@ public class AuthController {
     authService.checkVerifyEmail(request);
 
     return ResponseEntity.ok(
-        BasicResponse.builder().message("confirm email verification success").build());
+        BasicResponse.builder().message("check email success").build());
   }
 
   @GetMapping("/oauth/{type}")

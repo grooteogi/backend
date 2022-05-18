@@ -49,4 +49,15 @@ public class AuthDto {
     @NotBlank(message = "인증코드를 입력해주세요.")
     private String code;
   }
+
+  @Data
+  @Builder
+  public static class Oauth {
+    @Email
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
+
+    @NotBlank(message = "인증코드를 입력해주세요.")
+    private String code;
+  }
 }
