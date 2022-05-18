@@ -12,8 +12,8 @@ public class UserDto {
   @AllArgsConstructor
   @NoArgsConstructor
   public static class Password {
-    String password;
 
+    String password;
   }
 
   @Data
@@ -21,10 +21,7 @@ public class UserDto {
   public static class Response {
 
     private int userId;
-
     private String nickname;
-
     private String imageUrl;
-
   }
 }

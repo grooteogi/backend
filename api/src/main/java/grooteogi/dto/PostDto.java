@@ -18,14 +18,11 @@ public class PostDto {
     private String title;
 
     @NotBlank(message = "내용을 입력하세요.")
+
     private String content;
-
     private CreditType credit;
-
     private String imageUrl;
-
     private String[] hashtags;
-
     private List<ScheduleDto.Request> schedules;
 
   }
@@ -35,7 +32,6 @@ public class PostDto {
   public static class CreateResponse {
 
     private Integer postId;
-
   }
 
   @Data
@@ -43,15 +39,10 @@ public class PostDto {
   public static class SearchResponse {
 
     private int postId;
-
     private String title;
-
     private String content;
-
     private String imageUrl;
-
     private List<String> hashtags;
-
   }
 
   @Data
@@ -59,23 +50,14 @@ public class PostDto {
   public static class Response {
 
     private int postId;
-
     private String title;
-
     private String content;
-
     private String imageUrl;
-
     private String createAt;
-
     private String[] hashtags;
-
     private CreditType creditType;
-
     private LikeDto.Response likes;
-
     private UserDto.Response mentor;
-
   }
 
   @Data
@@ -83,15 +65,10 @@ public class PostDto {
   public static class ReviewResponse {
 
     private int reviewId;
-
     private int score;
-
     private String nickname;
-
     private String imageUrl;
-
     private String createAt;
-
     private String text;
   }
 }

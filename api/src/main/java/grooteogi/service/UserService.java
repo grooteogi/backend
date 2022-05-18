@@ -2,9 +2,9 @@ package grooteogi.service;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
+import grooteogi.dto.AuthDto;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.AuthDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.UserMapper;

@@ -13,6 +13,7 @@ public class HashtagDto {
   @Data
   @Builder
   public static class Request {
+
     @NotNull
     private String name;
     private int id;
@@ -24,7 +25,5 @@ public class HashtagDto {
 
     private int hashtagId;
     private String name;
-
   }
-
 }
