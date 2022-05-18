@@ -3,11 +3,12 @@ package grooteogi.service;
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.Response;
+import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.exception.ApiException;
@@ -17,6 +18,7 @@ import grooteogi.mapper.PostMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
+import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
@@ -39,6 +41,7 @@ public class PostService {
   private final HashtagRepository hashtagRepository;
   private final ScheduleRepository scheduleRepository;
   private final ReviewRepository reviewRepository;
+  private final ReservationRepository reservationRepository;
 
   public PostDto.Response getPostResponse(Integer postId) {
 
@@ -87,13 +90,13 @@ public class PostService {
     return postHashtagList;
   }
 
-  public PostDto.CreateResponse createPost(PostDto.Request request) {
+  public PostDto.CreateResponse createPost(PostDto.Request request, Integer userId) {
 
     List<Schedule> requests = createSchedule(request.getSchedules());
 
     List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
 
-    Optional<User> user = userRepository.findById(request.getUserId());
+    Optional<User> user = userRepository.findById(userId);
 
     Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get());
     createdPost.setSchedules(requests);
@@ -115,7 +118,7 @@ public class PostService {
   }
 
   @Transactional
-  public Response modifyPost(PostDto.Request request, Integer postId) {
+  public PostDto.Response modifyPost(Request request, Integer postId) {
     Optional<Post> post = postRepository.findById(postId);
 
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
@@ -162,6 +165,9 @@ public class PostService {
       hashtag.get().setCount(hashtag.get().getCount() - 1);
     });
 
+    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+    reservationRepository.deleteAll(reservations);
+
     List<Schedule> schedules = scheduleRepository.findByPost(post.get());
 
     if (schedules.isEmpty()) {
@@ -204,8 +210,13 @@ public class PostService {
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
-    List<Schedule> schedules = scheduleRepository.findByPostId(postId);
-    return PostMapper.INSTANCE.toScheduleResponses(schedules);
+    List<ScheduleDto.Response> responses = new ArrayList<>();
+    scheduleRepository.findByPostId(postId).forEach(schedule -> {
+      ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
+      responses.add(response);
+    });
+
+    return responses;
   }
 
   public List<PostDto.ReviewResponse> getReviewsResponse(Integer postId) {

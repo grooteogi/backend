@@ -74,4 +74,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
       nativeQuery = true
   )
   Optional<Reservation> findByUncanceld(@Param("id") Integer id);
+
+
+  @Query(
+      value = "select * from reservation, schedule where reservation.schedule_id = schedule.id "
+          + "and schedule.post_id = :id",
+      nativeQuery = true
+  )
+  List<Reservation> findByPostId(@Param("id") Integer id);
 }
