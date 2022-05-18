@@ -37,6 +37,7 @@ public enum ApiExceptionEnum {
   SCHEDULE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
   RESERVATION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "예약이 존재하지 않습니다."),
   INVALID_CODE_EXCEPTION(HttpStatus.NOT_FOUND, "인증코드를 다시 확인해주세요."),
+  RESERVATION_HOST_EXCEPTION(HttpStatus.BAD_REQUEST, "호스트는 예약을 신청할 수 없습니다."),
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다.");
 
   private final HttpStatus httpStatus;

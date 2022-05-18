@@ -42,74 +42,53 @@ public class ReservationService {
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    ReservationDto.Responses responses = ReservationMapper.INSTANCE
-        .toResponseDtos(reservation.get(), post, schedule);
-    return responses;
+    return ReservationMapper.INSTANCE.toResponseDtos(reservation.get(), post, schedule);
   }
 
   public List<ReservationDto.Responses> getHostReservation(int userId, String sort) {
-    // CANCEL 여부 확인
-    ReservationType status =
-        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
-    List<Reservation> reservations =
-        reservationRepository.findByHostUserIdAndStatusOrderByIdDesc(userId, status);
 
-    // DATE 필터링
-    List<ReservationDto.Responses> responses = (status.getValue() == 0)
-        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
-    return responses;
+    List<Reservation> result = new ArrayList<>();
+    switch (sort) {
+      case "ALL":
+        result = reservationRepository.findByHost(userId);
+        break;
+      case "PROCEED":
+        result = reservationRepository.findByHostProceed(userId);
+        break;
+      case "COMPLETE":
+        result = reservationRepository.findByHostComplete(userId);
+        break;
+      case "CANCEL":
+        result = reservationRepository.findByHostReservation(userId);
+        break;
+      default:
+        break;
+    }
+
+    return getReservationDto(result);
   }
 
   public List<ReservationDto.Responses> getUserReservation(Integer userId, String sort) {
-    // CANCEL 여부 확인
-    ReservationType status =
-        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
-    List<Reservation> reservations =
-        reservationRepository.findByParticipateUserIdAndStatusOrderByIdDesc(userId, status);
 
-    // DATE 필터링
-    List<ReservationDto.Responses> responses = (status.getValue() == 0)
-        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
-    return responses;
-  }
-
-  private List<ReservationDto.Responses> getSortedReservationDto(
-      List<Reservation> reservations, String sort) {
-
-    if (reservations.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    List<Reservation> result = new ArrayList<>();
+    switch (sort) {
+      case "ALL":
+        result = reservationRepository.findByPart(userId);
+        break;
+      case "PROCEED":
+        result = reservationRepository.findByPartProceed(userId);
+        break;
+      case "COMPLETE":
+        result = reservationRepository.findByPartComplete(userId);
+        break;
+      case "CANCEL":
+        result = reservationRepository.findByPartReservation(userId);
+        break;
+      default:
+        break;
     }
-    List<ReservationDto.Responses> responseList = new ArrayList<>();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String ss = sdf.format(new java.util.Date());
-    Date now = Date.valueOf(ss);
-    reservations.forEach(reservation -> {
-      Schedule schedule = reservation.getSchedule();
-      Post post = schedule.getPost();
-      Date date = schedule.getDate();
-      if (sort.equals("PROCEED")) {
-        if (date.before(now)) {
-          ReservationDto.Responses responses =
-              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-          responses.setHashtags(getTags(post.getPostHashtags()));
-          responseList.add(responses);
-        }
-      } else if (sort.equals("COMPLETE")) {
-        if (date.after(now)) {
-          ReservationDto.Responses responses =
-              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-          responses.setHashtags(getTags(post.getPostHashtags()));
-          responseList.add(responses);
-        }
-      } else {
-        ReservationDto.Responses responses =
-            ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-        responses.setHashtags(getTags(post.getPostHashtags()));
-        responseList.add(responses);
-      }
 
-    });
-    return responseList;
+    return getReservationDto(result);
   }
 
   private List<ReservationDto.Responses> getReservationDto(List<Reservation> reservations) {
@@ -155,7 +134,7 @@ public class ReservationService {
 
     boolean isWriter = postRepository.existsByUser(user.get());
     if (isWriter) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.RESERVATION_HOST_EXCEPTION);
     }
 
     Reservation createdReservation =
@@ -174,7 +153,7 @@ public class ReservationService {
 
   public ReservationDto.Response modifyStatus(Integer reservationId) {
 
-    Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+    Optional<Reservation> reservation = reservationRepository.findByUncanceld(reservationId);
 
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);

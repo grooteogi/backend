@@ -44,39 +44,43 @@ public class PostService {
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
     Post updatePost = this.postRepository.save(post.get());
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(updatePost);
-    return response;
+    return PostMapper.INSTANCE.toResponseDto(updatePost);
   }
 
   private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
     List<Schedule> schedules = PostMapper.INSTANCE.toScheduleEntities(requests);
 
-    schedules.forEach(schedule -> {
-      scheduleRepository.save(schedule);
-    });
+    scheduleRepository.saveAll(schedules);
     return schedules;
   }
 
-  public PostDto.Response createPost(PostDto.Request request) {
-
-    List<Schedule> requests = createSchedule(request.getSchedules());
-
-    Optional<User> user = this.userRepository.findById(request.getUserId());
-
-    List<PostHashtag> postHashtags = new ArrayList<>();
-    Arrays.stream(request.getHashtags()).forEach(name -> {
+  private List<PostHashtag> createPostHashtag(String[] postHashtags) {
+    List<PostHashtag> postHashtagList = new ArrayList<>();
+    Arrays.stream(postHashtags).forEach(name -> {
       Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         PostHashtag createdPostHashtag = PostHashtag.builder()
             .hashTag(tag)
             .build();
-        postHashtags.add(createdPostHashtag);
+        postHashtagRepository.save(createdPostHashtag);
+        postHashtagList.add(createdPostHashtag);
       });
     });
+    return postHashtagList;
+  }
 
-    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags);
+  public PostDto.Response createPost(PostDto.Request request) {
+
+    List<Schedule> requests = createSchedule(request.getSchedules());
+
+    List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
+
+    Optional<User> user = this.userRepository.findById(request.getUserId());
+
+    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get());
     createdPost.setSchedules(requests);
+    createdPost.setPostHashtags(postHashtags);
 
     Post savedPost = postRepository.save(createdPost);
 
@@ -85,8 +89,12 @@ public class PostService {
       scheduleRepository.save(schedule);
     });
 
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(savedPost);
-    return response;
+    postHashtags.forEach(postHashtag -> {
+      postHashtag.setPost(savedPost);
+      postHashtagRepository.save(postHashtag);
+    });
+
+    return PostMapper.INSTANCE.toResponseDto(savedPost);
   }
 
   @Transactional
@@ -122,8 +130,7 @@ public class PostService {
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
     postRepository.save(modifiedPost);
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
-    return response;
+    return PostMapper.INSTANCE.toResponseDto(modifiedPost);
   }
 
   public void deletePost(int postId) {
@@ -145,7 +152,7 @@ public class PostService {
     if (schedules.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
-    schedules.forEach(schedule -> scheduleRepository.delete(schedule));
+    scheduleRepository.deleteAll(schedules);
     this.postRepository.delete(post.get());
   }
 
