@@ -29,6 +29,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "dto.credit", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "user", target = "user")
+  @Mapping(target = "id", ignore = true)
   Post toEntity(Request dto, User user);
 
   @Mapping(source = "post.id", target = "postId")
