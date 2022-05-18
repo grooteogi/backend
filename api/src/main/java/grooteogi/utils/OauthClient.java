@@ -3,8 +3,8 @@ package grooteogi.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import grooteogi.dto.OauthDto;
 import grooteogi.dto.auth.UserDto;
+import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class OauthClient {
     this.httpServletResponse = httpServletResponse;
   }
 
-  public UserDto kakaoToken(OauthDto oauthDto) {
+  public UserDto kakaoToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -60,7 +60,7 @@ public class OauthClient {
     params.add("client_id", kakaoClientId);
     params.add("client_secret", kakaoClientSecret);
     params.add("redirect_uri", "http://localhost:8080/user/oauth/kakao");
-    params.add("code", oauthDto.getCode());
+    params.add("code", code);
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
@@ -71,7 +71,7 @@ public class OauthClient {
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
       UserDto userDto = kakaoAuth(accessToken);
-      userDto.setType(oauthDto.getType());
+      userDto.setType(LoginType.KAKAO);
       return userDto;
     } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
@@ -123,7 +123,7 @@ public class OauthClient {
     }
   }
 
-  public UserDto googleToken(OauthDto oauthDto) {
+  public UserDto googleToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -134,7 +134,7 @@ public class OauthClient {
     params.add("client_id", googleClientId);
     params.add("client_secret", googleClientSecret);
     params.add("redirect_uri", "http://localhost:8080/user/oauth/google");
-    params.add("code", oauthDto.getCode());
+    params.add("code", code);
     params.add("state", "url_parameter");
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -146,7 +146,7 @@ public class OauthClient {
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
       UserDto userDto = googleAuth(accessToken);
-      userDto.setType(oauthDto.getType());
+      userDto.setType(LoginType.GOOGLE);
       return userDto;
     } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);

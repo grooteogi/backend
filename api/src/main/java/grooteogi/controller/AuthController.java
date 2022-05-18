@@ -2,7 +2,6 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
-import grooteogi.dto.OauthDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
@@ -23,8 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -100,25 +97,23 @@ public class AuthController {
         BasicResponse.builder().message("check email success").build());
   }
 
-  @GetMapping("/oauth/{type}")
+  @PostMapping("/oauth")
   public ResponseEntity<BasicResponse> oauth(
-      @PathVariable String type, @RequestParam("code") String code) {
-    OauthDto oauthDto = new OauthDto();
-    oauthDto.setCode(code);
-    UserDto userDto;
+      @RequestBody AuthDto.OauthRequest request) {
 
-    if (type.toUpperCase().equals(LoginType.GOOGLE)) {
-      oauthDto.setType(LoginType.GOOGLE);
-      userDto = oauthClient.googleToken(oauthDto);
-    } else if (type.toUpperCase().equals(LoginType.KAKAO)) {
-      oauthDto.setType(LoginType.KAKAO);
-      userDto = oauthClient.kakaoToken(oauthDto);
+    UserDto userDto;
+    String loginType = request.getType();
+    String code = request.getCode();
+
+    if (loginType.equalsIgnoreCase(LoginType.GOOGLE.name())) {
+      userDto = oauthClient.googleToken(code);
+    } else if (loginType.equalsIgnoreCase(LoginType.KAKAO.name())) {
+      userDto = oauthClient.kakaoToken(code);
     } else {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
 
     Map<String, Object> result = authService.oauth(userDto);
-
     Token token = (Token) result.get("token");
     HttpHeaders responseHeaders = setHeader(token, true);
 

@@ -52,12 +52,11 @@ public class AuthDto {
 
   @Data
   @Builder
-  public static class Oauth {
-    @Email
-    @NotBlank(message = "이메일을 입력해주세요.")
-    private String email;
+  public static class OauthRequest {
+    @NotBlank(message = "")
+    private String type;
 
-    @NotBlank(message = "인증코드를 입력해주세요.")
+    @NotBlank(message = "")
     private String code;
   }
 }
