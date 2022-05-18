@@ -14,9 +14,6 @@ public class PostDto {
   @Builder
   public static class Request {
 
-    @NotBlank(message = "user id를 입력하세요.")
-    private Integer userId;
-
     @NotBlank(message = "제목을 입력하세요.")
     private String title;
 
