@@ -95,7 +95,7 @@ public class PostDocumentationTests {
     PostDto.Request request = postReq();
     PostDto.CreateResponse createResponse = postRes();
 
-    given(postService.createPost(eq(request))).willReturn(createResponse);
+    given(postService.createPost(eq(request), session.getId())).willReturn(createResponse);
 
     String json = objectMapper.writeValueAsString(request);
 
@@ -119,7 +119,6 @@ public class PostDocumentationTests {
   private PostDto.Request postReq() {
     return PostDto.Request
         .builder()
-        .userId(1)
         .title("제목입니다")
         .content("내용입니다")
         .credit(CreditType.DIRECT)
