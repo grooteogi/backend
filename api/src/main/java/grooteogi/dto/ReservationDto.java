@@ -35,4 +35,10 @@ public class ReservationDto {
   public static class Response {
     private int reservationId;
   }
+
+  @Data
+  @Builder
+  public static class SmsCode {
+    private String code;
+  }
 }

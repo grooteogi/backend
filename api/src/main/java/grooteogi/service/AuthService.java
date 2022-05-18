@@ -3,10 +3,11 @@ package grooteogi.service;
 import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
 
 import grooteogi.domain.User;
+import grooteogi.dto.auth.AuthDto;
 import grooteogi.dto.auth.EmailCodeDto;
-import grooteogi.dto.auth.LoginDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
+import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.repository.UserRepository;
@@ -33,8 +34,9 @@ public class AuthService {
   private final EmailClient emailClient;
   private final RedisClient redisClient;
 
-  public Token login(User user, LoginDto loginDto) {
-    if (passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+  public Token login(User user, AuthDto.Request request) {
+
+    if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       Token token = generateToken(user.getId(), user.getEmail());
       session(token.getAccessToken(), user.getId());
       return token;
@@ -43,19 +45,30 @@ public class AuthService {
     }
   }
 
-  public User register(UserDto userDto) {
-    Optional<User> user = userRepository.findByEmail(userDto.getEmail());
+  public User register(AuthDto.Request request) {
+    Optional<User> user = userRepository.findByEmail(request.getEmail());
     if (user.isPresent()) {
       throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
     }
-    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    userDto.setNickname("groot");
 
-    User registerUser = registerDto(userDto);
+    String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+    User createdUser = User.builder()
+        .email(request.getEmail())
+        .password(encodedPassword)
+        .type(LoginType.GENERAL)
+        .nickname("groot")
+        .build();
+
+
+    User registerUser = userRepository.save(createdUser);
+
     if (registerUser.getNickname().equals("groot")) {
       registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     }
+
     return userRepository.save(registerUser);
+
   }
 
   private User registerDto(UserDto userDto) {
@@ -89,7 +102,7 @@ public class AuthService {
     redisClient.setValue(key, code, 3L);
   }
 
-  public void checkVerifyEmail(EmailCodeDto emailCodeRequest) {
+  public void checkVerifyEmail(EmailCodeDto.Request emailCodeRequest) {
     String key = prefix + emailCodeRequest.getEmail();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(emailCodeRequest.getCode())) {
