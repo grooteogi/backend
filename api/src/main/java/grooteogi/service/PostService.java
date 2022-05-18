@@ -10,7 +10,7 @@ import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
-import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.dto.HashtagDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;

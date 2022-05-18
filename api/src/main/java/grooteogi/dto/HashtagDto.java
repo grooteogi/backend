@@ -1,4 +1,4 @@
-package grooteogi.dto.hashtag;
+package grooteogi.dto;
 
 import javax.validation.constraints.NotNull;
 import lombok.Builder;

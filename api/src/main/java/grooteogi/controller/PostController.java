@@ -2,7 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ScheduleDto;
-import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.dto.HashtagDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
 import grooteogi.utils.Session;
