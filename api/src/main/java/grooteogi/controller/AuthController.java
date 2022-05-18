@@ -1,9 +1,8 @@
 package grooteogi.controller;
 
 import grooteogi.domain.User;
-import grooteogi.dto.OauthDto;
 import grooteogi.dto.AuthDto;
-import grooteogi.dto.auth.EmailCodeDto;
+import grooteogi.dto.OauthDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
@@ -16,7 +15,6 @@ import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
 import java.util.Map;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -77,25 +75,26 @@ public class AuthController {
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
-  @GetMapping("/email")
+  @PostMapping("/auth/email/send")
   public ResponseEntity<BasicResponse> sendVerifyEmail(
-      @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
-      @RequestParam String address) {
+      @RequestBody AuthDto.SendEmailRequest request) {
 
-    if (userService.isExistEmail(address)) {
+    String email = request.getEmail();
+
+    if (userService.isExistEmail(email)) {
       throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
     }
 
-    authService.sendVerifyEmail(address);
+    authService.sendVerifyEmail(email);
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("send email verification success").build());
   }
 
-  @PostMapping("/auth/email")
+  @PostMapping("/auth/email/check")
   public ResponseEntity<BasicResponse> checkVerifyEmail(
-      @RequestBody EmailCodeDto.Request emailCodeRequest) {
-    authService.checkVerifyEmail(emailCodeRequest);
+      @RequestBody AuthDto.CheckEmailRequest request) {
+    authService.checkVerifyEmail(request);
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("confirm email verification success").build());

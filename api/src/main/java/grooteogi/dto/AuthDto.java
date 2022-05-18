@@ -1,5 +1,6 @@
 package grooteogi.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -30,6 +31,22 @@ public class AuthDto {
     private String imageUrl;
   }
 
+  @Data
+  @Builder
+  public static class SendEmailRequest {
+    @Email
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
+  }
 
+  @Data
+  @Builder
+  public static class CheckEmailRequest {
+    @Email
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
 
+    @NotBlank(message = "인증코드를 입력해주세요.")
+    private String code;
+  }
 }

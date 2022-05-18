@@ -4,7 +4,6 @@ import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
-import grooteogi.dto.auth.EmailCodeDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
@@ -102,10 +101,10 @@ public class AuthService {
     redisClient.setValue(key, code, 3L);
   }
 
-  public void checkVerifyEmail(EmailCodeDto.Request emailCodeRequest) {
-    String key = prefix + emailCodeRequest.getEmail();
+  public void checkVerifyEmail(AuthDto.CheckEmailRequest request) {
+    String key = prefix + request.getEmail();
     String value = redisClient.getValue(key);
-    if (value == null || !value.equals(emailCodeRequest.getCode())) {
+    if (value == null || !value.equals(request.getCode())) {
       throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
     }
   }

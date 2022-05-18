@@ -51,8 +51,8 @@ public class UserService {
     return user.get();
   }
 
-  public boolean isExistEmail(String address) {
-    return userRepository.existsByEmail(address);
+  public boolean isExistEmail(String email) {
+    return userRepository.existsByEmail(email);
   }
 
   public User getUserProfile(Integer userId) {
