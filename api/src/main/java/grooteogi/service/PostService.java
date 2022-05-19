@@ -163,15 +163,53 @@ public class PostService {
 
   public List<PostDto.Response> searchAllPosts(Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findAllByPage(page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
+
+    if (sort == null) {
+      sort = "date";
+    }
+
+    switch (sort) {
+      case "heart":
+        this.postRepository.findAllByHeart(page).forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+      case "review":
+        this.postRepository.findAllByReview(page).forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+      default:
+        this.postRepository.findAllByPage(page).forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+    }
+
+
     return responses;
   }
 
   private List<PostDto.Response> searchPosts(String keyword, Pageable page, String sort) {
     List<PostDto.Response> responses = new ArrayList<>();
-    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
-        .add(PostMapper.INSTANCE.toResponseDto(result)));
+
+    if (sort == null) {
+      sort = "date";
+    }
+
+    switch (sort) {
+      case "heart":
+        this.postRepository.findBySearchAndHeart(keyword, keyword, page).forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+      case "review":
+        this.postRepository.findBySearchAndReview(keyword, keyword, page)
+            .forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+      default:
+        this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
+            .add(PostMapper.INSTANCE.toResponseDto(result)));
+        break;
+    }
+
     return responses;
   }
 }
