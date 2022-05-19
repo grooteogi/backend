@@ -28,20 +28,20 @@ public class ReviewController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    this.reviewService.createReview(request, session.getId());
+    reviewService.createReview(request, session.getId());
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
   @PatchMapping("/{reviewId}")
   public ResponseEntity<BasicResponse> modifyReview(
       @RequestBody ReviewDto.Request request, @PathVariable Integer reviewId) {
-    this.reviewService.modifyReview(request, reviewId);
+    reviewService.modifyReview(request, reviewId);
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<BasicResponse> deleteReview(@PathVariable Integer reviewId) {
-    this.reviewService.deleteReview(reviewId);
+    reviewService.deleteReview(reviewId);
     return ResponseEntity.ok(BasicResponse.builder().build());
   }
 }
