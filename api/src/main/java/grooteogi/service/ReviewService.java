@@ -46,7 +46,7 @@ public class ReviewService {
 
     boolean isWriter = postRepository.existsByUser(user.get());
     if (isWriter) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.REVIEW_HOST_EXCEPTION);
     }
 
     reviewRepository.save(ReviewMapper.INSTANCE.toEntity(request));
@@ -55,7 +55,7 @@ public class ReviewService {
   public void deleteReview(Integer reviewId) {
     Optional<Review> review = reviewRepository.findById(reviewId);
     if (review.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.REVIEW_NOT_FOUND_EXCEPTION);
     }
     reviewRepository.delete(review.get());
   }

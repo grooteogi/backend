@@ -20,16 +20,13 @@ public class HashtagService {
 
 
   public HashtagDto.Response createHashtag(HashtagDto.Request request) {
-    Hashtag createdHashtag = new Hashtag();
-
-
     Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(request.getName());
 
     if (!findHashtag.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
+    Hashtag createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
     hashtagRepository.save(createdHashtag);
 
     return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
@@ -50,7 +47,6 @@ public class HashtagService {
   public HashtagDto.Response search(String keyword) {
     Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(keyword);
 
-
     if (findHashtag.isEmpty()) {
       Hashtag createdHashtag = Hashtag.builder().name(keyword).build();
       hashtagRepository.save(createdHashtag);
@@ -59,6 +55,5 @@ public class HashtagService {
 
     return HashtagMapper.INSTANCE.toResponseDto(findHashtag.get());
   }
-
 
 }
