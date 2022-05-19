@@ -1,17 +1,18 @@
-package grooteogi.dto.auth;
+package grooteogi.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
 
-
 public class AuthDto {
 
   @Data
   @Builder
   public static class Request {
+
     @NotBlank(message = "이메일 주소를 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
         message = "이메일 형식에 맞게 입력해주세요.")
@@ -26,8 +27,29 @@ public class AuthDto {
   @Data
   @Builder
   public static class Response {
+
     private String nickname;
     private String imageUrl;
   }
 
+  @Data
+  @Builder
+  public static class SendEmailRequest {
+
+    @Email
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
+  }
+
+  @Data
+  @Builder
+  public static class CheckEmailRequest {
+
+    @Email
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
+
+    @NotBlank(message = "인증코드를 입력해주세요.")
+    private String code;
+  }
 }

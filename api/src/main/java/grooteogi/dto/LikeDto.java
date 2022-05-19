@@ -10,9 +10,6 @@ public class LikeDto {
   public static class Response {
 
     private int count;
-
     private boolean liked;
-
   }
-
 }

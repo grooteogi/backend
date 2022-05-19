@@ -10,6 +10,7 @@ public class ReservationDto {
   @Data
   @Builder
   public static class Request {
+
     @NotNull
     private Integer scheduleId;
     private String message;
@@ -18,6 +19,7 @@ public class ReservationDto {
   @Data
   @Builder
   public static class Responses {
+
     private String title;
     private String date;
     private String startTime;
@@ -33,12 +35,14 @@ public class ReservationDto {
   @Data
   @Builder
   public static class Response {
+
     private int reservationId;
   }
 
   @Data
   @Builder
   public static class SmsCode {
+
     private String code;
   }
 }

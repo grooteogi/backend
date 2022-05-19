@@ -7,10 +7,10 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
+import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
-import grooteogi.dto.hashtag.HashtagDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;
@@ -80,9 +80,7 @@ public class PostService {
       Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
-        PostHashtag createdPostHashtag = PostHashtag.builder()
-            .hashTag(tag)
-            .build();
+        PostHashtag createdPostHashtag = PostHashtag.builder().hashTag(tag).build();
         postHashtagRepository.save(createdPostHashtag);
         postHashtagList.add(createdPostHashtag);
       });
@@ -177,8 +175,7 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.SearchResponse> search(String keyword, String sort,
-      Pageable page) {
+  public List<PostDto.SearchResponse> search(String keyword, String sort, Pageable page) {
     final List<PostDto.SearchResponse> posts;
     if (keyword == null) {
       posts = searchAllPosts(page, sort);
@@ -224,8 +221,8 @@ public class PostService {
     reviewRepository.findByPostId(postId).forEach(review -> {
       User user = review.getUser();
       UserInfo userInfo = user.getUserInfo();
-      PostDto.ReviewResponse response =
-          PostMapper.INSTANCE.toReviewResponse(review, user, userInfo);
+      PostDto.ReviewResponse response = PostMapper.INSTANCE.toReviewResponse(review, user,
+          userInfo);
       responses.add(response);
     });
     return responses;

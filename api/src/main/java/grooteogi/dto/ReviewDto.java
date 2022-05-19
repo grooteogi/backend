@@ -9,12 +9,16 @@ public class ReviewDto {
   @Data
   @Builder
   public static class Request {
+
     @NotNull
     private Integer postId;
+
     @NotNull
     private Integer reservationId;
+
     @NotNull
     private String text;
+
     @NotNull
     private Long score;
   }
@@ -22,5 +26,6 @@ public class ReviewDto {
   @Data
   @Builder
   public static class Response {
+
   }
 }

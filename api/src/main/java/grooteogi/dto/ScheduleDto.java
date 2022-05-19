@@ -10,15 +10,10 @@ public class ScheduleDto {
   public static class Request {
 
     private String date;
-
     private String startTime;
-
     private String endTime;
-
     private String region;
-
     private String place;
-
   }
 
   @Data
@@ -26,16 +21,10 @@ public class ScheduleDto {
   public static class Response {
 
     private int scheduleId;
-
     private String date;
-
     private String startTime;
-
     private String endTime;
-
     private String region;
-
     private String place;
-
   }
 }
