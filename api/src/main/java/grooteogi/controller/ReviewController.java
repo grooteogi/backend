@@ -29,19 +29,25 @@ public class ReviewController {
         .getPrincipal();
 
     reviewService.createReview(request, session.getId());
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    return ResponseEntity.ok(BasicResponse.builder().message("create review success").build());
   }
 
   @PatchMapping("/{reviewId}")
   public ResponseEntity<BasicResponse> modifyReview(
       @RequestBody ReviewDto.Request request, @PathVariable Integer reviewId) {
-    reviewService.modifyReview(request, reviewId);
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    reviewService.modifyReview(request, reviewId, session.getId());
+    return ResponseEntity.ok(BasicResponse.builder().message("modify review success").build());
   }
 
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<BasicResponse> deleteReview(@PathVariable Integer reviewId) {
-    reviewService.deleteReview(reviewId);
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    reviewService.deleteReview(reviewId, session.getId());
+    return ResponseEntity.ok(BasicResponse.builder().message("delete review success").build());
   }
 }
