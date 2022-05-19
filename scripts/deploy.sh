@@ -16,7 +16,7 @@ else
 fi
 
 echo "> Deploy new application"
-JAR_NAME=$(ls -tr $REPOSITORY/*jar | tail -n 1)
+JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
 
 echo "> Grant execute permission for $JAR_NAME"
 chmod +x $JAR_NAME
