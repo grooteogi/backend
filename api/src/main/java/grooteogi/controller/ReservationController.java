@@ -85,7 +85,8 @@ public class ReservationController {
   @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
     ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);
-    return ResponseEntity.ok(BasicResponse.builder().message("send sms code success").data(response).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("send sms code success").data(response).build());
   }
 
   @PostMapping("/check-sms")
