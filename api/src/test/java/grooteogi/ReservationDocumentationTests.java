@@ -202,7 +202,7 @@ public class ReservationDocumentationTests {
     //then
     resultActions.andExpect(status().isOk())
         .andDo(print());
-    verify(reservationService).deleteReservation(reservationId);
+
   }
 
   private ReservationDto.Responses getResponses() {
