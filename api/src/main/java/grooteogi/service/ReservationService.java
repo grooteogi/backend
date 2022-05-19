@@ -147,21 +147,36 @@ public class ReservationService {
     return ReservationMapper.INSTANCE.toResponseDto(createdReservation);
   }
 
-  public void deleteReservation(Integer reservationId) {
+  public void deleteReservation(Integer reservationId, Integer userId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
+    int hostId = reservation.get().getHostUser().getId();
+    int participateId = reservation.get().getParticipateUser().getId();
+
+    if (hostId != userId && participateId != userId) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
+
     reservationRepository.delete(reservation.get());
   }
 
-  public ReservationDto.Response modifyStatus(Integer reservationId) {
+  public ReservationDto.Response modifyStatus(Integer reservationId, Integer userId) {
 
     Optional<Reservation> reservation = reservationRepository.findByUncanceld(reservationId);
 
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
+
+    int hostId = reservation.get().getHostUser().getId();
+    int participateId = reservation.get().getParticipateUser().getId();
+
+    if (hostId != userId && participateId != userId) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
+
     reservation.get().setStatus(ReservationType.CANCELED);
     reservationRepository.save(reservation.get());
     return ReservationMapper.INSTANCE.toResponseDto(reservation.get());

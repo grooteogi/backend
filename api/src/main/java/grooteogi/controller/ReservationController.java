@@ -71,14 +71,21 @@ public class ReservationController {
 
   @DeleteMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> deleteReservation(@PathVariable Integer reservationId) {
-    this.reservationService.deleteReservation(reservationId);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    reservationService.deleteReservation(reservationId, session.getId());
     return ResponseEntity.ok(BasicResponse.builder()
         .message("delete reservation success").build());
   }
 
   @PatchMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> modifyStatus(@PathVariable Integer reservationId) {
-    ReservationDto.Response response = this.reservationService.modifyStatus(reservationId);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    ReservationDto.Response response =
+        reservationService.modifyStatus(reservationId, session.getId());
     return ResponseEntity.ok(BasicResponse.builder()
         .message("modify reservation status success").data(response).build());
   }
