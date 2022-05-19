@@ -6,6 +6,8 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.CheckSmsRequest;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.enums.ReservationType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -14,9 +16,8 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.RedisClient;
 import grooteogi.utils.SmsClient;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,9 @@ public class ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+  private final RedisClient redisClient;
+
+  private final String prefix = "sms_verify";
 
   private final SmsClient smsClient;
 
@@ -162,14 +166,24 @@ public class ReservationService {
     reservationRepository.save(reservation.get());
     return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
   }
-  
-  public ReservationDto.SmsCode sendSms(String phoneNumber) {
+
+  public SendSmsResponse sendSms(String phoneNumber) {
 
     Random rand = new Random();
     String numStr = String.format("%04d", rand.nextInt(10000));
 
     smsClient.certifiedPhoneNumber(phoneNumber, numStr);
-    return ReservationDto.SmsCode.builder()
+    String key = prefix + phoneNumber;
+    redisClient.setValue(key, numStr, 3L);
+    return SendSmsResponse.builder()
         .code(numStr).build();
+  }
+
+  public void checkVerifySms(CheckSmsRequest request) {
+    String key = prefix + request.getPhoneNumber();
+    String value = redisClient.getValue(key);
+    if (value == null || !value.equals(request.getCode())) {
+      throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
+    }
   }
 }
