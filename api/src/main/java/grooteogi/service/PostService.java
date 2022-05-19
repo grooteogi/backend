@@ -4,6 +4,7 @@ import grooteogi.domain.Hashtag;
 import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
@@ -160,22 +161,9 @@ public class PostService {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
-//    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
-//
-//    postHashtagList.forEach(postHashtag -> {
-//      Optional<Hashtag> hashtag = hashtagRepository.findById(postHashtag.getHashTag().getId());
-//      hashtag.get().setCount(hashtag.get().getCount() - 1);
-//    });
-//
-//    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
-//    reservationRepository.deleteAll(reservations);
-//
-//    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
-//
-//    if (schedules.isEmpty()) {
-//      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
-//    }
-//    scheduleRepository.deleteAll(schedules);
+    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+    reservationRepository.deleteAll(reservations);
+
     this.postRepository.delete(post.get());
   }
 
@@ -245,17 +233,16 @@ public class PostService {
 
   public void modifyHeart(Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
-    if (post.isEmpty()){
+    if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
 
-    if (heart.isEmpty()){
+    if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
-    }
-    else {
+    } else {
       heartRepository.delete(heart.get());
     }
   }
