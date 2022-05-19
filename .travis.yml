@@ -13,14 +13,15 @@ notifications:
     recipients:
       - support@grooteogi.net
 script:
-  - "cd ./api"
-  - "./gradlew clean build"
+  - cd api/
+  - ./gradlew clean build
+  - cd ../
 before_deploy:
   - mkdir -p before-deploy
   - cp scripts/deploy.sh before-deploy/
   - cp appspec.yml before-deploy/
   - cp api/build/libs/*.jar before-deploy/
-  - cd before-deploy && zip -r before-deploy
+  - cd before-deploy && zip -r before-deploy *
   - cd ../ && mkdir -p deploy
   - mv before-deploy/before-deploy.zip deploy/Grooteogi.zip
 deploy:
