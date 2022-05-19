@@ -42,7 +42,7 @@ public class ReservationDto {
 
   @Data
   @Builder
-  public static class SmsCode {
+  public static class SendSmsResponse {
 
     private String code;
   }

@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.Session;
@@ -84,7 +85,7 @@ public class ReservationController {
   
   @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
-    ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);
+    SendSmsResponse response = this.reservationService.sendSms(phoneNumber);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("send sms code success").data(response).build());
   }

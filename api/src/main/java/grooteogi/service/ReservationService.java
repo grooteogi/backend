@@ -7,6 +7,7 @@ import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
 import grooteogi.dto.ReservationDto.CheckSmsRequest;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.enums.ReservationType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -166,7 +167,7 @@ public class ReservationService {
     return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
   }
 
-  public ReservationDto.SmsCode sendSms(String phoneNumber) {
+  public SendSmsResponse sendSms(String phoneNumber) {
 
     Random rand = new Random();
     String numStr = String.format("%04d", rand.nextInt(10000));
@@ -174,7 +175,7 @@ public class ReservationService {
     smsClient.certifiedPhoneNumber(phoneNumber, numStr);
     String key = prefix + phoneNumber;
     redisClient.setValue(key, numStr, 3L);
-    return ReservationDto.SmsCode.builder()
+    return SendSmsResponse.builder()
         .code(numStr).build();
   }
 
