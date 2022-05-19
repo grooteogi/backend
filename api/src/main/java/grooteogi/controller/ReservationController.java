@@ -1,10 +1,10 @@
 package grooteogi.controller;
 
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.Session;
-import grooteogi.utils.SmsClient;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -85,7 +85,19 @@ public class ReservationController {
   
   @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
-    ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    SendSmsResponse response = this.reservationService.sendSms(phoneNumber);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("send sms code success").data(response).build());
   }
+
+  @PostMapping("/check-sms")
+  public ResponseEntity<BasicResponse> checkVerifySms(
+      @RequestBody ReservationDto.CheckSmsRequest request) {
+    reservationService.checkVerifySms(request);
+
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("check sms success").build());
+  }
+
+
 }

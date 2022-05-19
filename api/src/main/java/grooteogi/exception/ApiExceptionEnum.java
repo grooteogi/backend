@@ -37,6 +37,7 @@ public enum ApiExceptionEnum {
   // Post Exception
   POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
   HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다."),
+  NO_PERMISSION_EXCEPTION(HttpStatus.FORBIDDEN, "수정 혹은 삭제할 권한이 없습니다."),
   // Reservation Exception,
   DUPLICATION_RESERVATION_EXCEPTION(HttpStatus.CONFLICT, "신청 불가능한 일정입니다."),
   SCHEDULE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
