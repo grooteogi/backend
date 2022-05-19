@@ -73,7 +73,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
           + " reservation.id =:id and status = 1 and schedule.date > CURRENT_DATE ",
       nativeQuery = true
   )
-  Optional<Reservation> findByUncanceld(@Param("id") Integer id);
+  Optional<Reservation> findByUncanceled(@Param("id") Integer id);
 
 
   @Query(
@@ -82,4 +82,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
       nativeQuery = true
   )
   List<Reservation> findByPostId(@Param("id") Integer id);
+
+  @Query(
+      value = "select * from reservation where status = 1 and reservation.id =:reservationId",
+      nativeQuery = true
+  )
+  Optional<Reservation> findByIdUncanceled(@Param("reservationId") Integer reservationId);
 }
