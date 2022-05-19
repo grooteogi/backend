@@ -6,8 +6,6 @@ import javax.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
-
-@SuppressWarnings("checkstyle:Indentation")
 public class PostDto {
 
   @Data
@@ -18,8 +16,8 @@ public class PostDto {
     private String title;
 
     @NotBlank(message = "내용을 입력하세요.")
-
     private String content;
+
     private CreditType credit;
     private String imageUrl;
     private String[] hashtags;

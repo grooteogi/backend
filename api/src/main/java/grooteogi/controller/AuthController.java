@@ -22,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,17 +99,15 @@ public class AuthController {
         BasicResponse.builder().message("check email success").build());
   }
 
-  @PostMapping("/oauth")
+  @GetMapping("/oauth/{type}")
   public ResponseEntity<BasicResponse> oauth(
-      @RequestBody AuthDto.OauthRequest request) {
+      @PathVariable String type, @RequestParam("code") String code) {
 
     UserDto userDto;
-    String loginType = request.getType();
-    String code = request.getCode();
 
-    if (loginType.equalsIgnoreCase(LoginType.GOOGLE.name())) {
+    if (type.equalsIgnoreCase(LoginType.GOOGLE.name())) {
       userDto = oauthClient.googleToken(code);
-    } else if (loginType.equalsIgnoreCase(LoginType.KAKAO.name())) {
+    } else if (type.equalsIgnoreCase(LoginType.KAKAO.name())) {
       userDto = oauthClient.kakaoToken(code);
     } else {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
