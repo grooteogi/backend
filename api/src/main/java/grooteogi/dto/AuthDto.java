@@ -52,15 +52,4 @@ public class AuthDto {
     @NotBlank(message = "인증코드를 입력해주세요.")
     private String code;
   }
-
-  @Data
-  @Builder
-  public static class OauthRequest {
-
-    @NotBlank(message = "")
-    private String type;
-
-    @NotBlank(message = "")
-    private String code;
-  }
 }
