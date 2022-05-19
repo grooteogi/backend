@@ -3,7 +3,7 @@ spring:
     url: "http://localhost:3000"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://dev-grtg.crhh1uzij006.ap-northeast-2.rds.amazonaws.com:3306/grtg
+    url: ${RDS_URL}
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
   jpa:
