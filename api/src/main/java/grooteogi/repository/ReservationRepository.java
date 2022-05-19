@@ -77,8 +77,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
 
   @Query(
-      value = "select * from reservation, schedule where reservation.schedule_id = schedule.id "
-          + "and schedule.post_id = :id",
+      value = "select * from reservation, schedule where reservation.schedule_id = schedule.id and"
+          + " schedule.post_id = :id",
       nativeQuery = true
   )
   List<Reservation> findByPostId(@Param("id") Integer id);
