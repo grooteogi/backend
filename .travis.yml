@@ -46,3 +46,5 @@ deploy:
     application: dev-grtg-back
     deployment-group: dev-grtg-group
     wait-until-deployed: true
+    on:
+      all_branches: true
