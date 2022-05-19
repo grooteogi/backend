@@ -61,6 +61,16 @@ public class PostController {
         .message("get reviews success").data(reviewResponses).build());
   }
 
+  @GetMapping("/{postId}/like")
+  public ResponseEntity<BasicResponse> createHeart(@PathVariable Integer postId) {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    postService.modifyHeart(postId, session.getId());
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("heart success").build());
+  }
+
   @GetMapping("/{postId}/hashtags")
   public ResponseEntity<BasicResponse> getHashtagsResponse(@PathVariable int postId) {
     List<HashtagDto.Response> hashtagsResponse = postService.getHashtagsResponse(postId);
@@ -73,7 +83,7 @@ public class PostController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    PostDto.CreateResponse createdPost = this.postService.createPost(request, session.getId());
+    PostDto.CreateResponse createdPost = postService.createPost(request, session.getId());
     return ResponseEntity.ok(BasicResponse.builder()
         .message("create post success").data(createdPost).build());
   }
@@ -81,7 +91,7 @@ public class PostController {
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    PostDto.Response modifiedPost = this.postService.modifyPost(request, postId);
+    PostDto.Response modifiedPost = postService.modifyPost(request, postId);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("modify post success").data(modifiedPost).build());
   }

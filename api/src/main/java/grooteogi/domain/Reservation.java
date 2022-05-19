@@ -3,6 +3,7 @@ package grooteogi.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import grooteogi.enums.ReservationType;
 import java.sql.Timestamp;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -52,7 +53,7 @@ public class Reservation {
   @JoinColumn(name = "participate_user_id")
   private User participateUser;
 
-  @OneToOne
+  @OneToOne(cascade = {CascadeType.REMOVE})
   @JoinColumn(name = "schedule_id")
   private Schedule schedule;
 

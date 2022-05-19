@@ -1,9 +1,9 @@
 package grooteogi.service;
 
 import grooteogi.domain.Hashtag;
+import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
-import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
@@ -16,6 +16,7 @@ import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;
 import grooteogi.mapper.PostMapper;
 import grooteogi.repository.HashtagRepository;
+import grooteogi.repository.HeartRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
@@ -42,6 +43,7 @@ public class PostService {
   private final ScheduleRepository scheduleRepository;
   private final ReviewRepository reviewRepository;
   private final ReservationRepository reservationRepository;
+  private final HeartRepository heartRepository;
 
   public PostDto.Response getPostResponse(Integer postId) {
 
@@ -158,22 +160,22 @@ public class PostService {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
-    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
-
-    postHashtagList.forEach(postHashtag -> {
-      Optional<Hashtag> hashtag = hashtagRepository.findById(postHashtag.getHashTag().getId());
-      hashtag.get().setCount(hashtag.get().getCount() - 1);
-    });
-
-    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
-    reservationRepository.deleteAll(reservations);
-
-    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
-
-    if (schedules.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
-    }
-    scheduleRepository.deleteAll(schedules);
+//    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
+//
+//    postHashtagList.forEach(postHashtag -> {
+//      Optional<Hashtag> hashtag = hashtagRepository.findById(postHashtag.getHashTag().getId());
+//      hashtag.get().setCount(hashtag.get().getCount() - 1);
+//    });
+//
+//    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+//    reservationRepository.deleteAll(reservations);
+//
+//    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
+//
+//    if (schedules.isEmpty()) {
+//      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+//    }
+//    scheduleRepository.deleteAll(schedules);
     this.postRepository.delete(post.get());
   }
 
@@ -239,5 +241,22 @@ public class PostService {
       responses.add(response);
     });
     return responses;
+  }
+
+  public void modifyHeart(Integer postId, Integer userId) {
+    Optional<Post> post = postRepository.findById(postId);
+    if (post.isEmpty()){
+      throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
+    }
+
+    Optional<User> user = userRepository.findById(userId);
+    Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
+
+    if (heart.isEmpty()){
+      heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
+    }
+    else {
+      heartRepository.delete(heart.get());
+    }
   }
 }
