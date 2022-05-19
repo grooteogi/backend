@@ -5,9 +5,7 @@ REPOSITORY=/home/ubuntu/app/grooteogi
 cp $REPOSITORY/zip/*.jar $REPOSITORY/
 
 echo "> check running application pid"
-CURRENT_PID=$(pgrep -f Grooteogi | grep jar | awk '{print$1}')
-
-echo "$CURRENT_PID"
+CURRENT_PID=$(ps -ef | grep grooteogi | grep jar | awk '{print$2}')
 if [ -z $CURRENT_PID ]; then
   echo "> running application not found\!"
 else
