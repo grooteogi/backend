@@ -31,3 +31,13 @@ deploy:
     wait-until-deployed: true
     on:
       all_branches: true
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: deploy-grtg
+    region: ap-northeast-2
+    key: Grooteogi.zip
+    bundle_type: zip
+    application: dev-grtg-back
+    deployment-group: dev-grtg-group
+    wait-until-deployed: true
