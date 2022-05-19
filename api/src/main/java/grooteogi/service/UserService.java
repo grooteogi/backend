@@ -2,9 +2,9 @@ package grooteogi.service;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
+import grooteogi.dto.AuthDto;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.auth.AuthDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.UserMapper;
@@ -51,8 +51,8 @@ public class UserService {
     return user.get();
   }
 
-  public boolean isExistEmail(String address) {
-    return userRepository.existsByEmail(address);
+  public boolean isExistEmail(String email) {
+    return userRepository.existsByEmail(email);
   }
 
   public User getUserProfile(Integer userId) {

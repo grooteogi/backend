@@ -2,7 +2,7 @@ package grooteogi.mapper;
 
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.PostHashtag;
-import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.dto.HashtagDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
