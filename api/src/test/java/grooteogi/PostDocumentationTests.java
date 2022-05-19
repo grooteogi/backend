@@ -161,7 +161,7 @@ public class PostDocumentationTests {
     );
 
 
-    verify(postService).deletePost(postId);
+    verify(postService).deletePost(postId, postId);
   }
 
   @Test
@@ -169,10 +169,11 @@ public class PostDocumentationTests {
   public void modifyPost() throws Exception {
     //given
     int postId = anyInt();
+    int userId = anyInt();
     PostDto.Request request = postReq();
     Response response = postDetailRes();
 
-    given(postService.modifyPost(eq(request), postId)).willReturn(response);
+    given(postService.modifyPost(eq(request), postId, userId)).willReturn(response);
 
     String json = objectMapper.writeValueAsString(request);
 

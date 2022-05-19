@@ -119,8 +119,13 @@ public class PostService {
   }
 
   @Transactional
-  public PostDto.Response modifyPost(Request request, Integer postId) {
+  public PostDto.Response modifyPost(Request request, Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
+    int writer = post.get().getUser().getId();
+
+    if (userId != writer) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
 
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
@@ -152,8 +157,14 @@ public class PostService {
     return PostMapper.INSTANCE.toDetailResponse(modifiedPost);
   }
 
-  public void deletePost(Integer postId) {
+  public void deletePost(Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
+
+    int writer = post.get().getUser().getId();
+
+    if (userId != writer) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
 
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
