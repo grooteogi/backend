@@ -15,8 +15,6 @@ import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.SmsClient;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -146,7 +144,7 @@ public class ReservationService {
   public void deleteReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
     reservationRepository.delete(reservation.get());
   }
