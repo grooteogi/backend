@@ -92,14 +92,20 @@ public class PostController {
   @PutMapping("/{postId}")
   public ResponseEntity<BasicResponse> modifyPost(@RequestBody PostDto.Request request,
       @PathVariable int postId) {
-    PostDto.Response modifiedPost = postService.modifyPost(request, postId);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    PostDto.Response modifiedPost = postService.modifyPost(request, postId, session.getId());
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify post success").data(modifiedPost).build());
   }
 
   @DeleteMapping("/{postId}")
   public ResponseEntity<BasicResponse> deletePost(@PathVariable int postId) {
-    postService.deletePost(postId);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    postService.deletePost(postId, session.getId());
     return ResponseEntity.ok(BasicResponse.builder().message("delete post success").build());
   }
 }
