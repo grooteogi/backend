@@ -164,7 +164,7 @@ public class ReservationService {
 
   public ReservationDto.Response modifyStatus(Integer reservationId, Integer userId) {
 
-    Optional<Reservation> reservation = reservationRepository.findByUncanceld(reservationId);
+    Optional<Reservation> reservation = reservationRepository.findByUncanceled(reservationId);
 
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
