@@ -51,7 +51,7 @@ public class ReservationController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    List<ReservationDto.Responses> reservations = reservationService.getUserReservation(
+    List<ReservationDto.Responses> reservations = reservationService.getApplyReservation(
         session.getId(), sort);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("get apply reservation success").data(reservations).build());
