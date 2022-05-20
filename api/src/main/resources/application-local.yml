@@ -1,6 +1,4 @@
 spring:
-  origin:
-    url: "http://localhost:3000"
   datasource:
     url: jdbc:mysql://localhost:3305/test_db
     username: test

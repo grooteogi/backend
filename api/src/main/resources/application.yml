@@ -1,4 +1,6 @@
 spring:
+  origin:
+    url: ${ORIGIN_URL}
   jackson:
     default-property-inclusion: non_null
   mail:

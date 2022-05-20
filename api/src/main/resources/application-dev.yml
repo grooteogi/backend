@@ -1,6 +1,4 @@
 spring:
-  origin:
-    url: "http://localhost:3000"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${RDS_URL}
