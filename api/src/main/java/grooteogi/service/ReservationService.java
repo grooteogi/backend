@@ -18,6 +18,7 @@ import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
 import grooteogi.utils.SmsClient;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +73,7 @@ public class ReservationService {
     return getReservationDto(result);
   }
 
-  public List<ReservationDto.Responses> getUserReservation(Integer userId, String sort) {
+  public List<ReservationDto.Responses> getApplyReservation(Integer userId, String sort) {
 
     List<Reservation> result = new ArrayList<>();
     switch (sort) {
@@ -164,10 +165,18 @@ public class ReservationService {
 
   public ReservationDto.Response modifyStatus(Integer reservationId, Integer userId) {
 
-    Optional<Reservation> reservation = reservationRepository.findByUncanceled(reservationId);
+    Optional<Reservation> reservation = reservationRepository.findUncanceledById(reservationId);
 
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    }
+    Schedule schedule = reservation.get().getSchedule();
+
+    long miliseconds = System.currentTimeMillis();
+    Date now = new Date(miliseconds);
+
+    if (now.before(schedule.getDate())) {
+      throw new ApiException(ApiExceptionEnum.NO_MODIFY_EXCEPTION);
     }
 
     int hostId = reservation.get().getHostUser().getId();
