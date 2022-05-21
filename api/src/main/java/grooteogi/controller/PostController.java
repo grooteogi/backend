@@ -29,7 +29,7 @@ public class PostController {
 
   private final PostService postService;
 
-  @GetMapping
+  @GetMapping("/search")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,

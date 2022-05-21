@@ -11,7 +11,7 @@ public class UserDto {
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class Password {
+  public static class PasswordRequest {
 
     String password;
   }
