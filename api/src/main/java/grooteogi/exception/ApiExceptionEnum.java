@@ -43,9 +43,11 @@ public enum ApiExceptionEnum {
   SCHEDULE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
   RESERVATION_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "예약이 존재하지 않습니다."),
   RESERVATION_HOST_EXCEPTION(HttpStatus.BAD_REQUEST, "호스트는 예약을 신청할 수 없습니다."),
+  NO_MODIFY_EXCEPTION(HttpStatus.FORBIDDEN, "변경 불가능한 예약입니다."),
   // Review Exception
   REVIEW_HOST_EXCEPTION(HttpStatus.BAD_REQUEST, "호스트는 리뷰를 남길 수 없습니다."),
   REVIEW_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 리뷰가 없습니다."),
+  NO_CREATE_REVIEW_EXCEPTION(HttpStatus.FORBIDDEN, "리뷰 작성 가능 기간이 아닙니다."),
   // Permission Exception
   INVALID_CODE_EXCEPTION(HttpStatus.NOT_FOUND, "인증코드를 다시 확인해주세요."),
   ;
