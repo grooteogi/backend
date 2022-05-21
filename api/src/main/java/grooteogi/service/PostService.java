@@ -6,7 +6,9 @@ import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
+import grooteogi.enums.PostFilterEnum;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.PostMapper;
@@ -17,8 +19,11 @@ import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +44,9 @@ public class PostService {
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
+
+    Optional<Post> weqwe = this.postRepository.findById(postId);
+    System.out.println(weqwe.get().getHearts().size());
 
     //조회수 증가
     Optional<Post> post = this.postRepository.findById(postId);
@@ -149,67 +157,48 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.Response> search(String keyword, String sort,
+  public List<PostDto.Response> search(String keyword, String filter,
       Pageable page) {
-    final List<PostDto.Response> posts;
-    if (keyword == null) {
-      posts = searchAllPosts(page, sort);
-    } else {
-      posts = searchPosts(keyword, page, sort);
-    }
-    return posts;
+    return keyword == null ? searchAllPosts(page, filter) : searchPosts(keyword, page, filter);
   }
 
+  private List<Response> filter(List<Post> postList, String filter) {
 
-  public List<PostDto.Response> searchAllPosts(Pageable page, String sort) {
-    List<PostDto.Response> responses = new ArrayList<>();
+    PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
 
-    if (sort == null) {
-      sort = "date";
+    if (postFilterEnum == PostFilterEnum.VIEWS) {
+      List<Post> filteredPostList = postList.stream()
+          .sorted(Comparator.comparingInt(Post::getViews).reversed())
+          .collect(Collectors.toList());
+      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
+    } else if (postFilterEnum == PostFilterEnum.POPULAR) {
+      List<Post> filteredPostList = postList.stream()
+          .filter(post -> post.getHearts().size() > 0)
+          .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
+          .collect(Collectors.toList());
+      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
+    } else if (postFilterEnum == PostFilterEnum.LATEST) {
+      List<Post> filteredPostList = postList.stream()
+          .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
+          .collect(Collectors.toList());
+      Collections.reverse(filteredPostList);
+      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
     }
 
-    switch (sort) {
-      case "heart":
-        this.postRepository.findAllByHeart(page).forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-      case "review":
-        this.postRepository.findAllByReview(page).forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-      default:
-        this.postRepository.findAllByPage(page).forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-    }
-
-
-    return responses;
+    return PostMapper.INSTANCE.toResponseListDto(postList);
   }
 
-  private List<PostDto.Response> searchPosts(String keyword, Pageable page, String sort) {
-    List<PostDto.Response> responses = new ArrayList<>();
+  public List<PostDto.Response> searchAllPosts(Pageable page, String filter) {
+    List<Post> posts = postRepository.findAll();
 
-    if (sort == null) {
-      sort = "date";
-    }
+    return filter(posts, filter);
+  }
 
-    switch (sort) {
-      case "heart":
-        this.postRepository.findBySearchAndHeart(keyword, keyword, page).forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-      case "review":
-        this.postRepository.findBySearchAndReview(keyword, keyword, page)
-            .forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-      default:
-        this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> responses
-            .add(PostMapper.INSTANCE.toResponseDto(result)));
-        break;
-    }
+  private List<PostDto.Response> searchPosts(String keyword, Pageable page, String filter) {
+    List<Post> posts = postRepository.findAllByKeyword(keyword, page);
 
-    return responses;
+    return filter(posts, filter);
+
+
   }
 }
