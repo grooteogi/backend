@@ -74,7 +74,8 @@ public class ReservationService {
     ReservationStatus reservationStatus = ReservationStatus.valueOf(filter);
 
     List<Reservation> filteredList = reservationList.stream().filter(
-        reservation -> reservation.getIsCanceled() == (reservationStatus == ReservationStatus.CANCELED)
+        reservation ->
+            reservation.getIsCanceled() == (reservationStatus == ReservationStatus.CANCELED)
     ).collect(Collectors.toList());
 
     if (reservationStatus == ReservationStatus.CANCELED) {
