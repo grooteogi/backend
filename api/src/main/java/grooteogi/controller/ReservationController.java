@@ -26,18 +26,6 @@ public class ReservationController {
 
   private final ReservationService reservationService;
 
-  @GetMapping("/host")
-  public ResponseEntity<BasicResponse> getHostReservation(
-      @RequestParam(name = "sort", required = false) String sort)  {
-    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-
-    List<ReservationDto.Responses> reservationList = reservationService.getHostReservation(
-        session.getId(), sort);
-    return ResponseEntity.ok(BasicResponse.builder()
-        .message("get host reservation success").data(reservationList).build());
-  }
-
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
     ReservationDto.Responses response = reservationService.getReservation(reservationId);
@@ -45,16 +33,30 @@ public class ReservationController {
         .message("get reservation success").data(response).build());
   }
 
-  @GetMapping("/apply")
-  public ResponseEntity<BasicResponse> getUserReservation(
-      @RequestParam(name = "sort", required = false) String sort)  {
+  @GetMapping("/filter")
+  public ResponseEntity<BasicResponse> getReservation(
+      @RequestParam(name = "isHost") boolean isHost,
+      @RequestParam(name = "filter", required = false) String filter)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
+    List<ReservationDto.Responses> reservations;
 
-    List<ReservationDto.Responses> reservations = reservationService.getApplyReservation(
-        session.getId(), sort);
+    reservations = reservationService.getReservation(isHost, session.getId(), filter);
+
     return ResponseEntity.ok(BasicResponse.builder()
-        .message("get apply reservation success").data(reservations).build());
+        .message("get reservation list with filtering success").data(reservations).build());
+  }
+
+  @GetMapping
+  public ResponseEntity<BasicResponse> getReservation(
+      @RequestParam(name = "isHost") boolean isHost)  {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    List<ReservationDto.Responses> reservations =
+        reservationService.getReservation(isHost, session.getId());
+
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get reservation list success").data(reservations).build());
   }
 
   @PostMapping
