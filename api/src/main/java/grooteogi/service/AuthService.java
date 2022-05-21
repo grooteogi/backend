@@ -4,17 +4,16 @@ import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
+import grooteogi.dto.auth.Oauthdto;
 import grooteogi.dto.auth.Token;
-import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.UserMapper;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.EmailClient;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.RedisClient;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
   private final String prefix = "email_verify";
+  private final String nickname = "groot";
 
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
@@ -44,33 +44,27 @@ public class AuthService {
     }
   }
 
-  public User register(AuthDto.Request request) {
+  public AuthDto.Response register(AuthDto.Request request) {
     Optional<User> user = userRepository.findByEmail(request.getEmail());
     if (user.isPresent()) {
       throw new ApiException(ApiExceptionEnum.EMAIL_DUPLICATION_EXCEPTION);
     }
 
-    String encodedPassword = passwordEncoder.encode(request.getPassword());
+    request.setPassword(passwordEncoder.encode(request.getPassword()));
 
-    User createdUser = User.builder()
-        .email(request.getEmail())
-        .password(encodedPassword)
-        .type(LoginType.GENERAL)
-        .nickname("groot")
-        .build();
+    User cuser = UserMapper.INSTANCE.toEntity(request, LoginType.GENERAL, nickname);
+    User registerUser = userRepository.save(cuser);
 
-
-    User registerUser = userRepository.save(createdUser);
-
-    if (registerUser.getNickname().equals("groot")) {
+    if (registerUser.getNickname().equals(nickname)) {
       registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     }
 
-    return userRepository.save(registerUser);
+    User ruser = userRepository.save(registerUser);
 
+    return UserMapper.INSTANCE.toResponseDto(ruser, ruser.getUserInfo());
   }
 
-  private User registerDto(UserDto userDto) {
+  private User registerDto(Oauthdto userDto) {
     User user = new User();
     BeanUtils.copyProperties(userDto, user);
 
@@ -85,7 +79,7 @@ public class AuthService {
     userRepository.delete(user.get());
   }
 
-  private Token generateToken(int id, String email) {
+  public Token generateToken(int id, String email) {
     Token token = new Token();
     token.setAccessToken(jwtProvider.generateAccessToken(id, email));
     token.setRefreshToken(jwtProvider.generateRefreshToken(id, email));
@@ -109,9 +103,7 @@ public class AuthService {
     }
   }
 
-  public Map<String, Object> oauth(UserDto userDto) {
-    Map<String, Object> result = new HashMap<>();
-
+  public User oauth(Oauthdto userDto) {
     Optional<User> userEmail = userRepository.findByEmail(userDto.getEmail());
     User user;
     if (userEmail.isEmpty()) {
@@ -120,16 +112,11 @@ public class AuthService {
       user = userEmail.get();
     }
 
-    if (user.getType().equals(userDto.getType())) {
-      Token token = generateToken(user.getId(), user.getEmail());
-      session(token.getAccessToken(), user.getId());
-      result.put("token", token);
-    } else {
+    if (!user.getType().equals(userDto.getType())) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
 
-    result.put("user", user);
-    return result;
+    return user;
   }
 
   private void session(String token, int id) {

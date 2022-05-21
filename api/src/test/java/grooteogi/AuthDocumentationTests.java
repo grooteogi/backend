@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.controller.AuthController;
 import grooteogi.domain.User;
-import grooteogi.dto.auth.UserDto;
+import grooteogi.dto.auth.Oauthdto;
 import grooteogi.enums.LoginType;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
@@ -69,8 +69,8 @@ public class AuthDocumentationTests {
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
   }
 
-  public UserDto getUserDto() {
-    UserDto userDto = new UserDto();
+  public Oauthdto getUserDto() {
+    Oauthdto userDto = new Oauthdto();
     userDto.setType(LoginType.GENERAL);
     userDto.setEmail("groot@example.com");
     userDto.setPassword("groot1234*");
@@ -91,7 +91,7 @@ public class AuthDocumentationTests {
   @Test
   void register() throws Exception {
     //given
-    UserDto userDto = getUserDto(); // for  request
+    Oauthdto userDto = getUserDto(); // for  request
     User testUser = getTestUser(); // for response
 
     // when

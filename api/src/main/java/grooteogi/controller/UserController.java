@@ -6,7 +6,6 @@ import grooteogi.dto.UserDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.UserService;
 import grooteogi.utils.Session;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,21 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-
-  @GetMapping
-  public ResponseEntity<BasicResponse> getAllUser() {
-    List<User> userList = userService.getAllUser();
-    return ResponseEntity.ok(BasicResponse.builder().count(userList.size()).data(userList).build());
-  }
-
-  @GetMapping("/self")
-  public ResponseEntity<BasicResponse> getUser() {
-    Session session = (Session) SecurityContextHolder.getContext()
-        .getAuthentication().getPrincipal();
-    User user = userService.getUser(session.getId());
-
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
-  }
 
   @GetMapping("/profile")
   public ResponseEntity<BasicResponse> getUserProfile() {
@@ -56,7 +40,7 @@ public class UserController {
   }
 
   @PatchMapping("/password")
-  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody UserDto.Password request) {
+  public ResponseEntity<BasicResponse> modifyUserPw(@RequestBody UserDto.PasswordRequest request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     userService.modifyUserPw(session.getId(), request);
