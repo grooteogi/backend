@@ -2,7 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
-import grooteogi.dto.auth.Oauthdto;
+import grooteogi.dto.auth.OauthDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
@@ -100,7 +100,7 @@ public class AuthController {
   public ResponseEntity<BasicResponse> oauth(
       @PathVariable String type, @RequestParam("code") String code) {
 
-    Oauthdto oauthDto;
+    OauthDto oauthDto;
 
     if (type.equalsIgnoreCase(LoginType.GOOGLE.name())) {
       oauthDto = oauthClient.googleToken(code);

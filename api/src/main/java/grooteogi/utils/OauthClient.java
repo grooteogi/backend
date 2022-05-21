@@ -3,7 +3,7 @@ package grooteogi.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import grooteogi.dto.auth.Oauthdto;
+import grooteogi.dto.auth.OauthDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -45,7 +45,7 @@ public class OauthClient {
     this.httpServletResponse = httpServletResponse;
   }
 
-  public Oauthdto kakaoToken(String code) {
+  public OauthDto kakaoToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -66,7 +66,7 @@ public class OauthClient {
       JsonParser parser = new JsonParser();
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
-      Oauthdto oauthDto = kakaoAuth(accessToken);
+      OauthDto oauthDto = kakaoAuth(accessToken);
       oauthDto.setType(LoginType.KAKAO);
       return oauthDto;
     } catch (RestClientException e) {
@@ -74,8 +74,8 @@ public class OauthClient {
     }
   }
 
-  private Oauthdto kakaoAuth(String token) {
-    Oauthdto oauthDto = new Oauthdto();
+  private OauthDto kakaoAuth(String token) {
+    OauthDto oauthDto = new OauthDto();
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -100,7 +100,7 @@ public class OauthClient {
     return oauthDto;
   }
 
-  public Oauthdto googleToken(String code) {
+  public OauthDto googleToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -122,7 +122,7 @@ public class OauthClient {
       JsonParser parser = new JsonParser();
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
-      Oauthdto oauth = googleAuth(accessToken);
+      OauthDto oauth = googleAuth(accessToken);
       oauth.setType(LoginType.GOOGLE);
       return oauth;
     } catch (RestClientException e) {
@@ -130,8 +130,8 @@ public class OauthClient {
     }
   }
 
-  private Oauthdto googleAuth(String token) {
-    Oauthdto oauth = new Oauthdto();
+  private OauthDto googleAuth(String token) {
+    OauthDto oauth = new OauthDto();
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

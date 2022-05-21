@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Oauthdto {
+public class OauthDto {
 
   @NotNull(message = "")
   private LoginType type;

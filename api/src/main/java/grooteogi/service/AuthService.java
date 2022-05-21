@@ -4,7 +4,7 @@ import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
-import grooteogi.dto.auth.Oauthdto;
+import grooteogi.dto.auth.OauthDto;
 import grooteogi.dto.auth.Token;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
@@ -64,9 +64,9 @@ public class AuthService {
     return UserMapper.INSTANCE.toResponseDto(ruser, ruser.getUserInfo());
   }
 
-  private User registerDto(Oauthdto oauthdto) {
+  private User registerDto(OauthDto oauthDto) {
     User user = new User();
-    BeanUtils.copyProperties(oauthdto, user);
+    BeanUtils.copyProperties(oauthDto, user);
 
     return userRepository.save(user);
   }
@@ -103,16 +103,16 @@ public class AuthService {
     }
   }
 
-  public User oauth(Oauthdto oauthdto) {
-    Optional<User> userEmail = userRepository.findByEmail(oauthdto.getEmail());
+  public User oauth(OauthDto oauthDto) {
+    Optional<User> userEmail = userRepository.findByEmail(oauthDto.getEmail());
     User user;
     if (userEmail.isEmpty()) {
-      user = registerDto(oauthdto);
+      user = registerDto(oauthDto);
     } else {
       user = userEmail.get();
     }
 
-    if (!user.getType().equals(oauthdto.getType())) {
+    if (!user.getType().equals(oauthDto.getType())) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
 
