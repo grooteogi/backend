@@ -5,6 +5,7 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.Request;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -23,10 +24,11 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "id", ignore = true),
       @Mapping(source = "schedule", target = "schedule"),
       @Mapping(source = "user", target = "participateUser"),
-      @Mapping(source = "schedule.post.user", target = "hostUser")
+      @Mapping(source = "schedule.post.user", target = "hostUser"),
+      @Mapping(source = "isCanceled", target = "isCanceled")
   })
-  Reservation toEntity(ReservationDto.Request dto, User user,
-      Schedule schedule);
+  Reservation toEntity(Request dto, User user,
+      Schedule schedule, boolean isCanceled);
 
   @Mapping(target = "reservationId", source = "reservation.id")
   ReservationDto.Response toResponseDto(Reservation reservation);
@@ -37,7 +39,11 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "endTime", dateFormat = "HH:mm:ss"),
       @Mapping(target = "postId", source = "post.id")
   })
-  ReservationDto.Responses toResponseDtos(Reservation reservation, Post post, Schedule schedule);
+  ReservationDto.DetailResponse toDetailResponseDto(Reservation reservation,
+      Post post, Schedule schedule);
+
+  @Mapping(source = "isCanceled", target = "isCanceled")
+  Reservation toModifyIsCanceled(Reservation reservation, boolean isCanceled);
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")

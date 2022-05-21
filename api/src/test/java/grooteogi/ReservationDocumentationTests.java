@@ -19,6 +19,7 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.DetailResponse;
 import grooteogi.mapper.ReservationMapper;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
@@ -151,11 +152,11 @@ public class ReservationDocumentationTests {
 
   }
 
-  private ReservationDto.Responses getResponses() {
+  private DetailResponse getResponses() {
     List<String> stringTags = new ArrayList<>();
     getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getName()));
-    ReservationDto.Responses response = ReservationMapper
-        .INSTANCE.toResponseDtos(getEntity(), getPost(), schedule);
+    DetailResponse response = ReservationMapper
+        .INSTANCE.toDetailResponseDto(getEntity(), getPost(), schedule);
     response.setHashtags(stringTags);
     return response;
   }

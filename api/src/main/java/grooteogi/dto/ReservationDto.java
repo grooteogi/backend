@@ -19,7 +19,7 @@ public class ReservationDto {
 
   @Data
   @Builder
-  public static class Responses {
+  public static class DetailResponse {
 
     private String title;
     private String date;

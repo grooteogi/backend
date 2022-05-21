@@ -1,6 +1,7 @@
 package grooteogi.controller;
 
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.DetailResponse;
 import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
@@ -28,7 +29,7 @@ public class ReservationController {
 
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    ReservationDto.Responses response = reservationService.getReservation(reservationId);
+    ReservationDto.DetailResponse response = reservationService.getReservation(reservationId);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("get reservation success").data(response).build());
   }
@@ -36,10 +37,10 @@ public class ReservationController {
   @GetMapping("/filter")
   public ResponseEntity<BasicResponse> getReservation(
       @RequestParam(name = "isHost") boolean isHost,
-      @RequestParam(name = "filter", required = false) String filter)  {
+      @RequestParam(name = "filter") String filter)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    List<ReservationDto.Responses> reservations;
+    List<ReservationDto.DetailResponse> reservations;
 
     reservations = reservationService.getReservation(isHost, session.getId(), filter);
 
@@ -52,7 +53,7 @@ public class ReservationController {
       @RequestParam(name = "isHost") boolean isHost)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    List<ReservationDto.Responses> reservations =
+    List<ReservationDto.DetailResponse> reservations =
         reservationService.getReservation(isHost, session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder()

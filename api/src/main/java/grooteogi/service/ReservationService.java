@@ -41,17 +41,17 @@ public class ReservationService {
 
   private final SmsClient smsClient;
 
-  public ReservationDto.Responses getReservation(Integer reservationId) {
+  public ReservationDto.DetailResponse getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    return ReservationMapper.INSTANCE.toResponseDtos(reservation.get(), post, schedule);
+    return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule);
   }
 
-  public List<ReservationDto.Responses> getReservation(boolean isHost, Integer userId) {
+  public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId) {
     List<Reservation> reservationList = (isHost) ? reservationRepository.findAllByHostUserId(userId)
         : reservationRepository.findAllByParticipateUserId(userId);
     return modifyResponseDto(reservationList);
@@ -62,7 +62,7 @@ public class ReservationService {
    * Reservation DB isCanceled boolean으로 다시 저장
    *
    * */
-  public List<ReservationDto.Responses> getReservation(boolean isHost, Integer userId,
+  public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
       String filter) {
     // CANCELED, PROCEED, COMPLETE
     // CANCELED, UNCANCELED
@@ -101,20 +101,20 @@ public class ReservationService {
 
   }
 
-  private List<ReservationDto.Responses> modifyResponseDto(List<Reservation> reservations) {
+  private List<ReservationDto.DetailResponse> modifyResponseDto(List<Reservation> reservations) {
     if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
-    List<ReservationDto.Responses> responseList = new ArrayList<>();
+    List<ReservationDto.DetailResponse> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
-      ReservationDto.Responses responses =
-          ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-      responses.setHashtags(getTags(post.getPostHashtags()));
-      responseList.add(responses);
+      ReservationDto.DetailResponse detailResponse =
+          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule);
+      detailResponse.setHashtags(getTags(post.getPostHashtags()));
+      responseList.add(detailResponse);
     });
     return responseList;
   }
@@ -148,8 +148,7 @@ public class ReservationService {
     }
 
     Reservation createdReservation = ReservationMapper.INSTANCE.toEntity(request, user.get(),
-        schedule.get());
-    createdReservation.setIsCanceled(false);
+        schedule.get(), false);
     Reservation savedReservation = reservationRepository.save(createdReservation);
     return ReservationMapper.INSTANCE.toResponseDto(savedReservation);
   }
@@ -192,9 +191,10 @@ public class ReservationService {
       throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
     }
 
-    reservation.get().setIsCanceled(true);
-    reservationRepository.save(reservation.get());
-    return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
+    Reservation modifiedReservation =
+        ReservationMapper.INSTANCE.toModifyIsCanceled(reservation.get(), true);
+    reservationRepository.save(modifiedReservation);
+    return ReservationMapper.INSTANCE.toResponseDto(modifiedReservation);
   }
 
   public SendSmsResponse sendSms(String phoneNumber) {
