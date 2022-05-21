@@ -64,9 +64,9 @@ public class AuthService {
     return UserMapper.INSTANCE.toResponseDto(ruser, ruser.getUserInfo());
   }
 
-  private User registerDto(Oauthdto userDto) {
+  private User registerDto(Oauthdto oauthdto) {
     User user = new User();
-    BeanUtils.copyProperties(userDto, user);
+    BeanUtils.copyProperties(oauthdto, user);
 
     return userRepository.save(user);
   }
@@ -103,16 +103,16 @@ public class AuthService {
     }
   }
 
-  public User oauth(Oauthdto userDto) {
-    Optional<User> userEmail = userRepository.findByEmail(userDto.getEmail());
+  public User oauth(Oauthdto oauthdto) {
+    Optional<User> userEmail = userRepository.findByEmail(oauthdto.getEmail());
     User user;
     if (userEmail.isEmpty()) {
-      user = registerDto(userDto);
+      user = registerDto(oauthdto);
     } else {
       user = userEmail.get();
     }
 
-    if (!user.getType().equals(userDto.getType())) {
+    if (!user.getType().equals(oauthdto.getType())) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
 
