@@ -57,15 +57,13 @@ public class ReservationService {
     return modifyResponseDto(reservationList);
   }
 
-  /*
-   * ReservationType -> CANCELED, PROCEED , COMPLETE 로 변경 <- 이건 프론트에서 전달 받을 때 사용
-   * Reservation DB isCanceled boolean으로 다시 저장
-   *
-   * */
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
       String filter) {
-    // CANCELED, PROCEED, COMPLETE
-    // CANCELED, UNCANCELED
+
+    if (filter == null) {
+      getReservation(isHost, userId);
+    }
+
     List<Reservation> reservationList = (isHost) ? reservationRepository.findAllByHostUserId(userId)
         : reservationRepository.findAllByParticipateUserId(userId);
 
