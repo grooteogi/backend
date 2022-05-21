@@ -95,7 +95,7 @@ public class AuthDocumentationTests {
     User testUser = getTestUser(); // for response
 
     // when
-    given(authService.register(any())).willReturn(testUser);
+    given(authService.register(any())).willReturn(any());
 
     // then
     ResultActions result = mockMvc.perform(
