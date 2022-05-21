@@ -32,7 +32,7 @@ public class ReviewService {
 
   public void createReview(ReviewDto.Request request, Integer userId) {
 
-    Optional<Reservation> reservation = reservationRepository.findByIdUncanceled(
+    Optional<Reservation> reservation = reservationRepository.findUncanceledById(
         request.getReservationId());
 
     if (reservation.isEmpty()) {
