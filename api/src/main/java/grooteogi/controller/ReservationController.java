@@ -36,7 +36,7 @@ public class ReservationController {
   @GetMapping
   public ResponseEntity<BasicResponse> getReservation(
       @RequestParam(name = "isHost") boolean isHost,
-      @RequestParam(name = "filter") String filter)  {
+      @RequestParam(name = "filter", required = false) String filter)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     List<ReservationDto.DetailResponse> reservations;
