@@ -173,11 +173,6 @@ public class PostService {
           .filter(post -> post.getHearts().size() > 0)
           .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
           .collect(Collectors.toList());
-      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
-    } else if (postFilterEnum == PostFilterEnum.LATEST) {
-      List<Post> filteredPostList = postList.stream()
-          .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
-          .collect(Collectors.toList());
       Collections.reverse(filteredPostList);
       return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
     }
