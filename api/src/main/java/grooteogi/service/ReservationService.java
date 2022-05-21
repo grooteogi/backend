@@ -51,21 +51,15 @@ public class ReservationService {
     return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule);
   }
 
-  public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId) {
-    List<Reservation> reservationList = (isHost) ? reservationRepository.findAllByHostUserId(userId)
-        : reservationRepository.findAllByParticipateUserId(userId);
-    return modifyResponseDto(reservationList);
-  }
-
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
       String filter) {
 
-    if (filter == null) {
-      getReservation(isHost, userId);
-    }
-
     List<Reservation> reservationList = (isHost) ? reservationRepository.findAllByHostUserId(userId)
         : reservationRepository.findAllByParticipateUserId(userId);
+
+    if (filter == null) {
+      return modifyResponseDto(reservationList);
+    }
 
     List<Reservation> dateFilteredList = new ArrayList<>();
 
