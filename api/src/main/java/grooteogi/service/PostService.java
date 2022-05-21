@@ -45,9 +45,6 @@ public class PostService {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
-    Optional<Post> weqwe = this.postRepository.findById(postId);
-    System.out.println(weqwe.get().getHearts().size());
-
     //조회수 증가
     Optional<Post> post = this.postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
