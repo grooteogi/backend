@@ -13,3 +13,7 @@ spring:
   redis:
     host: ${REDIS_URL}
     port: 6379
+  data:
+    redis:
+      repositories:
+        enabled: false
