@@ -5,7 +5,6 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
-import grooteogi.enums.ReservationType;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -21,14 +20,13 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
   ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
 
   @Mappings({
-      @Mapping(source = "status", target = "status"),
       @Mapping(target = "id", ignore = true),
       @Mapping(source = "schedule", target = "schedule"),
       @Mapping(source = "user", target = "participateUser"),
       @Mapping(source = "schedule.post.user", target = "hostUser")
   })
   Reservation toEntity(ReservationDto.Request dto, User user,
-      Schedule schedule, ReservationType status);
+      Schedule schedule);
 
   @Mapping(target = "reservationId", source = "reservation.id")
   ReservationDto.Response toResponseDto(Reservation reservation);
@@ -37,18 +35,9 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", dateFormat = "HH:mm:ss"),
       @Mapping(target = "endTime", dateFormat = "HH:mm:ss"),
-      @Mapping(target = "postId", source = "post.id"),
-      @Mapping(target = "status", source = "reservation.status")
+      @Mapping(target = "postId", source = "post.id")
   })
   ReservationDto.Responses toResponseDtos(Reservation reservation, Post post, Schedule schedule);
-
-  default ReservationType map(Integer value) {
-    return ReservationType.valueOf(value);
-  }
-
-  default Integer map(ReservationType status) {
-    return status.getValue();
-  }
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")

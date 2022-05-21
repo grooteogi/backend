@@ -1,6 +1,6 @@
 package grooteogi.enums;
 
-public enum ReservationType {
+public enum ReservationStatus {
   CANCELED,
   PROCEED,
   COMPLETE
