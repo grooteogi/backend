@@ -1,6 +1,7 @@
 package grooteogi.mapper;
 
 import grooteogi.domain.Post;
+import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
@@ -30,7 +31,10 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "user", target = "user")
   @Mapping(target = "id", ignore = true)
-  Post toEntity(Request dto, User user);
+  @Mapping(source = "schedules", target = "schedules")
+  @Mapping(source = "postHashtags", target = "postHashtags")
+  Post toEntity(Request dto, User user, List<Schedule> schedules,
+      List<PostHashtag> postHashtags);
 
   @Mapping(source = "post.id", target = "postId")
   @Mapping(source = "post.title", target = "title")
