@@ -93,19 +93,17 @@ public class PostService {
 
   public PostDto.CreateResponse createPost(PostDto.Request request, Integer userId) {
 
-    List<Schedule> requests = createSchedule(request.getSchedules());
+    List<Schedule> schedules = createSchedule(request.getSchedules());
 
     List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
 
     Optional<User> user = userRepository.findById(userId);
 
-    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get());
-    createdPost.setSchedules(requests);
-    createdPost.setPostHashtags(postHashtags);
+    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), schedules, postHashtags);
 
     Post savedPost = postRepository.save(createdPost);
 
-    requests.forEach(schedule -> {
+    schedules.forEach(schedule -> {
       schedule.setPost(savedPost);
       scheduleRepository.save(schedule);
     });
