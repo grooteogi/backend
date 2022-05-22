@@ -10,18 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
-  @Query(
-      value = "SELECT * FROM post WHERE (title LIKE %:title% OR content LIKE %:content%)",
-      nativeQuery = true
-  )
-  List<Post> findBySearch(@Param("title") String title,
-      @Param("content") String content, Pageable pageable);
-
-  @Query(
-      value = "SELECT * FROM post",
-      nativeQuery = true
-  )
-  List<Post> findAllByPage(Pageable pageable);
-
   Boolean existsByUser(User user);
+
+  @Query(
+      value = "SELECT * FROM post WHERE (title LIKE %:keyword% OR content LIKE %:keyword%)",
+      nativeQuery = true
+  )
+  List<Post> findAllByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
 }

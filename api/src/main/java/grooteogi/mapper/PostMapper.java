@@ -65,6 +65,9 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.postHashtags", target = "hashtags", ignore = true)
   PostDto.SearchResponse toSearchResponseDto(Post post);
 
+  @Mapping(source = "post.id", target = "postId")
+  List<PostDto.Response> toResponseListDto(List<Post> post);
+
   @Mappings({
       @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),

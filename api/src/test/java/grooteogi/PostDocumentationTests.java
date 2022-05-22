@@ -253,19 +253,19 @@ public class PostDocumentationTests {
     // given
     String keyword = anyString();
     Pageable page = PageRequest.of(0, 20);
-    String sort = anyString();
+    String filter = anyString();
 
     PostDto.SearchResponse post = postSearchRes();
-    List<PostDto.SearchResponse> createResponse = new ArrayList<>();
-    createResponse.add(post);
+    List<PostDto.SearchResponse> searchResponse = new ArrayList<>();
+    searchResponse.add(post);
 
     // when
-    given(postService.search(keyword, sort, eq(page))).willReturn(createResponse);
+    given(postService.search(keyword, filter, eq(page))).willReturn(searchResponse);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post?keyword={keyword}&page={page}&sort={sort}",
-                keyword, 1, sort)
+            .get("/post?keyword={keyword}&page={page}&filter={filter}",
+                keyword, 1, filter)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
 

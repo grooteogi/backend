@@ -10,8 +10,8 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
+import grooteogi.enums.PostFilterEnum;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;
@@ -26,8 +26,11 @@ import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -117,7 +120,7 @@ public class PostService {
   }
 
   @Transactional
-  public PostDto.Response modifyPost(Request request, Integer postId, Integer userId) {
+  public PostDto.Response modifyPost(PostDto.Request request, Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
     int writer = post.get().getUser().getId();
 
@@ -174,35 +177,56 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.SearchResponse> search(String keyword, String sort, Pageable page) {
-    final List<PostDto.SearchResponse> posts;
-    if (keyword == null) {
-      posts = searchAllPosts(page, sort);
-    } else {
-      posts = searchPosts(keyword, page, sort);
+  public List<PostDto.SearchResponse> search(String keyword, String filter,
+      Pageable page) {
+    return keyword == null ? searchAllPosts(page, filter) : searchPosts(keyword, page, filter);
+  }
+
+  private List<PostDto.SearchResponse> filter(List<Post> postList, String filter) {
+
+    PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
+
+    List<PostDto.SearchResponse> responses = new ArrayList<>();
+
+    if (postFilterEnum == PostFilterEnum.VIEWS) {
+      List<Post> filteredPostList = postList.stream()
+          .sorted(Comparator.comparingInt(Post::getViews).reversed())
+          .collect(Collectors.toList());
+
+      filteredPostList.forEach(
+          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
+      return responses;
+
+    } else if (postFilterEnum == PostFilterEnum.POPULAR) {
+      List<Post> filteredPostList = postList.stream()
+          .filter(post -> post.getHearts().size() > 0)
+          .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
+          .collect(Collectors.toList());
+      Collections.reverse(filteredPostList);
+
+      filteredPostList.forEach(
+          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
+      return responses;
+
     }
-    return posts;
-  }
 
+    Collections.reverse(postList);
 
-  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String sort) {
-    List<PostDto.SearchResponse> responses = new ArrayList<>();
-    this.postRepository.findAllByPage(page).forEach(result -> {
-      PostDto.SearchResponse response = PostMapper.INSTANCE.toSearchResponseDto(result);
-      response.setHashtags(getPostHashtags(result.getPostHashtags()));
-      responses.add(response);
-    });
+    postList.forEach(post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
     return responses;
   }
 
-  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String sort) {
-    List<PostDto.SearchResponse> responses = new ArrayList<>();
-    this.postRepository.findBySearch(keyword, keyword, page).forEach(result -> {
-      PostDto.SearchResponse response = PostMapper.INSTANCE.toSearchResponseDto(result);
-      response.setHashtags(getPostHashtags(result.getPostHashtags()));
-      responses.add(response);
-    });
-    return responses;
+  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String filter) {
+    List<Post> posts = postRepository.findAll();
+    return filter(posts, filter);
+  }
+
+  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String filter) {
+    List<Post> posts = postRepository.findAllByKeyword(keyword, page);
+    return filter(posts, filter);
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
