@@ -179,38 +179,54 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.Response> search(String keyword, String filter,
+  public List<PostDto.SearchResponse> search(String keyword, String filter,
       Pageable page) {
     return keyword == null ? searchAllPosts(page, filter) : searchPosts(keyword, page, filter);
   }
 
-  private List<PostDto.Response> filter(List<Post> postList, String filter) {
+  private List<PostDto.SearchResponse> filter(List<Post> postList, String filter) {
 
     PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
+
+    List<PostDto.SearchResponse> responses = new ArrayList<>();
 
     if (postFilterEnum == PostFilterEnum.VIEWS) {
       List<Post> filteredPostList = postList.stream()
           .sorted(Comparator.comparingInt(Post::getViews).reversed())
           .collect(Collectors.toList());
-      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
+
+      filteredPostList.forEach(
+          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
+      return responses;
+
     } else if (postFilterEnum == PostFilterEnum.POPULAR) {
       List<Post> filteredPostList = postList.stream()
           .filter(post -> post.getHearts().size() > 0)
           .sorted(Comparator.comparingInt(post -> post.getHearts().size()))
           .collect(Collectors.toList());
       Collections.reverse(filteredPostList);
-      return PostMapper.INSTANCE.toResponseListDto(filteredPostList);
+
+      filteredPostList.forEach(
+          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
+      return responses;
+
     }
 
-    return PostMapper.INSTANCE.toResponseListDto(postList);
+    Collections.reverse(postList);
+
+    postList.forEach(post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+
+    return responses;
   }
 
-  public List<PostDto.Response> searchAllPosts(Pageable page, String filter) {
+  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String filter) {
     List<Post> posts = postRepository.findAll();
     return filter(posts, filter);
   }
 
-  private List<PostDto.Response> searchPosts(String keyword, Pageable page, String filter) {
+  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String filter) {
     List<Post> posts = postRepository.findAllByKeyword(keyword, page);
     return filter(posts, filter);
   }
