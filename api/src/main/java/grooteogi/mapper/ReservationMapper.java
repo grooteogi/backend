@@ -5,7 +5,7 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
-import grooteogi.enums.ReservationType;
+import grooteogi.dto.ReservationDto.Request;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -15,21 +15,20 @@ import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(
-    unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ReservationMapper extends BasicMapper<ReservationDto, Reservation> {
 
   ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
 
   @Mappings({
-      @Mapping(source = "status", target = "status"),
       @Mapping(target = "id", ignore = true),
       @Mapping(source = "schedule", target = "schedule"),
       @Mapping(source = "user", target = "participateUser"),
-      @Mapping(source = "schedule.post.user", target = "hostUser")
+      @Mapping(source = "schedule.post.user", target = "hostUser"),
+      @Mapping(source = "isCanceled", target = "isCanceled")
   })
-  Reservation toEntity(ReservationDto.Request dto, User user,
-      Schedule schedule, ReservationType status);
+  Reservation toEntity(Request dto, User user,
+      Schedule schedule, boolean isCanceled);
 
   @Mapping(target = "reservationId", source = "reservation.id")
   ReservationDto.Response toResponseDto(Reservation reservation);
@@ -38,18 +37,13 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", dateFormat = "HH:mm:ss"),
       @Mapping(target = "endTime", dateFormat = "HH:mm:ss"),
-      @Mapping(target = "postId", source = "post.id"),
-      @Mapping(target = "status", source = "reservation.status")
+      @Mapping(target = "postId", source = "post.id")
   })
-  ReservationDto.Responses toResponseDtos(Reservation reservation, Post post, Schedule schedule);
+  ReservationDto.DetailResponse toDetailResponseDto(Reservation reservation,
+      Post post, Schedule schedule);
 
-  default ReservationType map(Integer value) {
-    return ReservationType.valueOf(value);
-  }
-
-  default Integer map(ReservationType status) {
-    return status.getValue();
-  }
+  @Mapping(source = "isCanceled", target = "isCanceled")
+  Reservation toModifyIsCanceled(Reservation reservation, boolean isCanceled);
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")
@@ -60,9 +54,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
     if (date == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-      String ss = sdf.format(new java.util.Date());
-      return Date.valueOf(ss);
+      return java.sql.Date.valueOf(date);
     }
   }
 
@@ -75,9 +67,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
     if (time == null) {
       return null;
     } else {
-      SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-      String ss = sdf.format(new java.util.Date());
-      return Time.valueOf(ss);
+      return java.sql.Time.valueOf(time);
     }
   }
 }

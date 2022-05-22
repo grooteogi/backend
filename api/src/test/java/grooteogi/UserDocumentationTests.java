@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.controller.UserController;
 import grooteogi.domain.User;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.UserDto.Password;
+import grooteogi.dto.UserDto.PasswordRequest;
 import grooteogi.enums.LoginType;
 import grooteogi.service.UserService;
 import java.util.ArrayList;
@@ -180,7 +180,7 @@ public class UserDocumentationTests {
   @DisplayName("비밀번호 변경")
   @Test
   void updatePassword() throws Exception {
-    UserDto.Password password = new Password("groot1234*");
+    UserDto.PasswordRequest password = new PasswordRequest("groot1234*");
     int userId = anyInt();
 
     User testUser = getTestUser();

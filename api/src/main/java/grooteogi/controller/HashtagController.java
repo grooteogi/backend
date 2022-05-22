@@ -1,6 +1,6 @@
 package grooteogi.controller;
 
-import grooteogi.dto.hashtag.HashtagDto;
+import grooteogi.dto.HashtagDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.HashtagService;
 import java.util.List;

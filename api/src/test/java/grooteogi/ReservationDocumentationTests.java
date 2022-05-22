@@ -3,7 +3,6 @@ package grooteogi;
 import static grooteogi.ApiDocumentUtils.getPost;
 import static grooteogi.ApiDocumentUtils.getPostHashtags;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -20,6 +19,7 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.DetailResponse;
 import grooteogi.mapper.ReservationMapper;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
@@ -102,59 +102,6 @@ public class ReservationDocumentationTests {
     verify(reservationService).getReservation(1);
   }
 
-  @Test
-  @DisplayName("호스트유저 예약조회")
-  public void getHostReservation() throws Exception {
-    // given
-    List<ReservationDto.Responses> responses = new ArrayList<>();
-    ReservationDto.Responses response = getResponses();
-    responses.add(response);
-
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
-
-    // when
-    given(reservationService.getHostReservation(anyInt(), anyString())).willReturn(responses);
-
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders
-            .get("/reservation/host").characterEncoding("uft-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    // then
-    resultActions.andExpect(status().isOk()).andDo(print());
-    verify(reservationService).getHostReservation(anyInt(), anyString());
-
-  }
-
-  @Test
-  @DisplayName("참가자유저 예약조회")
-  public void getUserReservation() throws Exception {
-    // given
-    List<ReservationDto.Responses> responses = new ArrayList<>();
-    ReservationDto.Responses response = getResponses();
-    responses.add(response);
-
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
-
-    // when
-    given(reservationService.getUserReservation(anyInt(), anyString())).willReturn(responses);
-
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders
-            .get("/reservation/apply").characterEncoding("uft-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    // then
-    resultActions.andExpect(status().isOk()).andDo(print());
-
-    verify(reservationService).getUserReservation(anyInt(), anyString());
-  }
 
   @Test
   @DisplayName("예약생성")
@@ -202,14 +149,14 @@ public class ReservationDocumentationTests {
     //then
     resultActions.andExpect(status().isOk())
         .andDo(print());
-    verify(reservationService).deleteReservation(reservationId);
+
   }
 
-  private ReservationDto.Responses getResponses() {
+  private DetailResponse getResponses() {
     List<String> stringTags = new ArrayList<>();
     getPostHashtags().forEach(postHashtag -> stringTags.add(postHashtag.getHashTag().getName()));
-    ReservationDto.Responses response = ReservationMapper
-        .INSTANCE.toResponseDtos(getEntity(), getPost(), schedule);
+    DetailResponse response = ReservationMapper
+        .INSTANCE.toDetailResponseDto(getEntity(), getPost(), schedule);
     response.setHashtags(stringTags);
     return response;
   }

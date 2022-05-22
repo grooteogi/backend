@@ -11,14 +11,17 @@ public class UserDto {
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class Password {
-    String password;
+  public static class PasswordRequest {
 
+    String password;
   }
 
   @Data
   @Builder
   public static class Response {
 
+    private int userId;
+    private String nickname;
+    private String imageUrl;
   }
 }

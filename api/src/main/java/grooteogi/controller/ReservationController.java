@@ -1,10 +1,10 @@
 package grooteogi.controller;
 
 import grooteogi.dto.ReservationDto;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.Session;
-import grooteogi.utils.SmsClient;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,32 +26,25 @@ public class ReservationController {
 
   private final ReservationService reservationService;
 
-  @GetMapping("/host")
-  public ResponseEntity<BasicResponse> getHostReservation(
-      @RequestParam(name = "sort", required = false) String sort)  {
-    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-
-    List<ReservationDto.Responses> reservationList = reservationService.getHostReservation(
-        session.getId(), sort);
-    return ResponseEntity.ok(BasicResponse.builder().data(reservationList).build());
-  }
-
   @GetMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> getReservation(@PathVariable Integer reservationId) {
-    ReservationDto.Responses response = reservationService.getReservation(reservationId);
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    ReservationDto.DetailResponse response = reservationService.getReservation(reservationId);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get reservation success").data(response).build());
   }
 
-  @GetMapping("/apply")
-  public ResponseEntity<BasicResponse> getUserReservation(
-      @RequestParam(name = "sort", required = false) String sort)  {
+  @GetMapping
+  public ResponseEntity<BasicResponse> getReservation(
+      @RequestParam(name = "isHost") boolean isHost,
+      @RequestParam(name = "filter", required = false) String filter)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
+    List<ReservationDto.DetailResponse> reservations;
 
-    List<ReservationDto.Responses> reservations = reservationService.getUserReservation(
-        session.getId(), sort);
-    return ResponseEntity.ok(BasicResponse.builder().data(reservations).build());
+    reservations = reservationService.getReservation(isHost, session.getId(), filter);
+
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get reservation list with filtering success").data(reservations).build());
   }
 
   @PostMapping
@@ -62,24 +55,46 @@ public class ReservationController {
 
     ReservationDto.Response createdReservation = reservationService.createReservation(request,
         session.getId());
-    return ResponseEntity.ok(BasicResponse.builder().data(createdReservation).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("create reservation success").data(createdReservation).build());
   }
 
   @DeleteMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> deleteReservation(@PathVariable Integer reservationId) {
-    this.reservationService.deleteReservation(reservationId);
-    return ResponseEntity.ok(BasicResponse.builder().message("delete reservation success").build());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    reservationService.deleteReservation(reservationId, session.getId());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("delete reservation success").build());
   }
 
   @PatchMapping("/{reservationId}")
   public ResponseEntity<BasicResponse> modifyStatus(@PathVariable Integer reservationId) {
-    ReservationDto.Response response = this.reservationService.modifyStatus(reservationId);
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    ReservationDto.Response response =
+        reservationService.modifyStatus(reservationId, session.getId());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("modify reservation status success").data(response).build());
   }
   
   @PostMapping("/send-sms")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
-    ReservationDto.SmsCode response = this.reservationService.sendSms(phoneNumber);
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    SendSmsResponse response = this.reservationService.sendSms(phoneNumber);
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("send sms code success").data(response).build());
   }
+
+  @PostMapping("/check-sms")
+  public ResponseEntity<BasicResponse> checkVerifySms(
+      @RequestBody ReservationDto.CheckSmsRequest request) {
+    reservationService.checkVerifySms(request);
+
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("check sms success").build());
+  }
+
+
 }

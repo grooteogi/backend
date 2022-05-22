@@ -2,7 +2,8 @@ package grooteogi.mapper;
 
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
-import grooteogi.dto.auth.AuthDto;
+import grooteogi.dto.AuthDto;
+import grooteogi.enums.LoginType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -15,15 +16,20 @@ public interface UserMapper extends BasicMapper<AuthDto, User> {
   UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
   @Mappings({
-      @Mapping(source = "dto.email", target = "email"),
-      @Mapping(source = "dto.password", target = "password")
-  })
-  User toEntity(AuthDto.Request dto);
-
-  @Mappings({
       @Mapping(source = "user.nickname", target = "nickname"),
       @Mapping(source = "userInfo.imageUrl", target = "imageUrl")
   })
   AuthDto.Response toResponseDto(User user, UserInfo userInfo);
 
+  @Mappings({
+      @Mapping(source = "dto.email", target = "email"),
+      @Mapping(source = "dto.password", target = "password")
+  })
+  User toEntity(AuthDto.Request dto);
+
+  @Mapping(source = "dto.email", target = "email")
+  @Mapping(source = "dto.password", target = "password")
+  @Mapping(source = "general", target = "type")
+  @Mapping(target = "nickname", defaultValue = "groot")
+  User toEntity(AuthDto.Request dto, LoginType general, String nickname);
 }

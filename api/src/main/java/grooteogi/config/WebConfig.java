@@ -24,6 +24,6 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new UserInterceptor(jwtProvider))
-        .excludePathPatterns("/auth/**");
+        .excludePathPatterns("/auth/**", "/hashtag/search/**", "/post/search/**");
   }
 }

@@ -6,7 +6,9 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
-import grooteogi.enums.ReservationType;
+import grooteogi.dto.ReservationDto.CheckSmsRequest;
+import grooteogi.dto.ReservationDto.SendSmsResponse;
+import grooteogi.enums.ReservationStatus;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.ReservationMapper;
@@ -14,13 +16,14 @@ import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.RedisClient;
 import grooteogi.utils.SmsClient;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,100 +35,78 @@ public class ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+  private final RedisClient redisClient;
+
+  private final String prefix = "sms_verify";
 
   private final SmsClient smsClient;
 
-  public ReservationDto.Responses getReservation(Integer reservationId) {
+  public ReservationDto.DetailResponse getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    ReservationDto.Responses responses = ReservationMapper.INSTANCE
-        .toResponseDtos(reservation.get(), post, schedule);
-    return responses;
+    return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule);
   }
 
-  public List<ReservationDto.Responses> getHostReservation(int userId, String sort) {
-    // CANCEL 여부 확인
-    ReservationType status =
-        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
-    List<Reservation> reservations =
-        reservationRepository.findByHostUserIdAndStatusOrderByIdDesc(userId, status);
+  public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
+      String filter) {
 
-    // DATE 필터링
-    List<ReservationDto.Responses> responses = (status.getValue() == 0)
-        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
-    return responses;
-  }
+    List<Reservation> reservationList = (isHost) ? reservationRepository.findAllByHostUserId(userId)
+        : reservationRepository.findAllByParticipateUserId(userId);
 
-  public List<ReservationDto.Responses> getUserReservation(Integer userId, String sort) {
-    // CANCEL 여부 확인
-    ReservationType status =
-        (sort.equals("CANCEL")) ? ReservationType.CANCELED : ReservationType.UNCANCELED;
-    List<Reservation> reservations =
-        reservationRepository.findByParticipateUserIdAndStatusOrderByIdDesc(userId, status);
-
-    // DATE 필터링
-    List<ReservationDto.Responses> responses = (status.getValue() == 0)
-        ? getReservationDto(reservations) : getSortedReservationDto(reservations, sort);
-    return responses;
-  }
-
-  private List<ReservationDto.Responses> getSortedReservationDto(
-      List<Reservation> reservations, String sort) {
-
-    if (reservations.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
+    if (filter == null) {
+      return modifyResponseDto(reservationList);
     }
-    List<ReservationDto.Responses> responseList = new ArrayList<>();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String ss = sdf.format(new java.util.Date());
-    Date now = Date.valueOf(ss);
-    reservations.forEach(reservation -> {
-      Schedule schedule = reservation.getSchedule();
-      Post post = schedule.getPost();
-      Date date = schedule.getDate();
-      if (sort.equals("PROCEED")) {
-        if (date.before(now)) {
-          ReservationDto.Responses responses =
-              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-          responses.setHashtags(getTags(post.getPostHashtags()));
-          responseList.add(responses);
-        }
-      } else if (sort.equals("COMPLETE")) {
-        if (date.after(now)) {
-          ReservationDto.Responses responses =
-              ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-          responses.setHashtags(getTags(post.getPostHashtags()));
-          responseList.add(responses);
+
+    List<Reservation> dateFilteredList = new ArrayList<>();
+
+    ReservationStatus reservationStatus = ReservationStatus.valueOf(filter);
+
+    List<Reservation> filteredList = reservationList.stream().filter(
+        reservation ->
+            reservation.getIsCanceled() == (reservationStatus == ReservationStatus.CANCELED)
+    ).collect(Collectors.toList());
+
+    if (reservationStatus == ReservationStatus.CANCELED) {
+      return modifyResponseDto(filteredList);
+    }
+
+    long miliseconds = System.currentTimeMillis();
+    Date now = new Date(miliseconds);
+    filteredList.forEach(reservation -> {
+      Date scheduleDate = reservation.getSchedule().getDate();
+      if (reservationStatus == ReservationStatus.COMPLETE) {
+        if (now.after(scheduleDate)) {
+          dateFilteredList.add(reservation);
         }
       } else {
-        ReservationDto.Responses responses =
-            ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-        responses.setHashtags(getTags(post.getPostHashtags()));
-        responseList.add(responses);
+        if (now.before(scheduleDate)) {
+          dateFilteredList.add(reservation);
+        }
       }
-
     });
-    return responseList;
+
+    return modifyResponseDto(dateFilteredList);
+
   }
 
-  private List<ReservationDto.Responses> getReservationDto(List<Reservation> reservations) {
+  private List<ReservationDto.DetailResponse> modifyResponseDto(List<Reservation> reservations) {
     if (reservations.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
-    List<ReservationDto.Responses> responseList = new ArrayList<>();
+    List<ReservationDto.DetailResponse> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
-      ReservationDto.Responses responses =
-          ReservationMapper.INSTANCE.toResponseDtos(reservation, post, schedule);
-      responses.setHashtags(getTags(post.getPostHashtags()));
-      responseList.add(responses);
+      ReservationDto.DetailResponse detailResponse =
+          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule);
+      detailResponse.setHashtags(getTags(post.getPostHashtags()));
+      responseList.add(detailResponse);
     });
     return responseList;
   }
@@ -155,42 +136,76 @@ public class ReservationService {
 
     boolean isWriter = postRepository.existsByUser(user.get());
     if (isWriter) {
-      throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.RESERVATION_HOST_EXCEPTION);
     }
 
-    Reservation createdReservation =
-        reservationRepository.save(ReservationMapper.INSTANCE.toEntity(request, user.get(),
-            schedule.get(), ReservationType.UNCANCELED));
-    return ReservationMapper.INSTANCE.toResponseDto(createdReservation);
+    Reservation createdReservation = ReservationMapper.INSTANCE.toEntity(request, user.get(),
+        schedule.get(), false);
+    Reservation savedReservation = reservationRepository.save(createdReservation);
+    return ReservationMapper.INSTANCE.toResponseDto(savedReservation);
   }
 
-  public void deleteReservation(Integer reservationId) {
+  public void deleteReservation(Integer reservationId, Integer userId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     if (reservation.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
+    int hostId = reservation.get().getHostUser().getId();
+    int participateId = reservation.get().getParticipateUser().getId();
+
+    if (hostId != userId && participateId != userId) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
+
     reservationRepository.delete(reservation.get());
   }
 
-  public ReservationDto.Response modifyStatus(Integer reservationId) {
+  public ReservationDto.Response modifyStatus(Integer reservationId, Integer userId) {
 
-    Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+    Optional<Reservation> reservation = reservationRepository.findUncanceledById(reservationId);
 
     if (reservation.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
     }
-    reservation.get().setStatus(ReservationType.CANCELED);
-    reservationRepository.save(reservation.get());
-    return ReservationMapper.INSTANCE.toResponseDto(reservation.get());
+    Schedule schedule = reservation.get().getSchedule();
+
+    long miliseconds = System.currentTimeMillis();
+    Date now = new Date(miliseconds);
+
+    if (now.before(schedule.getDate())) {
+      throw new ApiException(ApiExceptionEnum.NO_MODIFY_EXCEPTION);
+    }
+
+    int hostId = reservation.get().getHostUser().getId();
+    int participateId = reservation.get().getParticipateUser().getId();
+
+    if (hostId != userId && participateId != userId) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
+
+    Reservation modifiedReservation =
+        ReservationMapper.INSTANCE.toModifyIsCanceled(reservation.get(), true);
+    reservationRepository.save(modifiedReservation);
+    return ReservationMapper.INSTANCE.toResponseDto(modifiedReservation);
   }
-  
-  public ReservationDto.SmsCode sendSms(String phoneNumber) {
+
+  public SendSmsResponse sendSms(String phoneNumber) {
 
     Random rand = new Random();
     String numStr = String.format("%04d", rand.nextInt(10000));
 
     smsClient.certifiedPhoneNumber(phoneNumber, numStr);
-    return ReservationDto.SmsCode.builder()
+    String key = prefix + phoneNumber;
+    redisClient.setValue(key, numStr, 3L);
+    return SendSmsResponse.builder()
         .code(numStr).build();
+  }
+
+  public void checkVerifySms(CheckSmsRequest request) {
+    String key = prefix + request.getPhoneNumber();
+    String value = redisClient.getValue(key);
+    if (value == null || !value.equals(request.getCode())) {
+      throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
+    }
   }
 }

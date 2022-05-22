@@ -1,20 +1,27 @@
 package grooteogi.service;
 
 import grooteogi.domain.Hashtag;
+import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
+import grooteogi.domain.Reservation;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
+import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.Response;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.PostFilterEnum;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.HashtagMapper;
 import grooteogi.mapper.PostMapper;
 import grooteogi.repository.HashtagRepository;
+import grooteogi.repository.HeartRepository;
 import grooteogi.repository.PostHashtagRepository;
 import grooteogi.repository.PostRepository;
+import grooteogi.repository.ReservationRepository;
+import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import java.util.ArrayList;
@@ -38,50 +45,66 @@ public class PostService {
   private final UserRepository userRepository;
   private final HashtagRepository hashtagRepository;
   private final ScheduleRepository scheduleRepository;
+  private final ReviewRepository reviewRepository;
+  private final ReservationRepository reservationRepository;
+  private final HeartRepository heartRepository;
 
-  public PostDto.Response getPost(int postId) {
+  public PostDto.Response getPostResponse(Integer postId) {
 
     if (this.postRepository.findById(postId).isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
     //조회수 증가
-    Optional<Post> post = this.postRepository.findById(postId);
+    Optional<Post> post = postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
-    Post updatePost = this.postRepository.save(post.get());
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(updatePost);
-    return response;
+    Post updatePost = postRepository.save(post.get());
+
+    PostDto.Response result = PostMapper.INSTANCE.toDetailResponse(updatePost);
+
+    User user = post.get().getUser();
+    result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
+    return result;
   }
 
   private List<Schedule> createSchedule(List<ScheduleDto.Request> requests) {
     List<Schedule> schedules = PostMapper.INSTANCE.toScheduleEntities(requests);
 
-    schedules.forEach(schedule -> {
-      scheduleRepository.save(schedule);
-    });
+    scheduleRepository.saveAll(schedules);
     return schedules;
   }
 
-  public PostDto.Response createPost(PostDto.Request request) {
+  private List<String> getPostHashtags(List<PostHashtag> postHashtags) {
+    List<String> response = new ArrayList<>();
+    postHashtags.forEach(postHashtag -> response.add(postHashtag.getHashTag().getName()));
+    return response;
+  }
+
+  private List<PostHashtag> createPostHashtag(String[] postHashtags) {
+    List<PostHashtag> postHashtagList = new ArrayList<>();
+    Arrays.stream(postHashtags).forEach(name -> {
+      Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
+      hashtag.ifPresent(tag -> {
+        tag.setCount(tag.getCount() + 1);
+        PostHashtag createdPostHashtag = PostHashtag.builder().hashTag(tag).build();
+        postHashtagRepository.save(createdPostHashtag);
+        postHashtagList.add(createdPostHashtag);
+      });
+    });
+    return postHashtagList;
+  }
+
+  public PostDto.CreateResponse createPost(PostDto.Request request, Integer userId) {
 
     List<Schedule> requests = createSchedule(request.getSchedules());
 
-    Optional<User> user = this.userRepository.findById(request.getUserId());
+    List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
 
-    List<PostHashtag> postHashtags = new ArrayList<>();
-    Arrays.stream(request.getHashtags()).forEach(name -> {
-      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
-      hashtag.ifPresent(tag -> {
-        tag.setCount(tag.getCount() + 1);
-        PostHashtag createdPostHashtag = PostHashtag.builder()
-            .hashTag(tag)
-            .build();
-        postHashtags.add(createdPostHashtag);
-      });
-    });
+    Optional<User> user = userRepository.findById(userId);
 
-    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), postHashtags);
+    Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get());
     createdPost.setSchedules(requests);
+    createdPost.setPostHashtags(postHashtags);
 
     Post savedPost = postRepository.save(createdPost);
 
@@ -90,15 +113,23 @@ public class PostService {
       scheduleRepository.save(schedule);
     });
 
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(savedPost);
-    return response;
+    postHashtags.forEach(postHashtag -> {
+      postHashtag.setPost(savedPost);
+      postHashtagRepository.save(postHashtag);
+    });
+
+    return PostMapper.INSTANCE.toCreateResponseDto(savedPost);
   }
 
   @Transactional
-  public PostDto.Response modifyPost(PostDto.Request request, int postId) {
-    Optional<Post> post = this.postRepository.findById(postId);
+  public PostDto.Response modifyPost(PostDto.Request request, Integer postId, Integer userId) {
+    Optional<Post> post = postRepository.findById(postId);
+    int writer = post.get().getUser().getId();
 
-    //hashtag count - 1
+    if (userId != writer) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
+
     List<PostHashtag> postHashtagList = post.get().getPostHashtags();
 
     postHashtagList.forEach(postHashtag -> {
@@ -109,12 +140,11 @@ public class PostService {
 
     post.get().getPostHashtags().clear();
 
-    //PostHashtag 저장
     String[] hashtags = request.getHashtags();
 
     Arrays.stream(hashtags).forEach(name -> {
       PostHashtag modifiedPostHashtag = new PostHashtag();
-      Optional<Hashtag> hashtag = this.hashtagRepository.findByName(name);
+      Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
 
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
@@ -127,30 +157,25 @@ public class PostService {
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
     postRepository.save(modifiedPost);
-    PostDto.Response response = PostMapper.INSTANCE.toResponseDto(modifiedPost);
-    return response;
+    return PostMapper.INSTANCE.toDetailResponse(modifiedPost);
   }
 
-  public void deletePost(int postId) {
-    Optional<Post> post = this.postRepository.findById(postId);
+  public void deletePost(Integer postId, Integer userId) {
+    Optional<Post> post = postRepository.findById(postId);
+
+    int writer = post.get().getUser().getId();
+
+    if (userId != writer) {
+      throw new ApiException(ApiExceptionEnum.NO_PERMISSION_EXCEPTION);
+    }
 
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
-    List<PostHashtag> postHashtagList = post.get().getPostHashtags();
+    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+    reservationRepository.deleteAll(reservations);
 
-    postHashtagList.forEach(postHashtag -> {
-      Optional<Hashtag> hashtag = this.hashtagRepository.findById(postHashtag.getHashTag().getId());
-      hashtag.get().setCount(hashtag.get().getCount() - 1);
-    });
-
-    List<Schedule> schedules = scheduleRepository.findByPost(post.get());
-
-    if (schedules.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
-    }
-    schedules.forEach(schedule -> scheduleRepository.delete(schedule));
     this.postRepository.delete(post.get());
   }
 
@@ -159,7 +184,7 @@ public class PostService {
     return keyword == null ? searchAllPosts(page, filter) : searchPosts(keyword, page, filter);
   }
 
-  private List<Response> filter(List<Post> postList, String filter) {
+  private List<PostDto.Response> filter(List<Post> postList, String filter) {
 
     PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
 
@@ -182,15 +207,59 @@ public class PostService {
 
   public List<PostDto.Response> searchAllPosts(Pageable page, String filter) {
     List<Post> posts = postRepository.findAll();
-
     return filter(posts, filter);
   }
 
   private List<PostDto.Response> searchPosts(String keyword, Pageable page, String filter) {
     List<Post> posts = postRepository.findAllByKeyword(keyword, page);
-
     return filter(posts, filter);
+  }
 
+  public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
+    List<ScheduleDto.Response> responses = new ArrayList<>();
+    scheduleRepository.findByPostId(postId).forEach(schedule -> {
+      ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
+      responses.add(response);
+    });
 
+    return responses;
+  }
+
+  public List<PostDto.ReviewResponse> getReviewsResponse(Integer postId) {
+    List<PostDto.ReviewResponse> responses = new ArrayList<>();
+    reviewRepository.findByPostId(postId).forEach(review -> {
+      User user = review.getUser();
+      UserInfo userInfo = user.getUserInfo();
+      PostDto.ReviewResponse response = PostMapper.INSTANCE.toReviewResponse(review, user,
+          userInfo);
+      responses.add(response);
+    });
+    return responses;
+  }
+
+  public List<HashtagDto.Response> getHashtagsResponse(Integer postId) {
+    List<HashtagDto.Response> responses = new ArrayList<>();
+    postHashtagRepository.findByPostId(postId).forEach(postHashtag -> {
+      Hashtag hashTag = postHashtag.getHashTag();
+      HashtagDto.Response response = HashtagMapper.INSTANCE.toPostResponseDto(postHashtag, hashTag);
+      responses.add(response);
+    });
+    return responses;
+  }
+
+  public void modifyHeart(Integer postId, Integer userId) {
+    Optional<Post> post = postRepository.findById(postId);
+    if (post.isEmpty()) {
+      throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
+    }
+
+    Optional<User> user = userRepository.findById(userId);
+    Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
+
+    if (heart.isEmpty()) {
+      heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
+    } else {
+      heartRepository.delete(heart.get());
+    }
   }
 }

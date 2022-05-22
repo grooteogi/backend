@@ -46,8 +46,7 @@ dependencies {
 
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'com.google.code.gson:gson:2.9.0'
-
-	compileOnly 'net.nurigo:javaSDK:2.2'
+	implementation 'net.nurigo:javaSDK:2.2'
 }
 
 checkstyle {
