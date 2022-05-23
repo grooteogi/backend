@@ -34,9 +34,7 @@ public class UserService {
 
   public User getUser(int userId) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
     return user.get();
   }
 
@@ -46,9 +44,7 @@ public class UserService {
 
     Optional<User> user = userRepository.findByEmail(requestUser.getEmail());
 
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     return user.get();
   }
@@ -59,24 +55,18 @@ public class UserService {
 
   public ProfileDto.Response getUserProfile(Integer userId) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
-    UserInfo userInfo = user.get().getUserInfo();
+    Optional<UserInfo> userInfo = Optional.ofNullable(user.get().getUserInfo());
 
-    if (userInfo == null) {
-      throw new ApiException(ApiExceptionEnum.USERINFO_NOT_FOUND_EXCEPTION);
-    }
+    userInfo.orElseThrow(() -> new ApiException(ApiExceptionEnum.USERINFO_NOT_FOUND_EXCEPTION));
 
-    return UserInfoMapper.INSTANCE.toResponseDto(user.get(), userInfo);
+    return UserInfoMapper.INSTANCE.toResponseDto(user.get(), userInfo.get());
   }
 
   public void modifyUserProfile(Integer userId, ProfileDto.Request request) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     if (!user.get().getNickname().equals(request.getNickname())
         && userRepository.existsByNickname(request.getNickname())) {
@@ -92,9 +82,7 @@ public class UserService {
 
   public void modifyUserPw(Integer userId, UserDto.PasswordRequest request) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);

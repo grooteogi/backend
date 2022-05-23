@@ -43,21 +43,21 @@ public class ReservationService {
 
   public ReservationDto.DetailResponse getReservation(Integer reservationId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
-    if (reservation.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
-    }
+    reservation.orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
 
-    String hostUserPhone = reservation.get().getHostUser().getUserInfo().getContact();
-    String participateUserPhone = reservation.get().getParticipateUser().getUserInfo().getContact();
+    Optional<String> hostUserPhone = Optional.ofNullable(
+        reservation.get().getHostUser().getUserInfo().getContact());
+    Optional<String> participateUserPhone = Optional.ofNullable(
+        reservation.get().getParticipateUser().getUserInfo().getContact());
 
-    if (hostUserPhone == null || participateUserPhone == null) {
-      throw new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION);
-    }
+    hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
+    participateUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
+
 
     return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule,
-        hostUserPhone, participateUserPhone);
+        hostUserPhone.get(), participateUserPhone.get());
   }
 
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
@@ -112,16 +112,17 @@ public class ReservationService {
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
-      String hostUserPhone = reservation.getHostUser().getUserInfo().getContact();
-      String participateUserPhone = reservation.getParticipateUser().getUserInfo().getContact();
+      Optional<String> hostUserPhone = Optional.ofNullable(
+          reservation.getHostUser().getUserInfo().getContact());
+      Optional<String> participateUserPhone = Optional.ofNullable(
+          reservation.getParticipateUser().getUserInfo().getContact());
 
-      if (hostUserPhone == null || participateUserPhone == null) {
-        throw new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION);
-      }
+      hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
+      participateUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
       ReservationDto.DetailResponse detailResponse =
-          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule, hostUserPhone,
-              participateUserPhone);
+          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule, hostUserPhone.get(),
+              participateUserPhone.get());
       detailResponse.setHashtags(getTags(post.getPostHashtags()));
       responseList.add(detailResponse);
     });
@@ -145,11 +146,11 @@ public class ReservationService {
 
     Optional<Schedule> schedule = scheduleRepository.findById(request.getScheduleId());
 
-    if (schedule.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION);
-    }
+    schedule.orElseThrow(() -> new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION));
 
     Optional<User> user = userRepository.findById(userId);
+
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     boolean isWriter = postRepository.existsByUser(user.get());
     if (isWriter) {
@@ -164,9 +165,8 @@ public class ReservationService {
 
   public void deleteReservation(Integer reservationId, Integer userId) {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
-    if (reservation.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
-    }
+    reservation.orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
+
     int hostId = reservation.get().getHostUser().getId();
     int participateId = reservation.get().getParticipateUser().getId();
 
@@ -181,9 +181,8 @@ public class ReservationService {
 
     Optional<Reservation> reservation = reservationRepository.findUncanceledById(reservationId);
 
-    if (reservation.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION);
-    }
+    reservation.orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
+
     Schedule schedule = reservation.get().getSchedule();
 
     long miliseconds = System.currentTimeMillis();
