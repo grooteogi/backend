@@ -254,13 +254,14 @@ public class PostDocumentationTests {
     String keyword = anyString();
     Pageable page = PageRequest.of(0, 20);
     String filter = anyString();
+    String region = anyString();
 
     PostDto.SearchResponse post = postSearchRes();
     List<PostDto.SearchResponse> searchResponse = new ArrayList<>();
     searchResponse.add(post);
 
     // when
-    given(postService.search(keyword, filter, eq(page))).willReturn(searchResponse);
+    given(postService.search(keyword, filter, eq(page), region)).willReturn(searchResponse);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders

@@ -32,10 +32,11 @@ public class PostController {
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
-      @RequestParam(name = "filter", required = false) String filter) {
+      @RequestParam(name = "filter", required = false) String filter,
+      @RequestParam(name = "region") String region) {
 
     List<PostDto.SearchResponse> posts = postService.search(keyword, filter,
-        PageRequest.of(page - 1, 12));
+        PageRequest.of(page - 1, 12), region);
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(posts).build());
   }
