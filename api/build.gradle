@@ -19,6 +19,12 @@ configurations {
 	asciidoctorExt
 }
 
+dependencyManagement {
+	imports {
+		mavenBom 'io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1'
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
 	implementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
@@ -47,6 +53,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'com.google.code.gson:gson:2.9.0'
 	implementation 'net.nurigo:javaSDK:2.2'
+
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config:2.4.1'
 }
 
 checkstyle {
