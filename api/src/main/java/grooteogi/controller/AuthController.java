@@ -2,8 +2,8 @@ package grooteogi.controller;
 
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
+import grooteogi.dto.auth.OauthDto;
 import grooteogi.dto.auth.Token;
-import grooteogi.dto.auth.UserDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -12,7 +12,6 @@ import grooteogi.response.BasicResponse;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
-import java.util.Map;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -60,9 +59,7 @@ public class AuthController {
       throw new ApiException(ApiExceptionEnum.BAD_REQUEST_EXCEPTION);
     }
 
-    User user = authService.register(request);
-
-    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
+    AuthDto.Response response = authService.register(request);
 
     return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
@@ -103,21 +100,24 @@ public class AuthController {
   public ResponseEntity<BasicResponse> oauth(
       @PathVariable String type, @RequestParam("code") String code) {
 
-    UserDto userDto;
+    OauthDto oauthDto;
 
     if (type.equalsIgnoreCase(LoginType.GOOGLE.name())) {
-      userDto = oauthClient.googleToken(code);
+      oauthDto = oauthClient.googleToken(code);
     } else if (type.equalsIgnoreCase(LoginType.KAKAO.name())) {
-      userDto = oauthClient.kakaoToken(code);
+      oauthDto = oauthClient.kakaoToken(code);
     } else {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
 
-    Map<String, Object> result = authService.oauth(userDto);
-    Token token = (Token) result.get("token");
+    User user = authService.oauth(oauthDto);
+    Token token = authService.generateToken(user.getId(), user.getEmail());
+
+    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
+
     HttpHeaders responseHeaders = setHeader(token, true);
 
-    return new ResponseEntity<>(BasicResponse.builder().data((User) result.get("user")).build(),
+    return new ResponseEntity<>(BasicResponse.builder().data(response).build(),
         responseHeaders, HttpStatus.OK);
   }
 

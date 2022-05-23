@@ -1,6 +1,7 @@
 package grooteogi.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import grooteogi.enums.RegionType;
 import java.sql.Date;
 import java.sql.Time;
 import javax.persistence.Column;
@@ -37,7 +38,7 @@ public class Schedule {
   private Time endTime;
 
   @Column(nullable = false, length = 10)
-  private String region;
+  private RegionType region;
 
   @Column(length = 40)
   private String place;

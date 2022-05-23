@@ -85,7 +85,7 @@ public class UserService {
     return userRepository.save(user.get());
   }
 
-  public void modifyUserPw(Integer userId, UserDto.Password request) {
+  public void modifyUserPw(Integer userId, UserDto.PasswordRequest request) {
     Optional<User> user = userRepository.findById(userId);
     if (user.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);

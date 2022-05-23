@@ -1,8 +1,5 @@
 package grooteogi.utils;
 
-import static grooteogi.enums.JwtExpirationEnum.ACCESS_TOKEN_EXPIRATION_TIME;
-import static grooteogi.enums.JwtExpirationEnum.REFRESH_TOKEN_EXPIRATION_TIME;
-
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import io.jsonwebtoken.Claims;
@@ -20,12 +17,18 @@ public class JwtProvider {
   @Value("${spring.jwt.secret}")
   private String secretKey;
 
+  @Value("${spring.jwt.access_token_expiration_time}")
+  private Long accessTokenExpirationTime;
+
+  @Value("${spring.jwt.refresh_token_expiration_time}")
+  private Long refreshTokenExpirationTime;
+
   public String generateAccessToken(int id, String email) {
-    return doGenerateToken(id, email, ACCESS_TOKEN_EXPIRATION_TIME.getValue());
+    return doGenerateToken(id, email, accessTokenExpirationTime);
   }
 
   public String generateRefreshToken(int id, String email) {
-    return doGenerateToken(id, email, REFRESH_TOKEN_EXPIRATION_TIME.getValue());
+    return doGenerateToken(id, email, refreshTokenExpirationTime);
   }
 
   public String doGenerateToken(int id, String email, long expireTime) {

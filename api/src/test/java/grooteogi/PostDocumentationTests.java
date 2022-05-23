@@ -1,5 +1,6 @@
 package grooteogi;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,20 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
 import grooteogi.controller.PostController;
-import grooteogi.domain.Review;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.CreateResponse;
 import grooteogi.dto.PostDto.Response;
-import grooteogi.dto.PostDto.SearchResponse;
-import grooteogi.dto.ScheduleDto;
-import grooteogi.dto.UserDto;
-import grooteogi.enums.CreditType;
 import grooteogi.mapper.PostMapper;
 import grooteogi.service.PostService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,8 +85,8 @@ public class PostDocumentationTests {
   @DisplayName("포스트 생성")
   public void createPost() throws Exception {
     // given
-    PostDto.Request request = postReq();
-    PostDto.CreateResponse createResponse = postRes();
+    PostDto.Request request = any();
+    PostDto.CreateResponse createResponse = any();
 
     given(postService.createPost(eq(request), session.getId())).willReturn(createResponse);
 
@@ -112,39 +105,9 @@ public class PostDocumentationTests {
 
   }
 
-  private CreateResponse postRes() {
-    return CreateResponse.builder().postId(1).build();
-  }
 
-  private PostDto.Request postReq() {
-    return PostDto.Request
-        .builder()
-        .title("제목입니다")
-        .content("내용입니다")
-        .credit(CreditType.DIRECT)
-        .imageUrl("이미지입니다")
-        .hashtags(postHashtags())
-        .schedules(scheduleReqs())
-        .build();
-  }
 
-  private List<ScheduleDto.Request> scheduleReqs() {
-    List<ScheduleDto.Request> schedules = new ArrayList<>();
-    ScheduleDto.Request schedule = ScheduleDto.Request
-        .builder()
-        .date("2022-05-01")
-        .startTime("12:00:00")
-        .endTime("13:00:00")
-        .region("어디게")
-        .place("여기다")
-        .build();
-    schedules.add(schedule);
-    return schedules;
-  }
 
-  private String[] postHashtags() {
-    return new String[]{"해시태그1", "해시태그2"};
-  }
 
   @Test
   @DisplayName("포스트 삭제")
@@ -170,8 +133,8 @@ public class PostDocumentationTests {
     //given
     int postId = anyInt();
     int userId = anyInt();
-    PostDto.Request request = postReq();
-    Response response = postDetailRes();
+    PostDto.Request request = any();
+    Response response = any();
 
     given(postService.modifyPost(eq(request), postId, userId)).willReturn(response);
 
@@ -191,48 +154,12 @@ public class PostDocumentationTests {
 
   }
 
-  private PostDto.Response postDetailRes() {
-    return PostDto.Response
-        .builder()
-        .postId(1)
-        .title("제목입니다")
-        .content("내용입니다")
-        .imageUrl("이미지입니다")
-        .createAt(String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
-        .creditType(CreditType.DIRECT)
-        .mentor(userRes())
-        .build();
-  }
-
-  private List<ScheduleDto.Response> scheduleRes() {
-    List<ScheduleDto.Response> responses = new ArrayList<>();
-    ScheduleDto.Response schedule = ScheduleDto.Response
-        .builder()
-        .scheduleId(1)
-        .date("2022-05-01")
-        .startTime("16:00:00")
-        .endTime("17:00:00")
-        .region("어디게")
-        .place("여기다")
-        .build();
-    responses.add(schedule);
-    return responses;
-  }
-
-  private List<Review> reviewRes() {
-    return null;
-  }
-
-  private UserDto.Response userRes() {
-    return UserDto.Response.builder().build();
-  }
-
   @Test
   @DisplayName("포스트 조회")
   public void getPost() throws Exception {
     // given
     int postId = anyInt();
-    Response createResponse = postDetailRes();
+    Response createResponse = any();
 
     // when
     given(postService.getPostResponse(postId)).willReturn(createResponse);
@@ -253,19 +180,20 @@ public class PostDocumentationTests {
     // given
     String keyword = anyString();
     Pageable page = PageRequest.of(0, 20);
-    String sort = anyString();
+    String filter = anyString();
+    String region = anyString();
 
-    PostDto.SearchResponse post = postSearchRes();
-    List<PostDto.SearchResponse> createResponse = new ArrayList<>();
-    createResponse.add(post);
+    PostDto.SearchResponse post = any();
+    List<PostDto.SearchResponse> searchResponse = new ArrayList<>();
+    searchResponse.add(post);
 
     // when
-    given(postService.search(keyword, sort, eq(page))).willReturn(createResponse);
+    given(postService.search(keyword, filter, eq(page), region)).willReturn(searchResponse);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post?keyword={keyword}&page={page}&sort={sort}",
-                keyword, 1, sort)
+            .get("/post?keyword={keyword}&page={page}&filter={filter}",
+                keyword, 1, filter)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
 
@@ -274,15 +202,5 @@ public class PostDocumentationTests {
 
   }
 
-  private SearchResponse postSearchRes() {
-    return PostDto.SearchResponse
-        .builder()
-        .postId(1)
-        .title("제목입니다")
-        .content("내용입니다")
-        .imageUrl("이미지입니다")
-        .hashtags(List.of(postHashtags()))
-        .build();
-  }
 
 }

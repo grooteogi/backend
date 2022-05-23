@@ -3,14 +3,10 @@ package grooteogi.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import grooteogi.dto.auth.UserDto;
+import grooteogi.dto.auth.OauthDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +45,7 @@ public class OauthClient {
     this.httpServletResponse = httpServletResponse;
   }
 
-  public UserDto kakaoToken(String code) {
+  public OauthDto kakaoToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -70,16 +66,16 @@ public class OauthClient {
       JsonParser parser = new JsonParser();
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
-      UserDto userDto = kakaoAuth(accessToken);
-      userDto.setType(LoginType.KAKAO);
-      return userDto;
+      OauthDto oauthDto = kakaoAuth(accessToken);
+      oauthDto.setType(LoginType.KAKAO);
+      return oauthDto;
     } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
 
-  private UserDto kakaoAuth(String token) {
-    UserDto userDto = new UserDto();
+  private OauthDto kakaoAuth(String token) {
+    OauthDto oauthDto = new OauthDto();
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -96,34 +92,15 @@ public class OauthClient {
       JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
       JsonObject kakaoAccount = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
 
-      userDto.setNickname(properties.get("nickname").getAsString());
-      userDto.setEmail(kakaoAccount.get("email").getAsString());
+      oauthDto.setNickname(properties.get("nickname").getAsString());
+      oauthDto.setEmail(kakaoAccount.get("email").getAsString());
     } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
-    return userDto;
+    return oauthDto;
   }
 
-  public void googleRequest() {
-    Map<String, Object> params = new HashMap<>();
-    params.put("scope", "profile https://www.googleapis.com/auth/userinfo.email");
-    params.put("response_type", "code");
-    params.put("client_id", googleClientId);
-    params.put("redirect_uri", "http://localhost:8080/user/oauth/google");
-
-    String parameterString = params.entrySet().stream().map(x -> x.getKey() + "=" + x.getValue())
-        .collect(Collectors.joining("&"));
-
-    String url = "https://accounts.google.com/o/oauth2/v2/auth" + "?" + parameterString;
-
-    try {
-      httpServletResponse.sendRedirect(url);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public UserDto googleToken(String code) {
+  public OauthDto googleToken(String code) {
     String accessToken = "";
 
     HttpHeaders headers = new HttpHeaders();
@@ -145,16 +122,16 @@ public class OauthClient {
       JsonParser parser = new JsonParser();
       JsonElement element = parser.parse(response.getBody());
       accessToken = element.getAsJsonObject().get("access_token").getAsString();
-      UserDto userDto = googleAuth(accessToken);
-      userDto.setType(LoginType.GOOGLE);
-      return userDto;
+      OauthDto oauth = googleAuth(accessToken);
+      oauth.setType(LoginType.GOOGLE);
+      return oauth;
     } catch (RestClientException e) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
 
-  private UserDto googleAuth(String token) {
-    UserDto userDto = new UserDto();
+  private OauthDto googleAuth(String token) {
+    OauthDto oauth = new OauthDto();
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -169,12 +146,12 @@ public class OauthClient {
       JsonParser parser = new JsonParser();
       JsonElement element = parser.parse(response.getBody());
 
-      userDto.setNickname(element.getAsJsonObject().get("name").getAsString());
-      userDto.setEmail(element.getAsJsonObject().get("email").getAsString());
+      oauth.setNickname(element.getAsJsonObject().get("name").getAsString());
+      oauth.setEmail(element.getAsJsonObject().get("email").getAsString());
     } catch (RestClientException e) {
       e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
-    return userDto;
+    return oauth;
   }
 }

@@ -2,7 +2,6 @@ package grooteogi.controller;
 
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.SearchResponse;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
@@ -29,14 +28,15 @@ public class PostController {
 
   private final PostService postService;
 
-  @GetMapping
+  @GetMapping("/search")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
-      @RequestParam(name = "sort", required = false) String sort) {
+      @RequestParam(name = "filter", required = false) String filter,
+      @RequestParam(name = "region") String region) {
 
-    List<SearchResponse> posts = postService.search(keyword, sort,
-        PageRequest.of(page - 1, 12));
+    List<PostDto.SearchResponse> posts = postService.search(keyword, filter,
+        PageRequest.of(page - 1, 12), region);
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(posts).build());
   }

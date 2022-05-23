@@ -1,6 +1,7 @@
 package grooteogi.mapper;
 
 import grooteogi.domain.Post;
+import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
@@ -9,6 +10,7 @@ import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.UserDto;
+import grooteogi.enums.RegionType;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -26,11 +28,14 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   @Mapping(source = "dto.title", target = "title")
   @Mapping(source = "dto.content", target = "content")
-  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.creditType", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "user", target = "user")
   @Mapping(target = "id", ignore = true)
-  Post toEntity(Request dto, User user);
+  @Mapping(source = "schedules", target = "schedules")
+  @Mapping(source = "postHashtags", target = "postHashtags")
+  Post toEntity(Request dto, User user, List<Schedule> schedules,
+      List<PostHashtag> postHashtags);
 
   @Mapping(source = "post.id", target = "postId")
   @Mapping(source = "post.title", target = "title")
@@ -61,17 +66,22 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.postHashtags", target = "hashtags", ignore = true)
   PostDto.SearchResponse toSearchResponseDto(Post post);
 
+  @Mapping(source = "post.id", target = "postId")
+  List<PostDto.Response> toResponseListDto(List<Post> post);
+
   @Mappings({
       @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),
-      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
+      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss"),
+      @Mapping(target = "region", source = "dto.region")
   })
   Schedule toScheduleEntity(ScheduleDto.Request dto);
 
   @Mappings({
       @Mapping(target = "date", source = "dto.date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", source = "dto.startTime", dateFormat = "HH:mm:ss"),
-      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss")
+      @Mapping(target = "endTime", source = "dto.endTime", dateFormat = "HH:mm:ss"),
+      @Mapping(target = "region", source = "dto.region")
   })
   List<Schedule> toScheduleEntities(List<ScheduleDto.Request> dto);
 
@@ -84,6 +94,13 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "schedules.place", target = "place")
   ScheduleDto.Response toScheduleResponses(Schedule schedules);
 
+  default String asStringRegion(RegionType type) {
+    return type != null ? type.toString() : null;
+  }
+
+  default RegionType asRegionType(String region) {
+    return region != null ? RegionType.getEnum(region) : null;
+  }
 
   default String asStringDate(Date date) {
     return date != null ? new SimpleDateFormat("yyyy-MM-dd")
@@ -113,7 +130,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   @Mapping(source = "dto.title", target = "title")
   @Mapping(source = "dto.content", target = "content")
-  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.creditType", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "post.schedules", target = "schedules", ignore = true)
   Post toModify(Post post, PostDto.Request dto);
