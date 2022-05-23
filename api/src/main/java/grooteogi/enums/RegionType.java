@@ -34,10 +34,6 @@ public enum RegionType {
     this.label = label;
   }
 
-  public String getLabel() {
-    return label;
-  }
-
   public static RegionType valueOfLabel(String label) {
     for (RegionType regionType : values()) {
       if (regionType.label.equals(label)) {
@@ -46,5 +42,4 @@ public enum RegionType {
     }
     return null;
   }
-
 }
