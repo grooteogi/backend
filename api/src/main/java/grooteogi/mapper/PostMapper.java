@@ -28,7 +28,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   @Mapping(source = "dto.title", target = "title")
   @Mapping(source = "dto.content", target = "content")
-  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.creditType", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "user", target = "user")
   @Mapping(target = "id", ignore = true)
@@ -130,7 +130,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   @Mapping(source = "dto.title", target = "title")
   @Mapping(source = "dto.content", target = "content")
-  @Mapping(source = "dto.credit", target = "credit")
+  @Mapping(source = "dto.creditType", target = "credit")
   @Mapping(source = "dto.imageUrl", target = "imageUrl")
   @Mapping(source = "post.schedules", target = "schedules", ignore = true)
   Post toModify(Post post, PostDto.Request dto);
