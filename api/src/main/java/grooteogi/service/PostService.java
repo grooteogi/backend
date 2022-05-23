@@ -180,7 +180,8 @@ public class PostService {
 
   public List<PostDto.SearchResponse> search(String keyword, String filter,
       Pageable page, String region) {
-    return keyword == null ? searchAllPosts(page, filter, region) : searchPosts(keyword, page, filter, region);
+    return keyword == null ? searchAllPosts(page, filter, region)
+        : searchPosts(keyword, page, filter, region);
   }
 
   private List<PostDto.SearchResponse> filter(List<Post> postList, String filter) {
@@ -235,7 +236,8 @@ public class PostService {
     return filter(posts, filter);
   }
 
-  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String filter, String region) {
+  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page,
+      String filter, String region) {
     List<Post> posts = postRepository.findAllByKeyword(keyword, page);
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)

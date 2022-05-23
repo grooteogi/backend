@@ -20,7 +20,7 @@ public class PostDto {
 
     private String imageUrl;
     private String[] hashtags;
-    private CreditType CreditType;
+    private CreditType creditType;
     private List<ScheduleDto.Request> schedules;
 
   }
