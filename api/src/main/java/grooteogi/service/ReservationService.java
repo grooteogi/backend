@@ -223,7 +223,7 @@ public class ReservationService {
         .code(numStr).build();
   }
 
-  public void checkVerifySms(CheckSmsRequest request) {
+  public void checkSms(CheckSmsRequest request) {
     String key = prefix + request.getPhoneNumber();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(request.getCode())) {

@@ -1,7 +1,5 @@
 package grooteogi.service;
 
-import static grooteogi.enums.JwtExpirationEnum.REDIS_TOKEN_EXPIRATION_TIME;
-
 import grooteogi.domain.User;
 import grooteogi.dto.AuthDto;
 import grooteogi.dto.auth.OauthDto;
@@ -17,12 +15,16 @@ import grooteogi.utils.RedisClient;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+  @Value("${spring.jwt.redis_token_expiration_time}")
+  private Long redisTokenExpirationTime;
 
   private final String prefix = "email_verify";
   private final String nickname = "groot";
@@ -120,6 +122,6 @@ public class AuthService {
   }
 
   private void session(String token, int id) {
-    redisClient.setValue(token, Integer.toString(id), REDIS_TOKEN_EXPIRATION_TIME.getValue());
+    redisClient.setValue(token, Integer.toString(id), redisTokenExpirationTime);
   }
 }

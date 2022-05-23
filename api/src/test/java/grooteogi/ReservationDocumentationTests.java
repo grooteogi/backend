@@ -63,19 +63,12 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  private Schedule schedule;
-
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
-
-    // domain for test
-    schedule = ApiDocumentUtils.getSchedule();
-    schedule.setPost(ApiDocumentUtils.getPost());
-
   }
 
   @Test
@@ -144,10 +137,4 @@ public class ReservationDocumentationTests {
         .andDo(print());
 
   }
-
-
-
-
-
-
 }
