@@ -18,9 +18,9 @@ public class PostDto {
     @NotBlank(message = "내용을 입력하세요.")
     private String content;
 
-    private CreditType credit;
     private String imageUrl;
     private String[] hashtags;
+    private CreditType CreditType;
     private List<ScheduleDto.Request> schedules;
 
   }
