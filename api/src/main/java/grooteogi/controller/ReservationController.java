@@ -80,21 +80,19 @@ public class ReservationController {
         .message("modify reservation status success").data(response).build());
   }
   
-  @PostMapping("/send-sms")
+  @PostMapping("/sms/send")
   public ResponseEntity<BasicResponse> sendSms(@RequestParam String phoneNumber) {
     SendSmsResponse response = this.reservationService.sendSms(phoneNumber);
     return ResponseEntity.ok(BasicResponse.builder()
         .message("send sms code success").data(response).build());
   }
 
-  @PostMapping("/check-sms")
-  public ResponseEntity<BasicResponse> checkVerifySms(
+  @PostMapping("/sms/check")
+  public ResponseEntity<BasicResponse> checkSms(
       @RequestBody ReservationDto.CheckSmsRequest request) {
-    reservationService.checkVerifySms(request);
+    reservationService.checkSms(request);
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("check sms success").build());
   }
-
-
 }
