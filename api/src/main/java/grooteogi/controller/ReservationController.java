@@ -39,9 +39,8 @@ public class ReservationController {
       @RequestParam(name = "filter", required = false) String filter)  {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    List<ReservationDto.DetailResponse> reservations;
-
-    reservations = reservationService.getReservation(isHost, session.getId(), filter);
+    List<ReservationDto.DetailResponse> reservations
+        = reservationService.getReservation(isHost, session.getId(), filter);
 
     return ResponseEntity.ok(BasicResponse.builder()
         .message("get reservation list with filtering success").data(reservations).build());

@@ -48,7 +48,16 @@ public class ReservationService {
     }
     Schedule schedule = reservation.get().getSchedule();
     Post post = schedule.getPost();
-    return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule);
+
+    String hostUserPhone = reservation.get().getHostUser().getUserInfo().getContact();
+    String participateUserPhone = reservation.get().getParticipateUser().getUserInfo().getContact();
+
+    if (hostUserPhone == null || participateUserPhone == null) {
+      throw new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION);
+    }
+
+    return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule,
+        hostUserPhone, participateUserPhone);
   }
 
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
@@ -103,8 +112,16 @@ public class ReservationService {
       Schedule schedule = reservation.getSchedule();
       Post post = schedule.getPost();
 
+      String hostUserPhone = reservation.getHostUser().getUserInfo().getContact();
+      String participateUserPhone = reservation.getParticipateUser().getUserInfo().getContact();
+
+      if (hostUserPhone == null || participateUserPhone == null) {
+        throw new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION);
+      }
+
       ReservationDto.DetailResponse detailResponse =
-          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule);
+          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule, hostUserPhone,
+              participateUserPhone);
       detailResponse.setHashtags(getTags(post.getPostHashtags()));
       responseList.add(detailResponse);
     });
