@@ -16,7 +16,12 @@ public class ProfileDto {
 
   @Data
   @Builder
-  public static class Response {
-
+  public static class Response { // user, userInfo
+    private String nickname;
+    private String email;
+    private String name;
+    private String phone;
+    private String address;
+    private String imageUrl;
   }
 }
