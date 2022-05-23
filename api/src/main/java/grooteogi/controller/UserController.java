@@ -1,6 +1,5 @@
 package grooteogi.controller;
 
-import grooteogi.domain.User;
 import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
 import grooteogi.response.BasicResponse;
@@ -26,17 +25,17 @@ public class UserController {
   public ResponseEntity<BasicResponse> getUserProfile() {
     Session session = (Session) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
-    User user = userService.getUserProfile(session.getId());
+    ProfileDto.Response response = userService.getUserProfile(session.getId());
 
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
+    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
   }
 
   @PatchMapping("/profile")
   public ResponseEntity<BasicResponse> modifyUserProfile(@RequestBody ProfileDto.Request request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-    User user = userService.modifyUserProfile(session.getId(), request);
-    return ResponseEntity.ok(BasicResponse.builder().data(user).build());
+    userService.modifyUserProfile(session.getId(), request);
+    return ResponseEntity.ok(BasicResponse.builder().message("modify user info success").build());
   }
 
   @PatchMapping("/password")

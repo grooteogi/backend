@@ -7,13 +7,14 @@ import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import grooteogi.mapper.UserInfoMapper;
 import grooteogi.mapper.UserMapper;
+import grooteogi.repository.UserInfoRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.Validator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final UserInfoRepository userInfoRepository;
   private final PasswordEncoder passwordEncoder;
   private final Validator validator;
 
@@ -32,9 +34,7 @@ public class UserService {
 
   public User getUser(int userId) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
     return user.get();
   }
 
@@ -44,9 +44,7 @@ public class UserService {
 
     Optional<User> user = userRepository.findByEmail(requestUser.getEmail());
 
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     return user.get();
   }
@@ -55,41 +53,36 @@ public class UserService {
     return userRepository.existsByEmail(email);
   }
 
-  public User getUserProfile(Integer userId) {
-    Optional<User> user = userRepository.findProfileById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
-    return user.get();
+  public ProfileDto.Response getUserProfile(Integer userId) {
+    Optional<User> user = userRepository.findById(userId);
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
+
+    Optional<UserInfo> userInfo = Optional.ofNullable(user.get().getUserInfo());
+
+    userInfo.orElseThrow(() -> new ApiException(ApiExceptionEnum.USERINFO_NOT_FOUND_EXCEPTION));
+
+    return UserInfoMapper.INSTANCE.toResponseDto(user.get(), userInfo.get());
   }
 
-  public User modifyUserProfile(Integer userId, ProfileDto.Request request) {
+  public void modifyUserProfile(Integer userId, ProfileDto.Request request) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
-    UserInfo userInfo = user.get().getUserInfo();
-    if (userInfo == null) {
-      userInfo = new UserInfo();
-    }
-
-    BeanUtils.copyProperties(request, userInfo);
-    user.get().setUserInfo(userInfo);
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     if (!user.get().getNickname().equals(request.getNickname())
         && userRepository.existsByNickname(request.getNickname())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
-    user.get().setNickname(request.getNickname());
 
-    return userRepository.save(user.get());
+    UserInfo userInfo = userInfoRepository.save(UserInfoMapper.INSTANCE.toEntity(request));
+
+    User modifiedUser = UserMapper.INSTANCE.toModify(user.get(), userInfo);
+
+    userRepository.save(modifiedUser);
   }
 
   public void modifyUserPw(Integer userId, UserDto.PasswordRequest request) {
     Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION);
-    }
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);

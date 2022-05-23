@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
 import grooteogi.controller.ReservationController;
+import grooteogi.domain.Schedule;
 import grooteogi.dto.ReservationDto;
 import grooteogi.service.ReservationService;
 import grooteogi.utils.JwtProvider;
@@ -62,24 +63,19 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-
-
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
-
-
-
   }
 
   @Test
   @DisplayName("예약조회")
   public void getReservation() throws Exception {
     // given
-    given(reservationService.getReservation(anyInt())).willReturn(any());
+    given(reservationService.getReservation(1)).willReturn(any());
 
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -141,5 +137,4 @@ public class ReservationDocumentationTests {
         .andDo(print());
 
   }
-
 }
