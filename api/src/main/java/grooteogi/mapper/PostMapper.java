@@ -99,7 +99,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   }
 
   default RegionType asRegionType(String region) {
-    return region != null ? RegionType.valueOfLabel(region) : null;
+    return region != null ? RegionType.getEnum(region) : null;
   }
 
   default String asStringDate(Date date) {

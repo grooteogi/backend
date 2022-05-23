@@ -222,7 +222,7 @@ public class PostService {
   }
   
   private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
-    RegionType regionType = RegionType.valueOfLabel(region);
+    RegionType regionType = RegionType.getEnum(region);
 
     return schedules.stream().filter(schedule -> schedule.getRegion() == regionType)
         .collect(Collectors.toList());

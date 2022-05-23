@@ -1,5 +1,7 @@
 package grooteogi.enums;
 
+import java.util.Arrays;
+
 public enum RegionType {
   GANGSEO("강서구"),
   GURO("구로구"),
@@ -34,12 +36,10 @@ public enum RegionType {
     this.label = label;
   }
 
-  public static RegionType valueOfLabel(String label) {
-    for (RegionType regionType : values()) {
-      if (regionType.label.equals(label)) {
-        return regionType;
-      }
-    }
-    return null;
+  public static RegionType getEnum(String label) {
+    return Arrays.stream(RegionType.values())
+        .filter(regionType -> regionType.label.equals(label))
+        .findFirst().orElse(null);
   }
+
 }
