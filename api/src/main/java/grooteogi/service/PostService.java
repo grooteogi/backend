@@ -12,6 +12,7 @@ import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.PostFilterEnum;
+import grooteogi.enums.RegionType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;
@@ -178,8 +179,9 @@ public class PostService {
   }
 
   public List<PostDto.SearchResponse> search(String keyword, String filter,
-      Pageable page) {
-    return keyword == null ? searchAllPosts(page, filter) : searchPosts(keyword, page, filter);
+      Pageable page, String region) {
+    return keyword == null ? searchAllPosts(page, filter, region)
+        : searchPosts(keyword, page, filter, region);
   }
 
   private List<PostDto.SearchResponse> filter(List<Post> postList, String filter) {
@@ -218,14 +220,28 @@ public class PostService {
 
     return responses;
   }
+  
+  private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
+    RegionType regionType = RegionType.getEnum(region);
 
-  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String filter) {
+    return schedules.stream().filter(schedule -> schedule.getRegion() == regionType)
+        .collect(Collectors.toList());
+  }
+
+  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String filter, String region) {
     List<Post> posts = postRepository.findAll();
+    posts.forEach(
+        post -> filterRegion(post.getSchedules(), region)
+    );
     return filter(posts, filter);
   }
 
-  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page, String filter) {
+  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page,
+      String filter, String region) {
     List<Post> posts = postRepository.findAllByKeyword(keyword, page);
+    posts.forEach(
+        post -> filterRegion(post.getSchedules(), region)
+    );
     return filter(posts, filter);
   }
 
