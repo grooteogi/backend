@@ -47,7 +47,8 @@ public class AuthController {
 
     HttpHeaders responseHeaders = setHeader(token, true);
 
-    return new ResponseEntity<>(BasicResponse.builder().data(response).build(), responseHeaders,
+    return new ResponseEntity<>(BasicResponse.builder()
+        .message("login success").data(response).build(), responseHeaders,
         HttpStatus.OK);
   }
 
@@ -61,14 +62,15 @@ public class AuthController {
 
     AuthDto.Response response = authService.register(request);
 
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("register user success").data(response).build());
   }
 
   @DeleteMapping("/auth/withdrawal")
   public ResponseEntity withdrawal(@RequestParam("user-id") Integer userId) {
     authService.withdrawal(userId);
 
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    return ResponseEntity.ok(BasicResponse.builder().message("delete user success").build());
   }
 
   @PostMapping("/auth/email/send")
@@ -117,7 +119,8 @@ public class AuthController {
 
     HttpHeaders responseHeaders = setHeader(token, true);
 
-    return new ResponseEntity<>(BasicResponse.builder().data(response).build(),
+    return new ResponseEntity<>(BasicResponse.builder()
+        .message("oauth success").data(response).build(),
         responseHeaders, HttpStatus.OK);
   }
 
