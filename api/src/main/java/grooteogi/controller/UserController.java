@@ -27,7 +27,8 @@ public class UserController {
         .getAuthentication().getPrincipal();
     ProfileDto.Response response = userService.getUserProfile(session.getId());
 
-    return ResponseEntity.ok(BasicResponse.builder().data(response).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get profile success").data(response).build());
   }
 
   @PatchMapping("/profile")
@@ -35,7 +36,7 @@ public class UserController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     userService.modifyUserProfile(session.getId(), request);
-    return ResponseEntity.ok(BasicResponse.builder().message("modify user info success").build());
+    return ResponseEntity.ok(BasicResponse.builder().message("modify profile success").build());
   }
 
   @PatchMapping("/password")
