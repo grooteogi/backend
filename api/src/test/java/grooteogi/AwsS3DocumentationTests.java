@@ -67,6 +67,7 @@ class AwsS3DocumentationTests {
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
   }
+
   @Test
   @DisplayName("이미지 업로드")
   void uploadImage() throws Exception {
