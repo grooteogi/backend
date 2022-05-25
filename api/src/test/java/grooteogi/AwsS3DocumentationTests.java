@@ -1,22 +1,17 @@
 package grooteogi;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
-import grooteogi.controller.ReservationController;
-import grooteogi.domain.Schedule;
-import grooteogi.dto.ReservationDto;
-import grooteogi.service.ReservationService;
+import grooteogi.controller.AwsS3Controller;
+import grooteogi.service.AwsS3Service;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,13 +36,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@WebMvcTest(ReservationController.class)
-public class ReservationDocumentationTests {
+@WebMvcTest(AwsS3Controller.class)
+class AwsS3DocumentationTests {
 
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private ReservationService reservationService;
+  private AwsS3Service awsS3Service;
+  @MockBean
+  private AmazonS3Client amazonS3Client;
   @MockBean
   private UserInterceptor userInterceptor;
   @MockBean
@@ -72,69 +69,44 @@ public class ReservationDocumentationTests {
   }
 
   @Test
-  @DisplayName("예약조회")
-  public void getReservation() throws Exception {
+  @DisplayName("이미지 업로드")
+  void uploadImage() throws Exception {
     // given
-    given(reservationService.getReservation(1)).willReturn(any());
+    MockMultipartFile multipartFile = new MockMultipartFile(
+        "image",
+        "image.jpeg",
+        MediaType.IMAGE_JPEG_VALUE,
+        "image".getBytes()
+    );
+
+    String response = anyString();
+
+    given(awsS3Service.uploadImage(multipartFile)).willReturn(response);
 
     ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders
-            .get("/reservation/{reservationId}", 1)
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON));
+        RestDocumentationRequestBuilders.multipart("/s3/image")
+            .file("multipartFile",  multipartFile.getBytes())
+            .contentType(MediaType.MULTIPART_FORM_DATA));
     result.andExpect(status().isOk())
         .andDo(print());
-
-    verify(reservationService).getReservation(1);
   }
 
-
   @Test
-  @DisplayName("예약생성")
-  public void createReservation() throws Exception {
+  @DisplayName("이미지 삭제")
+  void deleteImage() throws Exception {
+
     // given
-    final ReservationDto.Request request =
-        ReservationDto.Request.builder().scheduleId(1).message("msg").build();
+    String fileName = anyString();
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+    awsS3Service.deleteImage(fileName);
 
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(any());
-
-    String json = objectMapper.writeValueAsString(request);
-
-    // when
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    // then
-    resultActions.andExpect(status().isOk())
-        .andDo(print());
-
-  }
-
-  @Test
-  @DisplayName("예약삭제")
-  public void deleteReservation() throws Exception {
-    //given
-    int reservationId = anyInt();
-
-    //when
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .delete("/reservation/{reservationId}", reservationId)
+            .delete("/s3/image?fileName={fileName}", fileName)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON)
     );
-
-    //then
     resultActions.andExpect(status().isOk())
         .andDo(print());
-
   }
 }

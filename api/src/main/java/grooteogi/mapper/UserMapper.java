@@ -27,9 +27,21 @@ public interface UserMapper extends BasicMapper<AuthDto, User> {
   })
   User toEntity(AuthDto.Request dto);
 
-  @Mapping(source = "dto.email", target = "email")
-  @Mapping(source = "dto.password", target = "password")
-  @Mapping(source = "general", target = "type")
-  @Mapping(target = "nickname", defaultValue = "groot")
+  @Mappings({
+      @Mapping(source = "dto.email", target = "email"),
+      @Mapping(source = "dto.password", target = "password"),
+      @Mapping(source = "general", target = "type"),
+      @Mapping(target = "nickname", defaultValue = "groot"),
+  })
   User toEntity(AuthDto.Request dto, LoginType general, String nickname);
+
+
+  @Mappings({
+      @Mapping(source = "user.id", target = "id"),
+      @Mapping(source = "userInfo.id", target = "userInfo.id"),
+      @Mapping(source = "user.nickname", target = "nickname"),
+      @Mapping(target = "createAt", ignore = true),
+      @Mapping(target = "updateAt", ignore = true)
+  })
+  User toModify(User user, UserInfo userInfo);
 }

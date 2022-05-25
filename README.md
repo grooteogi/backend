@@ -1,51 +1,44 @@
 Grooteogi Backend
 ===
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/grooteogi/backend?style=flat-square)
+![deploy](https://img.shields.io/travis/com/grooteogi/backend/develop?label=deploy&logo=travis&style=flat-square)
+
 🚀 Getting Started
 ---
 
-1. Set env_file in `./api/config/dev.env`
-Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file).
-2. Execute docker-compose
+1. Set up environments variables.
+2. Execute docker-compose to run db server.
+
     ```bash
-    docker-compose -f docker-compose.local.yml up
+    docker-compose up
     ```
 
-🧐 How to develop
+3. Run Spring Boot project in IntelliJ.
+
+🧐 How to set env vars 
 ---
 
-1. Set env_file in `./api/config/dev.env`
-Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file).
-2. Execute docker-compose to run development database
-    ```bash
-    docker-compose -f docker-compose.dev.yml up
-    ```
-3. Run the Spring Boot project in IntelliJ.
+- In local environment, `./api/config/local.env` is used.
+  - Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file)
+- In server environment, use the `aws parameter store`.
 
 ⚙️ Profiles
 ---
 
+> Common settings are defined in [application.yml](./api/src/main/resources/application.yml).
+
 ### local
 
-This profile for testing communication with the frontend in local.
+- profile for testing locally.
+- [application.local.yml](./api/src/main/resources/application-local.yml)
 
-- docker configuration file
-  - docker-compose.local.yml
-- spring configuration file
-  - application.local.yml
+### dev
 
-### develop
+- profile for develop server.
+- [application.dev.yml](./api/src/main/resources/application-dev.yml)
 
-This profile for development in local.
+### prod
 
-- docker configuration file
-  - docker-compose.dev.yml
-- spring configuration file
-  - application.dev.yml
-
-### production
-
-This profile for deployment in server.
-
-- spring configuration file
-  - application.prod.yml
+- profile for production server.
+- application.prod.yml

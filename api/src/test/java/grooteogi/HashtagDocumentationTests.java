@@ -1,11 +1,8 @@
 package grooteogi;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,12 +10,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
-import grooteogi.controller.ReservationController;
-import grooteogi.domain.Schedule;
-import grooteogi.dto.ReservationDto;
-import grooteogi.service.ReservationService;
+import grooteogi.controller.HashtagController;
+import grooteogi.dto.HashtagDto;
+import grooteogi.service.HashtagService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,13 +38,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@WebMvcTest(ReservationController.class)
-public class ReservationDocumentationTests {
+@WebMvcTest(HashtagController.class)
+public class HashtagDocumentationTests {
 
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private ReservationService reservationService;
+  private HashtagService hashtagService;
   @MockBean
   private UserInterceptor userInterceptor;
   @MockBean
@@ -63,6 +60,9 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
+  private HashtagDto.Request request = HashtagDto.Request.builder().build();
+  private HashtagDto.Response response = HashtagDto.Response.builder().build();
+
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
@@ -72,69 +72,56 @@ public class ReservationDocumentationTests {
   }
 
   @Test
-  @DisplayName("예약조회")
-  public void getReservation() throws Exception {
+  @DisplayName("해시태그 조회")
+  void getHashtag() throws Exception {
     // given
-    given(reservationService.getReservation(1)).willReturn(any());
+    List<HashtagDto.Response> responses = new ArrayList<>();
+    responses.add(response);
 
-    ResultActions result = mockMvc.perform(
+    given(hashtagService.getHashtag()).willReturn(responses);
+
+    ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/reservation/{reservationId}", 1)
+            .get("/hashtag")
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
-    result.andExpect(status().isOk())
+    resultActions.andExpect(status().isOk())
         .andDo(print());
-
-    verify(reservationService).getReservation(1);
   }
 
+  @Test
+  @DisplayName("해시태그 검색")
+  void search() throws Exception {
+
+    String keyword = anyString();
+
+    given(hashtagService.search(keyword)).willReturn(any());
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .get("/hashtag/search?keyword={keyword}", keyword)
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON));
+    resultActions.andExpect(status().isOk())
+        .andDo(print());
+  }
 
   @Test
-  @DisplayName("예약생성")
-  public void createReservation() throws Exception {
-    // given
-    final ReservationDto.Request request =
-        ReservationDto.Request.builder().scheduleId(1).message("msg").build();
+  @DisplayName("해시태그 생성")
+  void createHashtag() throws Exception {
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
-
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(any());
+    given(hashtagService.createHashtag(request)).willReturn(response);
 
     String json = objectMapper.writeValueAsString(request);
 
-    // when
-    ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-    );
-
-    // then
-    resultActions.andExpect(status().isOk())
-        .andDo(print());
-
-  }
-
-  @Test
-  @DisplayName("예약삭제")
-  public void deleteReservation() throws Exception {
-    //given
-    int reservationId = anyInt();
-
-    //when
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .delete("/reservation/{reservationId}", reservationId)
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
+            .post("/hashtag")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
 
-    //then
     resultActions.andExpect(status().isOk())
         .andDo(print());
-
   }
 }

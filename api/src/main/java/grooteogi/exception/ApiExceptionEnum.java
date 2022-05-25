@@ -34,6 +34,7 @@ public enum ApiExceptionEnum {
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다."),
   // UserInfo Exception
   USERINFO_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저 프로필 정보를 찾을 수 없습니다."),
+  CONTACT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "유저의 연락처 정보를 찾을 수 없습니다."),
   // Post Exception
   POST_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 포스트가 없습니다."),
   HASHTAG_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "저장된 해당 해시태그가 없습니다."),

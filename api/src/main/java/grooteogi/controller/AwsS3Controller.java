@@ -21,12 +21,14 @@ public class AwsS3Controller {
   @PostMapping("/image")
   public ResponseEntity<BasicResponse> uploadImage(@RequestParam MultipartFile multipartFile) {
     String imageUrl = awsS3Service.uploadImage(multipartFile);
-    return ResponseEntity.ok(BasicResponse.builder().data(imageUrl).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("upload image success").data(imageUrl).build());
   }
 
   @DeleteMapping("/image")
   public ResponseEntity<BasicResponse> deleteImage(@RequestParam String fileName) {
     awsS3Service.deleteImage(fileName);
-    return ResponseEntity.ok(BasicResponse.builder().build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("delete image success").build());
   }
 }

@@ -23,19 +23,22 @@ public class HashtagController {
   @GetMapping
   public ResponseEntity<BasicResponse> getHashtag() {
     List<HashtagDto.Response> hashtags = hashtagService.getHashtag();
-    return ResponseEntity.ok(BasicResponse.builder().data(hashtags).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get hashtag list success").data(hashtags).build());
   }
 
   @GetMapping("/search")
   public ResponseEntity<BasicResponse> search(
       @RequestParam(name = "keyword", required = false) String keyword) {
     HashtagDto.Response hashtag = hashtagService.search(keyword);
-    return ResponseEntity.ok(BasicResponse.builder().data(hashtag).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("search hashtag success").data(hashtag).build());
   }
 
   @PostMapping
   public ResponseEntity<BasicResponse> createHashtag(@RequestBody HashtagDto.Request request) {
     HashtagDto.Response createdHashtag = hashtagService.createHashtag(request);
-    return ResponseEntity.ok(BasicResponse.builder().data(createdHashtag).build());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("create hashtag success").data(createdHashtag).build());
   }
 }

@@ -31,6 +31,8 @@ public class ReservationDto {
     private int postId;
     private String imageUrl;
     private String status;
+    private String hostPhone;
+    private String applyPhone;
   }
 
   @Data

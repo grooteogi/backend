@@ -1,10 +1,6 @@
 package grooteogi;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -13,10 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grooteogi.config.UserInterceptor;
-import grooteogi.controller.ReservationController;
-import grooteogi.domain.Schedule;
-import grooteogi.dto.ReservationDto;
-import grooteogi.service.ReservationService;
+import grooteogi.controller.ReviewController;
+import grooteogi.dto.ReviewDto;
+import grooteogi.service.ReviewService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,13 +36,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@WebMvcTest(ReservationController.class)
-public class ReservationDocumentationTests {
+@WebMvcTest(ReviewController.class)
+public class ReviewDocumentationTests {
 
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private ReservationService reservationService;
+  private ReviewService reviewService;
   @MockBean
   private UserInterceptor userInterceptor;
   @MockBean
@@ -63,76 +58,81 @@ public class ReservationDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
+  private ReviewDto.Request request = ReviewDto.Request.builder().build();
+  private int reviewId = 1;
+
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(
         documentationConfiguration(restDocumentation).operationPreprocessors()
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
+
   }
 
   @Test
-  @DisplayName("예약조회")
-  public void getReservation() throws Exception {
+  @DisplayName("리뷰 생성")
+  void createReview() throws Exception {
+
     // given
-    given(reservationService.getReservation(1)).willReturn(any());
-
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders
-            .get("/reservation/{reservationId}", 1)
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON));
-    result.andExpect(status().isOk())
-        .andDo(print());
-
-    verify(reservationService).getReservation(1);
-  }
-
-
-  @Test
-  @DisplayName("예약생성")
-  public void createReservation() throws Exception {
-    // given
-    final ReservationDto.Request request =
-        ReservationDto.Request.builder().scheduleId(1).message("msg").build();
-
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(reservationService.createReservation(eq(request), anyInt())).willReturn(any());
+    reviewService.createReview(request, session.getId());
 
     String json = objectMapper.writeValueAsString(request);
 
-    // when
     ResultActions resultActions = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/reservation").characterEncoding("utf-8")
+        RestDocumentationRequestBuilders.post("/review")
+            .characterEncoding("utf-8")
             .content(json)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
     );
 
-    // then
     resultActions.andExpect(status().isOk())
         .andDo(print());
-
   }
 
   @Test
-  @DisplayName("예약삭제")
-  public void deleteReservation() throws Exception {
-    //given
-    int reservationId = anyInt();
+  @DisplayName("리뷰 수정")
+  void modifyReview() throws Exception {
+    // given
 
-    //when
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    reviewService.modifyReview(request, reviewId, session.getId());
+
+    String json = objectMapper.writeValueAsString(request);
+
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .delete("/reservation/{reservationId}", reservationId)
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON)
-    );
+            .patch("/review/{reviewId}", reviewId)
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
 
-    //then
+    resultActions.andExpect(status().isOk())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("리뷰 삭제")
+  void deleteReview() throws Exception {
+    // given
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    reviewService.deleteReview(anyInt(), anyInt());
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .delete("/review/{reviewId}", reviewId));
     resultActions.andExpect(status().isOk())
         .andDo(print());
 
