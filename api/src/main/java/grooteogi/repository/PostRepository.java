@@ -13,10 +13,22 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   Boolean existsByUser(User user);
 
   @Query(
-      value = "SELECT * FROM post WHERE (title LIKE %:keyword% OR content LIKE %:keyword%)",
+      value = "SELECT * FROM post WHERE (title LIKE %:keyword% OR content LIKE %:keyword%) "
+          + "ORDER BY id DESC",
       nativeQuery = true
   )
   List<Post> findAllByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+  @Query(
+      value = "SELECT * FROM post ORDER BY id DESC",
+      nativeQuery = true
+  )
+  List<Post> findAllByNonKeyword(Pageable pageable);
 
+
+  @Query(
+      value = "SELECT count(*) FROM post WHERE (title LIKE %:keyword% OR content LIKE %:keyword%)",
+      nativeQuery = true
+  )
+  int countFilteredPost(@Param("keyword") String keyword);
 }
