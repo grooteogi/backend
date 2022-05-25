@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -182,16 +183,12 @@ public class PostService {
   public PostDto.SearchResponse search(String keyword, String filter,
       Pageable page, String region) {
 
-    float count =
-        keyword == null ? postRepository.count() : postRepository.countByKeyword(keyword);
-    int pageCount = (int) Math.ceil(count / 12);
-
-    List<SearchResult> searchResults = keyword == null ? searchAllPosts(page, filter, region)
+    return keyword == null ? searchAllPosts(page, filter, region)
         : searchPosts(keyword, page, filter, region);
-    return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
+
   }
 
-  private List<SearchResult> filter(List<Post> postList, String filter) {
+  private PostDto.SearchResponse filter(List<Post> postList, String filter, int pageCount) {
 
     PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
 
@@ -222,7 +219,7 @@ public class PostService {
       postList.forEach(post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
     }
 
-    return searchResults;
+    return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
 
   private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
@@ -232,22 +229,22 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  public List<SearchResult> searchAllPosts(Pageable page, String filter, String region) {
-    List<Post> posts = postRepository.findAllByNonKeyword(page);
+  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
+    Page<Post> posts = postRepository.findAll(page);
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
     );
 
-    return filter(posts, filter);
+    return filter(posts.getContent(), filter, posts.getTotalPages());
   }
 
-  private List<SearchResult> searchPosts(String keyword, Pageable page,
+  private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
       String filter, String region) {
-    List<Post> posts = postRepository.findAllByKeyword(keyword, page);
+    Page<Post> posts = postRepository.findAllByKeyword(keyword, page);
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
     );
-    return filter(posts, filter);
+    return filter(posts.getContent(), filter, posts.getTotalPages());
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
