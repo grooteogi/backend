@@ -34,13 +34,21 @@ public class PostDto {
 
   @Data
   @Builder
-  public static class SearchResponse {
+  public static class SearchResult {
 
     private int postId;
     private String title;
     private String content;
     private String imageUrl;
     private List<String> hashtags;
+  }
+
+  @Data
+  @Builder
+  public static class SearchResponse {
+
+    private List<SearchResult> posts;
+    private int pageCount;
   }
 
   @Data

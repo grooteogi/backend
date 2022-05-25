@@ -88,12 +88,10 @@ public class PostDocumentationTests {
     String filter = "LATEST";
     String region = "강서구";
 
-    PostDto.SearchResponse post = PostDto.SearchResponse.builder().build();
-    List<PostDto.SearchResponse> searchResponse = new ArrayList<>();
-    searchResponse.add(post);
+    PostDto.SearchResponse response = PostDto.SearchResponse.builder().build();
 
     // when
-    given(postService.search(keyword, filter, page, region)).willReturn(searchResponse);
+    given(postService.search(keyword, filter, page, region)).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -266,7 +264,6 @@ public class PostDocumentationTests {
   @DisplayName("포스트 삭제")
   public void deletePost() throws Exception {
     // given
-
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);

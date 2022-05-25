@@ -9,6 +9,7 @@ import grooteogi.utils.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,10 +36,10 @@ public class PostController {
       @RequestParam(name = "filter", required = false) String filter,
       @RequestParam(name = "region") String region) {
 
-    List<PostDto.SearchResponse> posts = postService.search(keyword, filter,
-        PageRequest.of(page - 1, 12), region);
+    PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
+        PageRequest.of(page - 1, 12, Sort.by("id").descending()), region);
     return ResponseEntity.ok(
-        BasicResponse.builder().message("search post success").data(posts).build());
+        BasicResponse.builder().message("search post success").data(searchResponse).build());
   }
 
   @GetMapping("/{postId}")
