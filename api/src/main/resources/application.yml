@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    default: local
   interceptor:
     excludes:
       - /auth/**
