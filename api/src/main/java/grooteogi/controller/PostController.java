@@ -35,10 +35,10 @@ public class PostController {
       @RequestParam(name = "filter", required = false) String filter,
       @RequestParam(name = "region") String region) {
 
-    List<PostDto.SearchResponse> posts = postService.search(keyword, filter,
+    PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
         PageRequest.of(page - 1, 12), region);
     return ResponseEntity.ok(
-        BasicResponse.builder().message("search post success").data(posts).build());
+        BasicResponse.builder().message("search post success").data(searchResponse).build());
   }
 
   @GetMapping("/{postId}")
