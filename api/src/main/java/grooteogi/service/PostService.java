@@ -240,7 +240,9 @@ public class PostService {
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
       String filter, String region) {
-    Page<Post> posts = postRepository.findAllByKeyword(keyword, page);
+    Page<Post> posts =
+        postRepository.findAllByTitleContainingOrContentContaining(keyword, keyword, page);
+
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
     );
