@@ -66,6 +66,9 @@ public class PostDocumentationTests {
   private SecurityContext securityContext;
 
   private int postId = 1;
+  private PostDto.Request request = PostDto.Request.builder().build();
+  private PostDto.CreateResponse createResponse = PostDto.CreateResponse.builder().build();
+  private PostDto.Response response = PostDto.Response.builder().build();
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -109,10 +112,8 @@ public class PostDocumentationTests {
   public void getPost() throws Exception {
     // given
 
-    PostDto.Response createResponse = PostDto.Response.builder().build();
-
     // when
-    given(postService.getPostResponse(postId)).willReturn(createResponse);
+    given(postService.getPostResponse(postId)).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -211,8 +212,6 @@ public class PostDocumentationTests {
   @DisplayName("포스트 생성")
   public void createPost() throws Exception {
     // given
-    PostDto.Request request = PostDto.Request.builder().build();
-    PostDto.CreateResponse createResponse = PostDto.CreateResponse.builder().build();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
@@ -240,9 +239,6 @@ public class PostDocumentationTests {
   @DisplayName("포스트 수정")
   public void modifyPost() throws Exception {
     //given
-
-    PostDto.Request request = PostDto.Request.builder().build();
-    PostDto.Response response = PostDto.Response.builder().build();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
