@@ -30,5 +30,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
       value = "SELECT count(*) FROM post WHERE (title LIKE %:keyword% OR content LIKE %:keyword%)",
       nativeQuery = true
   )
-  int countFilteredPost(@Param("keyword") String keyword);
+  int countByKeyword(@Param("keyword") String keyword);
+
 }

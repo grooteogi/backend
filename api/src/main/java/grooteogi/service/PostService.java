@@ -183,7 +183,7 @@ public class PostService {
       Pageable page, String region) {
 
     float count =
-        keyword == null ? postRepository.count() : postRepository.countFilteredPost(keyword);
+        keyword == null ? postRepository.count() : postRepository.countByKeyword(keyword);
     int pageCount = (int) Math.ceil(count / 12);
 
     List<SearchResult> searchResults = keyword == null ? searchAllPosts(page, filter, region)
