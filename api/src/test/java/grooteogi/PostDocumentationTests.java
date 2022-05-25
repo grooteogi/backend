@@ -20,8 +20,6 @@ import grooteogi.mapper.PostMapper;
 import grooteogi.service.PostService;
 import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -183,12 +181,10 @@ public class PostDocumentationTests {
     String filter = anyString();
     String region = anyString();
 
-    PostDto.SearchResponse post = any();
-    List<PostDto.SearchResponse> searchResponse = new ArrayList<>();
-    searchResponse.add(post);
+    PostDto.SearchResponse response = PostDto.SearchResponse.builder().build();
 
     // when
-    given(postService.search(keyword, filter, eq(page), region)).willReturn(searchResponse);
+    given(postService.search(keyword, filter, eq(page), region)).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
