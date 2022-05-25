@@ -1,4 +1,7 @@
 spring:
+  interceptor:
+    excludes:
+      - /docs/**
   origin:
     url: "http://localhost:3000"
   datasource:

@@ -1,4 +1,9 @@
 spring:
+  interceptor:
+    excludes:
+      - /auth/**
+      - /hashtag/search/**
+      - /post/search/**
   jackson:
     default-property-inclusion: non_null
   mail:

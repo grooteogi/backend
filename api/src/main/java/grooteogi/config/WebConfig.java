@@ -1,6 +1,7 @@
 package grooteogi.config;
 
 import grooteogi.utils.JwtProvider;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Value("${spring.origin.url}")
   private String url;
+
+  @Value("${spring.interceptor.excludes}")
+  private List<String> excludes;
+
   private final JwtProvider jwtProvider;
 
   @Override
@@ -24,6 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new UserInterceptor(jwtProvider))
-        .excludePathPatterns("/auth/**", "/hashtag/search/**", "/post/search/**");
+        .addPathPatterns("/**")
+        .excludePathPatterns(excludes);
   }
 }

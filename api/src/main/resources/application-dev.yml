@@ -1,4 +1,9 @@
 spring:
+  config:
+    import: 'aws-parameterstore:'
+  interceptor:
+    excludes:
+      - /docs/**
   origin:
     url: "http://localhost:3000"
   datasource:
@@ -21,8 +26,6 @@ spring:
     access_token_expiration_time: 1800000
     redis_token_expiration_time: 30
     refresh_token_expiration_time: 604800000
-  config:
-    import: 'aws-parameterstore:'
 aws:
   paramstore:
     name: grooteogi
