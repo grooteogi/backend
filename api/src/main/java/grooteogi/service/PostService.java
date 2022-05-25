@@ -10,7 +10,7 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
-import grooteogi.dto.PostDto.SearchPost;
+import grooteogi.dto.PostDto.SearchResult;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.PostFilterEnum;
 import grooteogi.enums.RegionType;
@@ -186,16 +186,16 @@ public class PostService {
         keyword == null ? postRepository.count() : postRepository.countFilteredPost(keyword);
     int pageCount = (int) Math.ceil(count / 12);
 
-    List<PostDto.SearchPost> searchPosts = keyword == null ? searchAllPosts(page, filter, region)
+    List<SearchResult> searchResults = keyword == null ? searchAllPosts(page, filter, region)
         : searchPosts(keyword, page, filter, region);
-    return PostDto.SearchResponse.builder().posts(searchPosts).pageCount(pageCount).build();
+    return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
 
-  private List<PostDto.SearchPost> filter(List<Post> postList, String filter) {
+  private List<SearchResult> filter(List<Post> postList, String filter) {
 
     PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
 
-    List<SearchPost> searchPosts = new ArrayList<>();
+    List<SearchResult> searchResults = new ArrayList<>();
 
     if (postFilterEnum == PostFilterEnum.VIEWS) {
       List<Post> filteredPostList = postList.stream()
@@ -203,7 +203,7 @@ public class PostService {
           .collect(Collectors.toList());
 
       filteredPostList.forEach(
-          post -> searchPosts.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
 
 
     } else if (postFilterEnum == PostFilterEnum.POPULAR) {
@@ -214,15 +214,15 @@ public class PostService {
       Collections.reverse(filteredPostList);
 
       filteredPostList.forEach(
-          post -> searchPosts.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
 
 
     } else {
 
-      postList.forEach(post -> searchPosts.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+      postList.forEach(post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
     }
 
-    return searchPosts;
+    return searchResults;
   }
 
   private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
@@ -232,7 +232,7 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  public List<PostDto.SearchPost> searchAllPosts(Pageable page, String filter, String region) {
+  public List<SearchResult> searchAllPosts(Pageable page, String filter, String region) {
     List<Post> posts = postRepository.findAllByNonKeyword(page);
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
@@ -241,7 +241,7 @@ public class PostService {
     return filter(posts, filter);
   }
 
-  private List<PostDto.SearchPost> searchPosts(String keyword, Pageable page,
+  private List<SearchResult> searchPosts(String keyword, Pageable page,
       String filter, String region) {
     List<Post> posts = postRepository.findAllByKeyword(keyword, page);
     posts.forEach(

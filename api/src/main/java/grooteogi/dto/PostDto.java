@@ -34,7 +34,7 @@ public class PostDto {
 
   @Data
   @Builder
-  public static class SearchPost {
+  public static class SearchResult {
 
     private int postId;
     private String title;
@@ -47,7 +47,7 @@ public class PostDto {
   @Builder
   public static class SearchResponse {
 
-    private List<SearchPost> posts;
+    private List<SearchResult> posts;
     private int pageCount;
   }
 

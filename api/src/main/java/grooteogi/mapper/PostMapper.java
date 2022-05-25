@@ -8,7 +8,7 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.Request;
-import grooteogi.dto.PostDto.SearchPost;
+import grooteogi.dto.PostDto.SearchResult;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.UserDto;
 import grooteogi.enums.RegionType;
@@ -65,7 +65,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "post.content", target = "content")
   @Mapping(source = "post.imageUrl", target = "imageUrl")
   @Mapping(source = "post.postHashtags", target = "hashtags", ignore = true)
-  SearchPost toSearchResponseDto(Post post);
+  SearchResult toSearchResponseDto(Post post);
 
   @Mapping(source = "post.id", target = "postId")
   List<PostDto.Response> toResponseListDto(List<Post> post);
