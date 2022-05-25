@@ -1,6 +1,7 @@
 Grooteogi Backend
 ===
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/grooteogi/backend?style=flat-square)
 ![deploy](https://img.shields.io/travis/com/grooteogi/backend/develop?label=deploy&logo=travis&style=flat-square)
 
 🚀 Getting Started
@@ -18,7 +19,7 @@ Grooteogi Backend
 🧐 How to set env vars 
 ---
 
-- In local environment, [local.env](./api/config/local.env) is used.
+- In local environment, `./api/config/local.env` is used.
   - Please refer to that [link](https://github.com/grooteogi/backend/wiki/env_file)
 - In server environment, use the `aws parameter store`.
 
