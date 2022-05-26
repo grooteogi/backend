@@ -1,9 +1,17 @@
 package grooteogi;
 
+import static grooteogi.ApiDocumentUtils.getDocumentRequest;
+import static grooteogi.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,22 +81,31 @@ class AwsS3DocumentationTests {
   void uploadImage() throws Exception {
     // given
     MockMultipartFile multipartFile = new MockMultipartFile(
-        "image",
-        "image.jpeg",
+        "multipartFile",
+        "multipartFile.jpeg",
         MediaType.IMAGE_JPEG_VALUE,
-        "image".getBytes()
+        "multipartFile".getBytes()
     );
 
-    String response = anyString();
+    String imageUrl =  "https://dev-grtg-bucket.s3.ap-northeast-2.amazonaws.com/e169bcdd-e8b6-4748-8eaa-2333762e013d.jpeg";
 
-    given(awsS3Service.uploadImage(multipartFile)).willReturn(response);
+    given(awsS3Service.uploadImage(multipartFile)).willReturn(imageUrl);
 
     ResultActions result = mockMvc.perform(
         RestDocumentationRequestBuilders.multipart("/s3/image")
-            .file("multipartFile",  multipartFile.getBytes())
-            .contentType(MediaType.MULTIPART_FORM_DATA));
+            .file("multipartFile", multipartFile.getBytes())
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("aws-s3-upload", getDocumentRequest(), getDocumentResponse(),
+                requestPartBody("multipartFile"),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                ))
+        );
   }
 
   @Test
@@ -107,6 +124,16 @@ class AwsS3DocumentationTests {
             .accept(MediaType.APPLICATION_JSON)
     );
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("aws-s3-delete", getDocumentRequest(), getDocumentResponse(),
+                requestParameters(
+                    parameterWithName("fileName").description("이미지 url")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                ))
+        );
   }
 }
