@@ -99,3 +99,24 @@ include::{snippets}/delete-reservation/http-request.adoc[]
 
 ==== Response
 include::{snippets}/delete-reservation/http-createResponse.adoc[]
+
+== AwsS3 API
+
+=== Upload Image
+
+==== Request
+include::{snippets}/aws-s3-upload/http-request.adoc[]
+
+==== Response
+include::{snippets}/aws-s3-upload/http-response.adoc[]
+
+=== Delete Image
+
+==== Request
+include::{snippets}/aws-s3-delete/http-request.adoc[]
+
+==== Request parameters
+include::{snippets}/aws-s3-delete/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/aws-s3-delete/http-response.adoc[]
