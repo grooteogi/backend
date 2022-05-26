@@ -1,5 +1,6 @@
 package grooteogi.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,11 @@ public class HashtagDto {
 
     @NotNull
     private String name;
-    private int id;
+
+    @JsonCreator
+    public Request(String name) {
+      this.name = name;
+    }
   }
 
   @Data

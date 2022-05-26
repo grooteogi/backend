@@ -27,9 +27,9 @@ public class HashtagService {
     }
 
     Hashtag createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
-    hashtagRepository.save(createdHashtag);
+    Hashtag savedHashtag = hashtagRepository.save(createdHashtag);
 
-    return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
+    return HashtagMapper.INSTANCE.toResponseDto(savedHashtag);
 
   }
 

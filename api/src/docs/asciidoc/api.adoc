@@ -100,6 +100,48 @@ include::{snippets}/delete-reservation/http-request.adoc[]
 ==== Response
 include::{snippets}/delete-reservation/http-createResponse.adoc[]
 
+
+== Hashtag API
+
+=== Create Hashtag
+
+==== Request
+include::{snippets}/hashtag-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/hashtag-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/hashtag-create/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-create/response-fields.adoc[]
+
+=== Get Hashtag
+
+==== Request
+include::{snippets}/hashtag-get/http-request.adoc[]
+
+==== Response
+include::{snippets}/hashtag-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-get/response-fields.adoc[]
+
+=== Search Hashtag
+
+==== Request
+include::{snippets}/hashtag-search/http-request.adoc[]
+
+==== Request Parameter
+include::{snippets}/hashtag-search/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/hashtag-search/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-search/response-fields.adoc[]
+
 == Review API
 
 === Create Review
