@@ -68,7 +68,6 @@ public class HashtagDocumentationTests {
 
   private HashtagDto.Request request = 
       HashtagDto.Request.builder()
-          .id(1)
           .name("개발자")
           .build();
   private HashtagDto.Response response = 
@@ -158,7 +157,6 @@ public class HashtagDocumentationTests {
         .andDo(print())
         .andDo(document("hashtag-create", getDocumentRequest(), getDocumentResponse(),
             requestFields(
-                fieldWithPath("id").description("무슨 아이디죠?"),
                 fieldWithPath("name").description("해시태그 이름")
             ),
             responseFields(
