@@ -37,6 +37,11 @@ public class UserInterceptor implements HandlerInterceptor {
         Cookie refreshCookie = WebUtils.getCookie(request, "X-REFRESH-TOKEN");
         if (refreshCookie != null) {
           String refreshToken = URLDecoder.decode(refreshCookie.getValue(), "UTF-8");
+
+          if (!jwtProvider.isUsable(refreshToken)) {
+            throw new ApiException(ApiExceptionEnum.EXPIRED_REFRESH_TOKEN_EXCEPTION);
+          }
+
           Session session = jwtProvider.extractAllClaims(refreshToken);
           response.setStatus(HttpServletResponse.SC_ACCEPTED);
           response.setHeader("X-AUTH-TOKEN",
