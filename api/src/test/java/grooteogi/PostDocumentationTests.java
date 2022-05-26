@@ -129,8 +129,9 @@ public class PostDocumentationTests {
   @DisplayName("포스트 검색")
   public void search() throws Exception {
     // given
-    final String keyword = "포스트";
-    final Pageable page = PageRequest.of(0, 12, Sort.by("id"));
+    final String keyword = "포";
+    final int page = 1;
+    Pageable pages = PageRequest.of(page - 1, 12, Sort.by("id").descending());
     final String filter = "LATEST";
     final String region = "강서구";
     final List<SearchResult> posts = new ArrayList<>();
@@ -150,14 +151,12 @@ public class PostDocumentationTests {
             .build();
 
     // when
-    given(postService.search(keyword, filter, page, region)).willReturn(response);
+    when(postService.search(keyword, filter, pages, region)).thenReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/search?keyword=포스트&page=1&filter=LATEST&region=강서구")
-            .characterEncoding("utf-8")
-            .accept(MediaType.APPLICATION_JSON));
-
+            .get("/post/search?keyword=포&page=1&filter=LATEST&region=강서구")
+        );
     resultActions.andExpect(status().isOk())
         .andDo(print())
         .andDo(
@@ -170,13 +169,13 @@ public class PostDocumentationTests {
                 ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("message").description("응답 메세지")
-//                    fieldWithPath("data").description("포스트 ID")
-//                    fieldWithPath("data.posts[].title").description("포스트 제목"),
-//                    fieldWithPath("data.posts[].content").description("포스트 내용"),
-//                    fieldWithPath("data.posts[].imageUrl").description("포스트 이미지 url"),
-//                    fieldWithPath("data.posts[].hashtags[]").description("해시태그 이름"),
-//                    fieldWithPath("data['pageCount']").description("총 페이지 수")
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.posts[].postId").description("포스트 ID"),
+                    fieldWithPath("data.posts[].title").description("포스트 제목"),
+                    fieldWithPath("data.posts[].content").description("포스트 내용"),
+                    fieldWithPath("data.posts[].imageUrl").description("포스트 이미지 url"),
+                    fieldWithPath("data.posts[].hashtags[]").description("해시태그 이름"),
+                    fieldWithPath("data['pageCount']").description("총 페이지 수")
                 ))
         );
 
@@ -328,6 +327,9 @@ public class PostDocumentationTests {
         .andDo(print())
         .andDo(
             document("like-get", getDocumentRequest(), getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("postId").description("포스트 ID")
+                ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지")
