@@ -10,6 +10,7 @@ import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.PostDto.SearchResult;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.PostFilterEnum;
 import grooteogi.enums.RegionType;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -102,6 +104,8 @@ public class PostService {
     List<PostHashtag> postHashtags = createPostHashtag(request.getHashtags());
 
     Optional<User> user = userRepository.findById(userId);
+
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
     Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), schedules, postHashtags);
 
@@ -178,17 +182,19 @@ public class PostService {
     this.postRepository.delete(post.get());
   }
 
-  public List<PostDto.SearchResponse> search(String keyword, String filter,
+  public PostDto.SearchResponse search(String keyword, String filter,
       Pageable page, String region) {
+
     return keyword == null ? searchAllPosts(page, filter, region)
         : searchPosts(keyword, page, filter, region);
+
   }
 
-  private List<PostDto.SearchResponse> filter(List<Post> postList, String filter) {
+  private PostDto.SearchResponse filter(List<Post> postList, String filter, int pageCount) {
 
     PostFilterEnum postFilterEnum = PostFilterEnum.valueOf(filter);
 
-    List<PostDto.SearchResponse> responses = new ArrayList<>();
+    List<SearchResult> searchResults = new ArrayList<>();
 
     if (postFilterEnum == PostFilterEnum.VIEWS) {
       List<Post> filteredPostList = postList.stream()
@@ -196,9 +202,8 @@ public class PostService {
           .collect(Collectors.toList());
 
       filteredPostList.forEach(
-          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
 
-      return responses;
 
     } else if (postFilterEnum == PostFilterEnum.POPULAR) {
       List<Post> filteredPostList = postList.stream()
@@ -208,19 +213,17 @@ public class PostService {
       Collections.reverse(filteredPostList);
 
       filteredPostList.forEach(
-          post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
 
-      return responses;
 
+    } else {
+
+      postList.forEach(post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
     }
 
-    Collections.reverse(postList);
-
-    postList.forEach(post -> responses.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
-
-    return responses;
+    return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
-  
+
   private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
     RegionType regionType = RegionType.getEnum(region);
 
@@ -228,21 +231,24 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  public List<PostDto.SearchResponse> searchAllPosts(Pageable page, String filter, String region) {
-    List<Post> posts = postRepository.findAll();
+  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
+    Page<Post> posts = postRepository.findAll(page);
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
     );
-    return filter(posts, filter);
+
+    return filter(posts.getContent(), filter, posts.getTotalPages());
   }
 
-  private List<PostDto.SearchResponse> searchPosts(String keyword, Pageable page,
+  private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
       String filter, String region) {
-    List<Post> posts = postRepository.findAllByKeyword(keyword, page);
+    Page<Post> posts =
+        postRepository.findAllByTitleContainingOrContentContaining(keyword, keyword, page);
+
     posts.forEach(
         post -> filterRegion(post.getSchedules(), region)
     );
-    return filter(posts, filter);
+    return filter(posts.getContent(), filter, posts.getTotalPages());
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {

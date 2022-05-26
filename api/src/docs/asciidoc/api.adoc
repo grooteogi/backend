@@ -99,3 +99,62 @@ include::{snippets}/delete-reservation/http-request.adoc[]
 
 ==== Response
 include::{snippets}/delete-reservation/http-createResponse.adoc[]
+
+== Review API
+
+=== Create Review
+
+==== Request
+include::{snippets}/review-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/review-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/review-create/http-response.adoc[]
+
+=== Modify Review
+
+==== Request
+include::{snippets}/review-modify/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-modify/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/review-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/review-modify/http-response.adoc[]
+
+=== Delete Review
+
+==== Request
+include::{snippets}/review-delete/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-delete/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/review-delete/http-response.adoc[]
+
+== AwsS3 API
+
+=== Upload Image
+
+==== Request
+include::{snippets}/aws-s3-upload/http-request.adoc[]
+
+==== Response
+include::{snippets}/aws-s3-upload/http-response.adoc[]
+
+=== Delete Image
+
+==== Request
+include::{snippets}/aws-s3-delete/http-request.adoc[]
+
+==== Request parameters
+include::{snippets}/aws-s3-delete/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/aws-s3-delete/http-response.adoc[]

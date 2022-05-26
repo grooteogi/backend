@@ -17,8 +17,8 @@ public class RedisConfig {
   @Value("${spring.redis.port}")
   private Integer redisPort;
 
-  @Profile("!local")
   @Bean
+  @Profile("!local")
   public RedisClusterConfiguration redisClusterConfiguration() {
     RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
     clusterConfiguration.clusterNode(redisHost, redisPort);

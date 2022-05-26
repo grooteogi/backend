@@ -1,9 +1,16 @@
 package grooteogi;
 
-import static org.mockito.ArgumentMatchers.anyInt;
+import static grooteogi.ApiDocumentUtils.getDocumentRequest;
+import static grooteogi.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +65,13 @@ public class ReviewDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  private ReviewDto.Request request = ReviewDto.Request.builder().build();
+  private ReviewDto.Request request =
+      ReviewDto.Request.builder()
+          .postId(1)
+          .reservationId(1)
+          .score(5L)
+          .text("만나서 반가웠어요")
+          .build();
   private int reviewId = 1;
 
   @BeforeEach
@@ -92,7 +105,20 @@ public class ReviewDocumentationTests {
     );
 
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("review-create", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("postId").description("포스트 ID"),
+                    fieldWithPath("reservationId").description("예약 ID"),
+                    fieldWithPath("text").description("리뷰 메세지"),
+                    fieldWithPath("score").description("평점")
+                    ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                ))
+        );
   }
 
   @Test
@@ -116,7 +142,22 @@ public class ReviewDocumentationTests {
             .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("review-modify", getDocumentRequest(), getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 ID")),
+                requestFields(
+                    fieldWithPath("postId").description("포스트 ID"),
+                    fieldWithPath("reservationId").description("예약 ID"),
+                    fieldWithPath("text").description("리뷰 메세지"),
+                    fieldWithPath("score").description("평점")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                ))
+        );
   }
 
   @Test
@@ -128,13 +169,17 @@ public class ReviewDocumentationTests {
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    reviewService.deleteReview(anyInt(), anyInt());
+    reviewService.deleteReview(reviewId, session.getId());
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
             .delete("/review/{reviewId}", reviewId));
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(document("review-delete", getDocumentRequest(), getDocumentResponse(),
+            pathParameters(
+                parameterWithName("reviewId").description("리뷰 ID")))
+        );
 
   }
 }

@@ -5,8 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### configs ###
-/src/main/resources/application-prod.yml
+### restdocs ###
+/src/main/resources/static/docs/
 
 ### env ###
 /config/local.env
