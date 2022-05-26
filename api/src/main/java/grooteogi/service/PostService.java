@@ -123,7 +123,8 @@ public class PostService {
   }
 
   @Transactional
-  public PostDto.CreateResponse modifyPost(PostDto.Request request, Integer postId, Integer userId) {
+  public PostDto.CreateResponse modifyPost(PostDto.Request request,
+      Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
     int writer = post.get().getUser().getId();
 
