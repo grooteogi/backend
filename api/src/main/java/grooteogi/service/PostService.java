@@ -123,7 +123,7 @@ public class PostService {
   }
 
   @Transactional
-  public PostDto.Response modifyPost(PostDto.Request request, Integer postId, Integer userId) {
+  public PostDto.CreateResponse modifyPost(PostDto.Request request, Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
     int writer = post.get().getUser().getId();
 
@@ -158,7 +158,7 @@ public class PostService {
 
     Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
     postRepository.save(modifiedPost);
-    return PostMapper.INSTANCE.toDetailResponse(modifiedPost);
+    return PostMapper.INSTANCE.toCreateResponseDto(modifiedPost);
   }
 
   public void deletePost(Integer postId, Integer userId) {

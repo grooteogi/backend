@@ -96,7 +96,7 @@ public class PostController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    PostDto.Response modifiedPost = postService.modifyPost(request, postId, session.getId());
+    PostDto.CreateResponse modifiedPost = postService.modifyPost(request, postId, session.getId());
     return ResponseEntity.ok(
         BasicResponse.builder().message("modify post success").data(modifiedPost).build());
   }
