@@ -1,9 +1,18 @@
 package grooteogi;
 
+import static grooteogi.ApiDocumentUtils.getDocumentRequest;
+import static grooteogi.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,6 +71,28 @@ public class ReservationDocumentationTests {
   private SecurityContext securityContext;
 
   private final int reservationId = 1;
+  final String[] hashtags = new String[]{"개발자", "코딩"};
+  private final ReservationDto.DetailResponse response =
+      ReservationDto.DetailResponse.builder()
+          .date("2022-05-25")
+          .startTime("11:00:00")
+          .endTime("12:00:00")
+          .hashtags(List.of(hashtags))
+          .imageUrl("imageUrl")
+          .place("할리스")
+          .region("마포구")
+          .postId(1)
+          .isCanceled(true)
+          .title("개발이 좋아?")
+          .applyPhone("01012345678")
+          .hostPhone("01098765432")
+          .build();
+
+  private final ReservationDto.Response createResponse =
+      ReservationDto.Response.builder()
+          .reservationId(1)
+          .build();
+  private final String phoneNumber = "01012345678";
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -75,7 +106,6 @@ public class ReservationDocumentationTests {
   @DisplayName("예약 개별 조회")
   public void getReservation() throws Exception {
     // given
-    ReservationDto.DetailResponse response = ReservationDto.DetailResponse.builder().build();
 
     given(reservationService.getReservation(reservationId)).willReturn(response);
 
@@ -85,10 +115,33 @@ public class ReservationDocumentationTests {
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-get", getDocumentRequest(), getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 ID")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.title").description("포스트 제목"),
+                    fieldWithPath("data.date").description("약속 날짜"),
+                    fieldWithPath("data.startTime").description("약속 시작 시간"),
+                    fieldWithPath("data.endTime").description("약속 종료 시간"),
+                    fieldWithPath("data.region").description("약속 지역"),
+                    fieldWithPath("data.place").description("약속 장소"),
+                    fieldWithPath("data.hashtags[]").description("해시태그"),
+                    fieldWithPath("data.postId").description("포스트 ID"),
+                    fieldWithPath("data.imageUrl").description("포스트 이미지 url"),
+                    fieldWithPath("data.isCanceled").description("약속 취소 여부"),
+                    fieldWithPath("data.hostPhone").description("멘토 연락처"),
+                    fieldWithPath("data.applyPhone").description("멘티 연락처")
+                )
+            )
+        );
 
   }
-  
+
   @Test
   @DisplayName("호스트 예약 조회")
   void getHostReservation() throws Exception {
@@ -97,7 +150,6 @@ public class ReservationDocumentationTests {
     final String filter = "ALL";
 
     List<DetailResponse> responses = new ArrayList<>();
-    ReservationDto.DetailResponse response = ReservationDto.DetailResponse.builder().build();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -112,7 +164,31 @@ public class ReservationDocumentationTests {
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-get-host", getDocumentRequest(), getDocumentResponse(),
+                requestParameters(
+                    parameterWithName("isHost").description("멘토 여부"),
+                    parameterWithName("filter").description("예약 조회 조건")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.[].title").description("포스트 제목"),
+                    fieldWithPath("data.[].date").description("약속 날짜"),
+                    fieldWithPath("data.[].startTime").description("약속 시작 시간"),
+                    fieldWithPath("data.[].endTime").description("약속 종료 시간"),
+                    fieldWithPath("data.[].region").description("약속 지역"),
+                    fieldWithPath("data.[].place").description("약속 장소"),
+                    fieldWithPath("data.[].hashtags[]").description("해시태그"),
+                    fieldWithPath("data.[].postId").description("포스트 ID"),
+                    fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
+                    fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
+                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
+                    fieldWithPath("data.[].applyPhone").description("멘티 연락처")
+                )
+            )
+        );
 
   }
 
@@ -124,7 +200,6 @@ public class ReservationDocumentationTests {
     final String filter = "ALL";
 
     List<DetailResponse> responses = new ArrayList<>();
-    ReservationDto.DetailResponse response = ReservationDto.DetailResponse.builder().build();
     responses.add(response);
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -139,7 +214,31 @@ public class ReservationDocumentationTests {
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     result.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-get-apply", getDocumentRequest(), getDocumentResponse(),
+                requestParameters(
+                    parameterWithName("isHost").description("멘토 여부"),
+                    parameterWithName("filter").description("예약 조회 조건")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.[].title").description("포스트 제목"),
+                    fieldWithPath("data.[].date").description("약속 날짜"),
+                    fieldWithPath("data.[].startTime").description("약속 시작 시간"),
+                    fieldWithPath("data.[].endTime").description("약속 종료 시간"),
+                    fieldWithPath("data.[].region").description("약속 지역"),
+                    fieldWithPath("data.[].place").description("약속 장소"),
+                    fieldWithPath("data.[].hashtags[]").description("해시태그"),
+                    fieldWithPath("data.[].postId").description("포스트 ID"),
+                    fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
+                    fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
+                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
+                    fieldWithPath("data.[].applyPhone").description("멘티 연락처")
+                )
+            )
+        );
 
   }
 
@@ -148,14 +247,18 @@ public class ReservationDocumentationTests {
   @DisplayName("예약생성")
   public void createReservation() throws Exception {
     // given
-    final ReservationDto.Request request = ReservationDto.Request.builder().build();
-    final ReservationDto.Response response = ReservationDto.Response.builder().build();
+    final ReservationDto.Request request =
+        ReservationDto.Request.builder()
+            .scheduleId(1)
+            .message("약속을 기다릴게요!")
+            .build();
 
     when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(reservationService.createReservation(request, session.getId())).willReturn(response);
+    given(reservationService.createReservation(request, session.getId())).willReturn(
+        createResponse);
 
     String json = objectMapper.writeValueAsString(request);
 
@@ -170,7 +273,20 @@ public class ReservationDocumentationTests {
 
     // then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-create", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("scheduleId").description("스케쥴 ID"),
+                    fieldWithPath("message").description("예약 시, 남기는 말")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.reservationId").description("예약 ID")
+                )
+            )
+        );
 
   }
 
@@ -195,7 +311,18 @@ public class ReservationDocumentationTests {
 
     //then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-delete", getDocumentRequest(), getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 ID")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )
+            )
+        );
 
   }
 
@@ -207,9 +334,8 @@ public class ReservationDocumentationTests {
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    final ReservationDto.Response response = ReservationDto.Response.builder().build();
-
-    given(reservationService.modifyStatus(reservationId, session.getId())).willReturn(response);
+    given(reservationService.modifyStatus(reservationId, session.getId())).willReturn(
+        createResponse);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -220,7 +346,19 @@ public class ReservationDocumentationTests {
 
     //then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-modify", getDocumentRequest(), getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 ID")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.reservationId").description("예약 ID")
+                )
+            )
+        );
 
   }
 
@@ -228,9 +366,10 @@ public class ReservationDocumentationTests {
   @DisplayName("연락처 문자 인증코드 전송")
   void sendSms() throws Exception {
 
-    final String phoneNumber = "01012345678";
     final ReservationDto.SendSmsResponse response
-        = ReservationDto.SendSmsResponse.builder().build();
+        = ReservationDto.SendSmsResponse.builder()
+        .code("ab12")
+        .build();
 
     given(reservationService.sendSms(phoneNumber)).willReturn(response);
 
@@ -244,7 +383,19 @@ public class ReservationDocumentationTests {
 
     //then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-send-sms", getDocumentRequest(), getDocumentResponse(),
+                requestParameters(
+                    parameterWithName("phoneNumber").description("연락처")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.code").description("인증코드")
+                )
+            )
+        );
 
   }
 
@@ -252,7 +403,11 @@ public class ReservationDocumentationTests {
   @DisplayName("연락처 문자 인증코드 검사")
   void checkSms() throws Exception {
 
-    final ReservationDto.CheckSmsRequest request = ReservationDto.CheckSmsRequest.builder().build();
+    final ReservationDto.CheckSmsRequest request =
+        ReservationDto.CheckSmsRequest.builder()
+            .code("ab12")
+            .phoneNumber(phoneNumber)
+            .build();
 
     reservationService.checkSms(request);
 
@@ -269,7 +424,19 @@ public class ReservationDocumentationTests {
 
     //then
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(
+            document("reservation-check-sms", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("phoneNumber").description("연락처"),
+                    fieldWithPath("code").description("인증코드")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )
+            )
+        );
 
   }
 }
