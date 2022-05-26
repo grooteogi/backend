@@ -11,9 +11,6 @@ permissions:
     group: ubuntu
 hooks:
   ApplicationStart:
-    - location: /etc/profile.d/codedeploy.sh
-      timeout: 10
-      runas: ubuntu
     - location: deploy.sh
       timeout: 60
       runas: ubuntu
