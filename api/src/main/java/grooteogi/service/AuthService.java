@@ -1,6 +1,7 @@
 package grooteogi.service;
 
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
 import grooteogi.dto.AuthDto;
 import grooteogi.dto.auth.OauthDto;
 import grooteogi.dto.auth.Token;
@@ -8,6 +9,7 @@ import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.UserMapper;
+import grooteogi.repository.UserInfoRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.EmailClient;
 import grooteogi.utils.JwtProvider;
@@ -32,6 +34,7 @@ public class AuthService {
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
+  private final UserInfoRepository userInfoRepository;
   private final EmailClient emailClient;
   private final RedisClient redisClient;
 
@@ -61,9 +64,12 @@ public class AuthService {
       registerUser.setNickname(registerUser.getNickname() + "-" + registerUser.getId());
     }
 
-    User ruser = userRepository.save(registerUser);
+    UserInfo userInfo = userInfoRepository.save(new UserInfo());
 
-    return UserMapper.INSTANCE.toResponseDto(ruser, ruser.getUserInfo());
+    User modifiedUser = UserMapper.INSTANCE.toModify(registerUser, userInfo);
+    userRepository.save(modifiedUser);
+
+    return UserMapper.INSTANCE.toResponseDto(modifiedUser, modifiedUser.getUserInfo());
   }
 
   private User registerDto(OauthDto oauthDto) {
