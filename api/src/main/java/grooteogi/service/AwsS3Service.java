@@ -42,11 +42,12 @@ public class AwsS3Service {
   }
 
   public void deleteImage(String fileName) {
+    String imgUrl = fileName.split("/")[3];
 
-    if (!this.amazonS3Client.doesObjectExist(this.bucket, fileName)) {
+    if (!this.amazonS3Client.doesObjectExist(this.bucket, imgUrl)) {
       throw new ApiException(ApiExceptionEnum.NOT_FOUND_EXCEPTION);
     }
-    amazonS3Client.deleteObject(new DeleteObjectRequest(this.bucket, fileName));
+    amazonS3Client.deleteObject(new DeleteObjectRequest(this.bucket, imgUrl));
   }
 
   private String createFileName(String fileName) {
