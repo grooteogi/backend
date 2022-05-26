@@ -6,30 +6,45 @@
 
 == User API
 
-=== Get All User
+=== Get User Profile
 
 ==== Request
-include::{snippets}/get-all-user/http-request.adoc[]
+include::{snippets}/profile-get/http-request.adoc[]
 
 ==== Response
-include::{snippets}/get-all-user/http-createResponse.adoc[]
+include::{snippets}/profile-get/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-all-user/createResponse-fields.adoc[]
+include::{snippets}/profile-get/response-fields.adoc[]
 
-=== Get User
+=== Modify User Profile
 
 ==== Request
-include::{snippets}/get-user/http-request.adoc[]
+include::{snippets}/profile-modify/http-request.adoc[]
 
 ==== Request Fields
-include::{snippets}/get-user/request-fields.adoc[]
+include::{snippets}/profile-modify/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/get-user/http-createResponse.adoc[]
+include::{snippets}/profile-modify/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-user/createResponse-fields.adoc[]
+include::{snippets}/profile-modify/response-fields.adoc[]
+
+=== Modify User Password
+
+==== Request
+include::{snippets}/password-modify/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/password-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/password-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/password-modify/response-fields.adoc[]
+
 
 == Auth API
 
