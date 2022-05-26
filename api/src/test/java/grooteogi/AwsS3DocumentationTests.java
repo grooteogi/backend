@@ -104,7 +104,6 @@ class AwsS3DocumentationTests {
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지")
-//                    fieldWithPath("data").description("이미지 url").type(JsonFieldType.STRING)
                 ))
         );
   }
