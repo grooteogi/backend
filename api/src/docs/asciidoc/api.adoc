@@ -59,46 +59,115 @@ include::{snippets}/auth-withdrawal/http-createResponse.adoc[]
 
 === Get Reservation
 
-==== Response
-include::{snippets}/get-reservation/http-createResponse.adoc[]
+==== Request
+include::{snippets}/reservation-get/http-request.adoc[]
 
-==== Response Fields
-include::{snippets}/get-reservation/createResponse-fields.adoc[]
-
-=== Get Host User Reservation
+==== Request PathVariable
+include::{snippets}/reservation-get/path-parameters.adoc[]
 
 ==== Response
-include::{snippets}/get-host-reservation/http-createResponse.adoc[]
+include::{snippets}/reservation-get/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-host-reservation/createResponse-fields.adoc[]
+include::{snippets}/reservation-get/response-fields.adoc[]
+
+=== Get Host User Reservations
+
+==== Request
+include::{snippets}/reservation-get-host/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/reservation-get-host/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-get-host/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-get-host/response-fields.adoc[]
 
 === Get Participate User Reservation
 
+==== Request
+include::{snippets}/reservation-get-apply/http-request.adoc[]
+
+==== Request parameters
+include::{snippets}/reservation-get-apply/request-parameters.adoc[]
+
 ==== Response
-include::{snippets}/get-participate-reservation/http-createResponse.adoc[]
+include::{snippets}/reservation-get-apply/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/get-participate-reservation/createResponse-fields.adoc[]
+include::{snippets}/reservation-get-apply/response-fields.adoc[]
 
 === Create Reservation
 
 ==== Request
-include::{snippets}/create-reservation/http-request.adoc[]
+include::{snippets}/reservation-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/reservation-create/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/create-reservation/http-createResponse.adoc[]
+include::{snippets}/reservation-create/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/create-reservation/createResponse-fields.adoc[]
+include::{snippets}/reservation-create/response-fields.adoc[]
 
 === Delete Reservation
 
 ==== Request
-include::{snippets}/delete-reservation/http-request.adoc[]
+include::{snippets}/reservation-delete/http-request.adoc[]
+
+==== Request PathVariables
+include::{snippets}/reservation-delete/path-parameters.adoc[]
 
 ==== Response
-include::{snippets}/delete-reservation/http-createResponse.adoc[]
+include::{snippets}/reservation-delete/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-delete/response-fields.adoc[]
+
+=== Modify Status about Reservation API
+
+==== Request
+include::{snippets}/reservation-modify/http-request.adoc[]
+
+==== Request PathVariables
+include::{snippets}/reservation-modify/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-modify/response-fields.adoc[]
+
+=== Send SMS API
+
+==== Request
+include::{snippets}/reservation-send-sms/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/reservation-send-sms/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-send-sms/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-send-sms/response-fields.adoc[]
+
+=== Check SMS API
+
+==== Request
+include::{snippets}/reservation-check-sms/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/reservation-check-sms/request-fields.adoc[]
+
+==== Response
+include::{snippets}/reservation-check-sms/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-check-sms/response-fields.adoc[]
 
 
 == Hashtag API
