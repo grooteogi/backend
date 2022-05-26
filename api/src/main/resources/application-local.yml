@@ -13,6 +13,6 @@ spring:
     host: localhost
     port: 6378
   jwt:
-    access_token_expiration_time: 60000
+    access_token_expiration_time: 600
     redis_token_expiration_time: 1
     refresh_token_expiration_time: 604800000

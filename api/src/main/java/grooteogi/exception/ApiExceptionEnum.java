@@ -25,7 +25,7 @@ public enum ApiExceptionEnum {
   EMAIL_DUPLICATION_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
   PASSWORD_VALUE_EXCEPTION(HttpStatus.BAD_REQUEST, "비밀번호는 영문과 특수문자 숫자를 포함하며 8자 이상이어야 합니다."),
   // Token Exception
-  EXPIRED_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+  EXPIRED_TOKEN_EXCEPTION(HttpStatus.ACCEPTED, "만료된 토큰입니다."),
   EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다. 회원가입을 다시 시도하십시오."),
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."),
   MALFORED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "위조된 토큰입니다."),
