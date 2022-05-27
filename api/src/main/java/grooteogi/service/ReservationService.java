@@ -52,6 +52,7 @@ public class ReservationService {
         reservation.get().getHostUser().getUserInfo().getContact());
     Optional<String> participateUserPhone = Optional.ofNullable(
         reservation.get().getParticipateUser().getUserInfo().getContact());
+    String participateUserNickname = reservation.get().getParticipateUser().getNickname();
 
     hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
     participateUserPhone
@@ -59,7 +60,7 @@ public class ReservationService {
 
 
     return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule,
-        hostUserPhone.get(), participateUserPhone.get());
+        hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
   }
 
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
@@ -124,9 +125,11 @@ public class ReservationService {
       participateUserPhone
           .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
+      String participateUserNickname = reservation.getParticipateUser().getNickname();
+
       ReservationDto.DetailResponse detailResponse =
           ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule,
-              hostUserPhone.get(), participateUserPhone.get());
+              hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
       detailResponse.setHashtags(getTags(post.getPostHashtags()));
       responseList.add(detailResponse);
     });
