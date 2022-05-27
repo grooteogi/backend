@@ -12,12 +12,14 @@ import grooteogi.response.BasicResponse;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
+import grooteogi.utils.Session;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,15 +69,17 @@ public class AuthController {
   }
 
   @DeleteMapping("/auth/withdrawal")
-  public ResponseEntity withdrawal(@RequestParam("user-id") Integer userId) {
-    authService.withdrawal(userId);
+  public ResponseEntity withdrawal() {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    authService.withdrawal(session.getId());
 
     return ResponseEntity.ok(BasicResponse.builder().message("delete user success").build());
   }
 
   @PostMapping("/auth/email/send")
   public ResponseEntity<BasicResponse> sendVerifyEmail(
-      @RequestBody AuthDto.SendEmailRequest request) {
+      @Valid @RequestBody AuthDto.SendEmailRequest request) {
 
     String email = request.getEmail();
 
@@ -91,7 +95,7 @@ public class AuthController {
 
   @PostMapping("/auth/email/check")
   public ResponseEntity<BasicResponse> checkVerifyEmail(
-      @RequestBody AuthDto.CheckEmailRequest request) {
+      @Valid @RequestBody AuthDto.CheckEmailRequest request) {
     authService.checkVerifyEmail(request);
 
     return ResponseEntity.ok(
