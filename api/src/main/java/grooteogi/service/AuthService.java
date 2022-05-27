@@ -96,7 +96,7 @@ public class AuthService {
   }
 
   public void sendVerifyEmail(String email) {
-    String code = emailClient.createCode();
+    String code = EmailClient.createCode();
     emailClient.send(email, code);
 
     String key = prefix + email;
@@ -105,8 +105,11 @@ public class AuthService {
 
   public void checkVerifyEmail(AuthDto.CheckEmailRequest request) {
     String key = prefix + request.getEmail();
-    String value = redisClient.getValue(key);
-    if (value == null || !value.equals(request.getCode())) {
+    Optional<String> value = Optional.ofNullable(redisClient.getValue(key));
+
+    value.orElseThrow(() -> new ApiException(ApiExceptionEnum.TIME_OUT_EXCEPTION));
+
+    if (!value.get().equals(request.getCode())) {
       throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
     }
   }

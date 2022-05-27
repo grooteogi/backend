@@ -1,6 +1,6 @@
 package grooteogi.dto;
 
-import javax.validation.constraints.Email;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -36,16 +36,23 @@ public class AuthDto {
   @Builder
   public static class SendEmailRequest {
 
-    @Email
+    @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+        message = "이메일 형식에 맞게 입력해주세요.")
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
+
+    @JsonCreator
+    public SendEmailRequest(String email) {
+      this.email = email;
+    }
   }
 
   @Data
   @Builder
   public static class CheckEmailRequest {
 
-    @Email
+    @Pattern(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+        message = "이메일 형식에 맞게 입력해주세요.")
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
 
