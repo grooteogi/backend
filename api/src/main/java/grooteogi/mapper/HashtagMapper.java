@@ -14,9 +14,9 @@ public interface HashtagMapper extends BasicMapper<HashtagDto, Hashtag> {
 
   HashtagMapper INSTANCE = Mappers.getMapper(HashtagMapper.class);
 
-  @Mapping(source = "dto.name", target = "name")
+  @Mapping(source = "name", target = "name")
   @Mapping(target = "id", ignore = true)
-  Hashtag toEntity(HashtagDto.Request dto);
+  Hashtag toEntity(String name);
 
   @Mappings({
       @Mapping(source = "hashtag.id", target = "hashtagId"),
