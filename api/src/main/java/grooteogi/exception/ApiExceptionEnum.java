@@ -51,6 +51,7 @@ public enum ApiExceptionEnum {
   NO_CREATE_REVIEW_EXCEPTION(HttpStatus.FORBIDDEN, "리뷰 작성 가능 기간이 아닙니다."),
   // Permission Exception
   INVALID_CODE_EXCEPTION(HttpStatus.NOT_FOUND, "인증코드를 다시 확인해주세요."),
+  TIME_OUT_EXCEPTION(HttpStatus.BAD_REQUEST, "유효시간이 종료되었습니다.")
   ;
 
   private final HttpStatus httpStatus;
