@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,7 +27,7 @@ public class HashtagService {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    Hashtag createdHashtag = HashtagMapper.INSTANCE.toEntity(request);
+    Hashtag createdHashtag = HashtagMapper.INSTANCE.toEntity(request.getName());
     Hashtag savedHashtag = hashtagRepository.save(createdHashtag);
 
     return HashtagMapper.INSTANCE.toResponseDto(savedHashtag);
@@ -45,15 +46,18 @@ public class HashtagService {
   }
 
   public HashtagDto.Response search(String keyword) {
-    Optional<Hashtag> findHashtag = this.hashtagRepository.findByName(keyword);
 
-    if (findHashtag.isEmpty()) {
-      Hashtag createdHashtag = Hashtag.builder().name(keyword).build();
-      hashtagRepository.save(createdHashtag);
-      return HashtagMapper.INSTANCE.toResponseDto(createdHashtag);
+    Optional<Hashtag> hashtag = (keyword == null || keyword.equals("")) ? hashtagRepository.findAll(
+        Sort.by(Sort.Direction.DESC, "count")).stream().findFirst()
+        : hashtagRepository.findByName(keyword);
+
+    if (hashtag.isEmpty()) {
+      Hashtag createdHashtag = HashtagMapper.INSTANCE.toEntity(keyword);
+      Hashtag savedHashtag = hashtagRepository.save(createdHashtag);
+      return HashtagMapper.INSTANCE.toResponseDto(savedHashtag);
     }
 
-    return HashtagMapper.INSTANCE.toResponseDto(findHashtag.get());
+    return HashtagMapper.INSTANCE.toResponseDto(hashtag.get());
   }
 
 }
