@@ -2,25 +2,25 @@ package grooteogi;
 
 import static grooteogi.ApiDocumentUtils.getDocumentRequest;
 import static grooteogi.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import grooteogi.config.UserInterceptor;
 import grooteogi.controller.UserController;
-import grooteogi.domain.User;
+import grooteogi.dto.ProfileDto;
 import grooteogi.dto.UserDto;
-import grooteogi.dto.UserDto.PasswordRequest;
-import grooteogi.enums.LoginType;
 import grooteogi.service.UserService;
-import java.util.ArrayList;
-import java.util.List;
+import grooteogi.utils.JwtProvider;
+import grooteogi.utils.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,15 +48,45 @@ public class UserDocumentationTests {
 
   @Autowired
   private MockMvc mockMvc;
-
   @MockBean
   private UserService userService;
-
-  @Autowired
+  @MockBean
+  private UserInterceptor userInterceptor;
+  @MockBean
+  private JwtProvider jwtProvider;
+  @MockBean
   private PasswordEncoder passwordEncoder;
-
   @Autowired
   private ObjectMapper objectMapper;
+  @MockBean
+  private Session session;
+  @MockBean
+  private Authentication authentication;
+  @MockBean
+  private SecurityContext securityContext;
+
+  //DTO
+  private final ProfileDto.Request request =
+      ProfileDto.Request.builder()
+          .address("인천 계양구")
+          .imageUrl("이미지")
+          .name("김영희")
+          .nickname("groot")
+          .phone("01012345678")
+          .build();
+  private final ProfileDto.Response response =
+      ProfileDto.Response.builder()
+      .address("인천 계양구")
+      .email("groot@example.com")
+      .nickname("groot")
+      .name("김영희")
+      .imageUrl("이미지")
+      .phone("01012345678")
+      .build();
+  private final UserDto.PasswordRequest passwordRequest =
+      UserDto.PasswordRequest.builder()
+      .password("groot1234*")
+      .build();
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -64,136 +96,97 @@ public class UserDocumentationTests {
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
   }
 
-  private User getTestUser() {
-    User user = new User();
-    user.setId(1);
-    user.setType(LoginType.GENERAL);
-    user.setEmail("groot@example.com");
-    user.setPassword(passwordEncoder.encode("groot1234*"));
-    user.setNickname("groot-1");
-    return user;
-  }
-
-  @DisplayName("모든 회원정보 조회")
   @Test
-  void getAllUser() throws Exception {
+  @DisplayName("사용자 프로필 조회")
+  public void getUserProfile() throws Exception {
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    User testUser = getTestUser();
-    List<User> userList = new ArrayList<>();
-    userList.add(testUser);
-    given(userService.getAllUser()).willReturn(userList);
+    given(userService.getUserProfile(session.getId())).willReturn(response);
 
-    //then
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/user").characterEncoding("utf-8")
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .get("/user/profile")
+            .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
-
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("get-all-user", getDocumentRequest(), getDocumentResponse(),
-            responseFields(fieldWithPath("status").description("결과 코드"),
-                fieldWithPath("count").description("리스트 카운트"),
-                fieldWithPath("data.[].id").description("아이디"),
-                fieldWithPath("data.[].type").description("타입"),
-                fieldWithPath("data.[].nickname").description("닉네임"),
-                fieldWithPath("data.[].password").type(JsonFieldType.STRING).description("패스워드"),
-                fieldWithPath("data.[].email").type(JsonFieldType.STRING).description("이메일"),
-                fieldWithPath("data.[].modified").type(JsonFieldType.STRING).description("수정날짜")
-                    .optional(),
-                fieldWithPath("data.[].registered").type(JsonFieldType.STRING).description("가입날짜")
-                    .optional(),
-                fieldWithPath("data.[].userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.[].posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.[].hostReserves").type(JsonFieldType.ARRAY).description("주최자")
-                    .optional(),
-                fieldWithPath("data.[].participateReserves").type(JsonFieldType.ARRAY)
-                    .description("참가자").optional(),
-                fieldWithPath("data.[].hearts").type(JsonFieldType.ARRAY).description("찜")
-                    .optional())));
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("profile-get", getDocumentRequest(), getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.nickname").description("닉네임"),
+                    fieldWithPath("data.email").description("이메일"),
+                    fieldWithPath("data.name").description("이름"),
+                    fieldWithPath("data.phone").description("핸드폰 번호"),
+                    fieldWithPath("data.address").description("주소"),
+                    fieldWithPath("data.imageUrl").description("이미지 url")
+                )));
   }
 
-  @DisplayName("회원정보 조회")
   @Test
-  void getUser() throws Exception {
-    int userId = anyInt();
-    User testUser = getTestUser();
+  @DisplayName("사용자 프로필 수정")
+  public void modifyUserProfile() throws Exception {
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(userService.getUser(userId)).willReturn(testUser);
+    userService.modifyUserProfile(session.getId(), request);
+    String json = objectMapper.writeValueAsString(request);
 
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/user/{userId}", userId).characterEncoding("utf-8")
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .patch("/user/profile")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON));
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("get-user", getDocumentRequest(), getDocumentResponse(),
-            responseFields(fieldWithPath("status").description("결과 코드"),
-                fieldWithPath("data.id").description("아이디"),
-                fieldWithPath("data.type").description("타입"),
-                fieldWithPath("data.nickname").description("닉네임"),
-                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
-                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
-                    .optional(),
-                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
-                    .optional(),
-                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자")
-                    .optional(), fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY)
-                    .description("참가자").optional(),
-                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜")
-                    .optional())));
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("profile-modify", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("nickname").description("닉네임"),
+                    fieldWithPath("name").description("이름"),
+                    fieldWithPath("address").description("주소"),
+                    fieldWithPath("imageUrl").description("이미지"),
+                    fieldWithPath("phone").description("핸드폰 번호")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )));
   }
 
-  @DisplayName("프로필 조회")
   @Test
-  void getProfile() throws Exception {
-    int userId = anyInt();
-    User testUser = getTestUser();
+  @DisplayName("사용자 비밀번호 변경")
+  public void modifyUserPw() throws Exception {
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(userService.getUser(userId)).willReturn(testUser);
-
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.get("/user/{userId}", userId).characterEncoding("utf-8")
+    userService.modifyUserPw(session.getId(), passwordRequest);
+    String json = objectMapper.writeValueAsString(passwordRequest);
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .patch("/user/password")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON));
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("get-user", getDocumentRequest(), getDocumentResponse(),
-            responseFields(fieldWithPath("status").description("결과 코드"),
-                fieldWithPath("data.id").description("아이디"),
-                fieldWithPath("data.type").description("타입"),
-                fieldWithPath("data.nickname").description("닉네임"),
-                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
-                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
-                    .optional(),
-                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
-                    .optional(),
-                fieldWithPath("data.userInfo").type(JsonFieldType.STRING).description("추가정보")
-                    .optional(),
-                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"),
-                fieldWithPath("data.hostReserves").type(JsonFieldType.ARRAY).description("주최자")
-                    .optional(), fieldWithPath("data.participateReserves").type(JsonFieldType.ARRAY)
-                    .description("참가자").optional(),
-                fieldWithPath("data.hearts").type(JsonFieldType.ARRAY).description("찜")
-                    .optional())));
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("password-modify", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("password").description("비밀번호")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )));
   }
 
-  @DisplayName("비밀번호 변경")
-  @Test
-  void updatePassword() throws Exception {
-    UserDto.PasswordRequest password = new PasswordRequest("groot1234*");
-    int userId = anyInt();
-
-    User testUser = getTestUser();
-    given(userService.getUser(userId)).willReturn(testUser);
-
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.patch("/user/{userId}/password", userId)
-            .characterEncoding("utf-8").content(objectMapper.writeValueAsString(password))
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
-
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("update-password", getDocumentRequest(), getDocumentResponse(),
-            responseFields(fieldWithPath("status").description("결과 코드"),
-                fieldWithPath("message").description("메시지"))));
-  }
 }
