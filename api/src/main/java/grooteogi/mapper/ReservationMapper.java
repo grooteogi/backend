@@ -40,10 +40,12 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "postId", source = "post.id"),
       @Mapping(target = "hostPhone", source = "hostPhone"),
       @Mapping(target = "applyPhone", source = "applyPhone"),
-      @Mapping(target = "isCanceled", source = "reservation.isCanceled")
+      @Mapping(target = "isCanceled", source = "reservation.isCanceled"),
+      @Mapping(target = "applyNickname", source = "applyNickname"),
+      @Mapping(target = "text", source = "reservation.message")
   })
   ReservationDto.DetailResponse toDetailResponseDto(Reservation reservation,
-      Post post, Schedule schedule, String hostPhone, String applyPhone);
+      Post post, Schedule schedule, String hostPhone, String applyPhone, String applyNickname);
 
   @Mapping(source = "isCanceled", target = "isCanceled")
   Reservation toModifyIsCanceled(Reservation reservation, boolean isCanceled);
