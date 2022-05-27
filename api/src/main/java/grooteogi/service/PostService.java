@@ -105,6 +105,8 @@ public class PostService {
 
     Optional<User> user = userRepository.findById(userId);
 
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
+
     Post createdPost = PostMapper.INSTANCE.toEntity(request, user.get(), schedules, postHashtags);
 
     Post savedPost = postRepository.save(createdPost);

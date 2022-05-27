@@ -1,10 +1,16 @@
 package grooteogi;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static grooteogi.ApiDocumentUtils.getDocumentRequest;
+import static grooteogi.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,8 +66,15 @@ public class HashtagDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  private HashtagDto.Request request = HashtagDto.Request.builder().build();
-  private HashtagDto.Response response = HashtagDto.Response.builder().build();
+  private HashtagDto.Request request = 
+      HashtagDto.Request.builder()
+          .name("개발자")
+          .build();
+  private HashtagDto.Response response = 
+      HashtagDto.Response.builder()
+          .hashtagId(1)
+          .name("개발자")
+          .build();
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -86,16 +99,24 @@ public class HashtagDocumentationTests {
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(document("hashtag-get", getDocumentRequest(), getDocumentResponse(),
+            responseFields(
+                fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("message").description("응답 메세지"),
+                fieldWithPath("data[].hashtagId").description("해시태그 ID"),
+                fieldWithPath("data[].name").description("해시태그 이름")
+            )
+        ));
   }
 
   @Test
   @DisplayName("해시태그 검색")
   void search() throws Exception {
 
-    String keyword = anyString();
+    String keyword = "개발";
 
-    given(hashtagService.search(keyword)).willReturn(any());
+    given(hashtagService.search(keyword)).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -103,7 +124,18 @@ public class HashtagDocumentationTests {
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(document("hashtag-search", getDocumentRequest(), getDocumentResponse(),
+            requestParameters(
+                parameterWithName("keyword").description("검색어")
+            ),
+            responseFields(
+                fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("message").description("응답 메세지"),
+                fieldWithPath("data.hashtagId").description("해시태그 ID"),
+                fieldWithPath("data.name").description("해시태그 이름")
+            )
+        ));
   }
 
   @Test
@@ -122,6 +154,17 @@ public class HashtagDocumentationTests {
             .accept(MediaType.APPLICATION_JSON));
 
     resultActions.andExpect(status().isOk())
-        .andDo(print());
+        .andDo(print())
+        .andDo(document("hashtag-create", getDocumentRequest(), getDocumentResponse(),
+            requestFields(
+                fieldWithPath("name").description("해시태그 이름")
+            ),
+            responseFields(
+                fieldWithPath("status").description("결과 코드"),
+                fieldWithPath("message").description("응답 메세지"),
+                fieldWithPath("data.hashtagId").description("해시태그 ID"),
+                fieldWithPath("data.name").description("해시태그 이름")
+            )
+        ));
   }
 }

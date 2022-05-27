@@ -30,7 +30,7 @@ public class ReservationDto {
     private List<String> hashtags;
     private int postId;
     private String imageUrl;
-    private String status;
+    private Boolean isCanceled;
     private String hostPhone;
     private String applyPhone;
   }

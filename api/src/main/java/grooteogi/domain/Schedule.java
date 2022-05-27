@@ -6,6 +6,8 @@ import java.sql.Date;
 import java.sql.Time;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,7 +39,8 @@ public class Schedule {
   @Column(nullable = false, length = 10)
   private Time endTime;
 
-  @Column(nullable = false, length = 10)
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
   private RegionType region;
 
   @Column(length = 40)

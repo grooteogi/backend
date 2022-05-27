@@ -50,7 +50,7 @@ public class JwtProvider {
     } catch (MalformedJwtException e) {
       throw new ApiException(ApiExceptionEnum.MALFORED_TOKEN_EXCEPTION);
     } catch (ExpiredJwtException e) {
-      throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
+      return false;
     }
   }
 
