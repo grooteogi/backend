@@ -33,6 +33,8 @@ public class ReservationDto {
     private Boolean isCanceled;
     private String hostPhone;
     private String applyPhone;
+    private String applyNickname;
+    private String text;
   }
 
   @Data
