@@ -267,5 +267,130 @@ include::{snippets}/aws-s3-delete/http-request.adoc[]
 ==== Request parameters
 include::{snippets}/aws-s3-delete/request-parameters.adoc[]
 
+== Post API
+
+=== Search Post
+
+==== Request
+include::{snippets}/post-search/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/post-search/request-parameters.adoc[]
+
 ==== Response
-include::{snippets}/aws-s3-delete/http-response.adoc[]
+include::{snippets}/post-search/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-search/response-fields.adoc[]
+
+=== Get Post
+
+==== Request
+include::{snippets}/post-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/post-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/post-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-get/response-fields.adoc[]
+
+=== Get Schedules
+
+==== Request
+include::{snippets}/schedule-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/schedule-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/schedule-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/schedule-get/response-fields.adoc[]
+
+=== Get Reviews
+
+==== Request
+include::{snippets}/review-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/review-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/review-get/response-fields.adoc[]
+
+=== Get / Modify Like
+
+==== Request
+include::{snippets}/like-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/like-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/like-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/like-get/response-fields.adoc[]
+
+=== Get Hashtags
+
+==== Request
+include::{snippets}/hashtags-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/hashtags-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/hashtags-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtags-get/response-fields.adoc[]
+
+=== Create Post
+
+==== Request
+include::{snippets}/post-create/http-request.adoc[]
+
+===== Request Fields
+include::{snippets}/post-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/post-create/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-create/response-fields.adoc[]
+
+=== Modify Post
+
+==== Request
+include::{snippets}/post-modify/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/post-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/post-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-modify/response-fields.adoc[]
+
+=== Delete Post
+
+==== Request
+include::{snippets}/post-delete/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/post-delete/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/post-delete/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-delete/response-fields.adoc[]
