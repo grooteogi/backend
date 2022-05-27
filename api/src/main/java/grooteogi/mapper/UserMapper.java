@@ -17,7 +17,7 @@ public interface UserMapper extends BasicMapper<AuthDto, User> {
 
   @Mappings({
       @Mapping(source = "user.nickname", target = "nickname"),
-      @Mapping(source = "userInfo.imageUrl", target = "imageUrl")
+      @Mapping(source = "userInfo.imageUrl", target = "imageUrl", defaultValue = "")
   })
   AuthDto.Response toResponseDto(User user, UserInfo userInfo);
 
