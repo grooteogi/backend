@@ -9,6 +9,7 @@ import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.HashtagDto;
+import grooteogi.dto.LikeDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.SearchResult;
 import grooteogi.dto.ScheduleDto;
@@ -52,14 +53,13 @@ public class PostService {
   private final ReservationRepository reservationRepository;
   private final HeartRepository heartRepository;
 
-  public PostDto.Response getPostResponse(Integer postId) {
-
-    if (this.postRepository.findById(postId).isEmpty()) {
+  public PostDto.Response getPostResponse(Integer postId, Integer currentUser) {
+    Optional<Post> post = postRepository.findById(postId);
+    if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
 
     //조회수 증가
-    Optional<Post> post = postRepository.findById(postId);
     post.get().setViews(post.get().getViews() + 1);
     Post updatePost = postRepository.save(post.get());
 
@@ -67,6 +67,24 @@ public class PostService {
 
     User user = post.get().getUser();
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
+
+    List<Heart> hearts = heartRepository.findByPost(post.get());
+    hearts.forEach(heart -> {
+      int heartUser = heart.getUser().getId();
+      LikeDto.Response likes;
+      if (heartUser == currentUser) {
+        likes = LikeDto.Response.builder().liked(true).count(hearts.size()).build();
+      } else {
+        likes = LikeDto.Response.builder().liked(false).count(hearts.size()).build();
+      }
+      result.setLikes(likes);
+    });
+
+    if (hearts.isEmpty()) {
+      LikeDto.Response likeRespones = LikeDto.Response.builder().liked(false).count(0).build();
+      result.setLikes(likeRespones);
+    }
+
     return result;
   }
 

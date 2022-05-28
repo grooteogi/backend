@@ -44,7 +44,10 @@ public class PostController {
 
   @GetMapping("/{postId}")
   public ResponseEntity<BasicResponse> getPostResponse(@PathVariable int postId) {
-    PostDto.Response post = postService.getPostResponse(postId);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    PostDto.Response post = postService.getPostResponse(postId, session.getId());
     return ResponseEntity.ok(
         BasicResponse.builder().message("get post success").data(post).build());
   }

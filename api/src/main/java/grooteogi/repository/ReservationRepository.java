@@ -20,7 +20,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
   List<Reservation> findByPostId(@Param("id") Integer id);
 
   @Query(
-      value = "select * from reservation where status = 1 and reservation.id =:reservationId",
+      value = "select * from reservation "
+          + "where is_canceled = false and reservation.id =:reservationId",
       nativeQuery = true
   )
   Optional<Reservation> findUncanceledById(@Param("reservationId") Integer reservationId);

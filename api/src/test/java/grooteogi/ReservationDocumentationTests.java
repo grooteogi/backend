@@ -151,7 +151,7 @@ public class ReservationDocumentationTests {
   void getHostReservation() throws Exception {
 
     final boolean isHost = true;
-    final String filter = "ALL";
+    final String filter = "PROCEED";
 
     List<DetailResponse> responses = new ArrayList<>();
     responses.add(response);
@@ -203,7 +203,7 @@ public class ReservationDocumentationTests {
   void getApplyReservation() throws Exception {
 
     final boolean isHost = false;
-    final String filter = "ALL";
+    final String filter = "PROCEED";
 
     List<DetailResponse> responses = new ArrayList<>();
     responses.add(response);
