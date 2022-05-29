@@ -100,6 +100,20 @@ public class PostService {
     return response;
   }
 
+  public List<PostDto.SearchResult> getLikePosts(Integer userId) {
+    List<Heart> hearts = heartRepository.findByUserId(userId);
+    List<PostDto.SearchResult> response = new ArrayList<>();
+
+    if (hearts.size() > 0) {
+      hearts.forEach(heart -> {
+        PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(heart.getPost());
+        response.add(result);
+      });
+    }
+
+    return response;
+  }
+
   private List<PostHashtag> createPostHashtag(String[] postHashtags) {
     List<PostHashtag> postHashtagList = new ArrayList<>();
     Arrays.stream(postHashtags).forEach(name -> {

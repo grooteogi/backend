@@ -84,6 +84,17 @@ public class PostController {
         BasicResponse.builder().message("get postHashtags success").data(hashtagsResponse).build());
   }
 
+  @GetMapping("/likes")
+  public ResponseEntity<BasicResponse> getLikePosts() {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<PostDto.SearchResult> postResponse = postService.getLikePosts(session.getId());
+
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("get likePosts success").data(postResponse).build());
+  }
+
   @PostMapping
   public ResponseEntity<BasicResponse> createPost(@RequestBody PostDto.Request request) {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
