@@ -71,12 +71,9 @@ public class PostService {
     List<Heart> hearts = heartRepository.findByPost(post.get());
     hearts.forEach(heart -> {
       int heartUser = heart.getUser().getId();
-      LikeDto.Response likes;
-      if (heartUser == currentUser) {
-        likes = LikeDto.Response.builder().liked(true).count(hearts.size()).build();
-      } else {
-        likes = LikeDto.Response.builder().liked(false).count(hearts.size()).build();
-      }
+      LikeDto.Response likes = LikeDto.Response.builder()
+          .liked(heartUser == currentUser).count(hearts.size()).build();
+
       result.setLikes(likes);
     });
 
