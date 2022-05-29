@@ -9,17 +9,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-public class WebConfig {
-
-  @Configuration
-  @Profile("test")
-  public static class TestConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-      registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
-    }
-  }
+public class WebConfig implements WebMvcConfigurer{
 
   @Configuration
   @Profile({"local", "dev", "prod"})
@@ -36,7 +26,7 @@ public class WebConfig {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-      registry.addMapping("/**").allowedOrigins(originUrl).allowedMethods("*");
+      registry.addMapping("/**").allowedOriginPatterns(originUrl).allowedMethods("*");
     }
 
     @Override
