@@ -40,12 +40,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+@ActiveProfiles("test")
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @WebMvcTest(AuthController.class)
 public class AuthDocumentationTests {
@@ -120,7 +122,7 @@ public class AuthDocumentationTests {
         .build();
 
     given(authService.login(user, request)).willReturn(new Token("sss", "ssss"));
-    given(authService.getAuthResponse(user)).willReturn(response);
+    given(userService.getAuthResponse(user)).willReturn(response);
 
     String json = objectMapper.writeValueAsString(request);
 
