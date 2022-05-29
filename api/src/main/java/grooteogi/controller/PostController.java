@@ -112,4 +112,14 @@ public class PostController {
     postService.deletePost(postId, session.getId());
     return ResponseEntity.ok(BasicResponse.builder().message("delete post success").build());
   }
+
+  @GetMapping("/writer")
+  public ResponseEntity<BasicResponse> writerPost() {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<PostDto.SearchResult> responses = postService.writerPost(session.getId());
+    return ResponseEntity.ok(BasicResponse.builder()
+        .message("get writer post success").data(responses).build());
+  }
 }
