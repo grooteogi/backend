@@ -92,4 +92,8 @@ public class UserService {
     user.get().setPassword(passwordEncoder.encode(request.getPassword()));
     userRepository.save(user.get());
   }
+
+  public AuthDto.Response getAuthResponse(User user) {
+    return UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());;
+  }
 }
