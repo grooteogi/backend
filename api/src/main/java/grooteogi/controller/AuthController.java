@@ -45,12 +45,10 @@ public class AuthController {
     User user = userService.getUserByEmail(request);
     Token token = authService.login(user, request);
 
-    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
-
     HttpHeaders responseHeaders = setHeader(token, true);
 
     return new ResponseEntity<>(BasicResponse.builder()
-        .message("login success").data(response).build(), responseHeaders,
+        .message("login success").data(userService.getAuthResponse(user)).build(), responseHeaders,
         HttpStatus.OK);
   }
 
