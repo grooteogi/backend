@@ -148,7 +148,7 @@ public class ReservationService {
         request.getScheduleId());
 
     if (reservation.isPresent()) {
-      throw new ApiException(ApiExceptionEnum.SCHEDULE_FAIL_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.SCHEDULE_APPLY_FAIL_EXCEPTION);
     }
 
     Optional<Schedule> schedule = scheduleRepository.findById(request.getScheduleId());
@@ -157,7 +157,7 @@ public class ReservationService {
     long miliseconds = System.currentTimeMillis();
     Date now = new Date(miliseconds);
     if (now.before(schedule.get().getDate())) {
-      throw new ApiException(ApiExceptionEnum.SCHEDULE_FAIL_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.SCHEDULE_APPLY_FAIL_EXCEPTION);
     }
 
     Optional<User> user = userRepository.findById(userId);
