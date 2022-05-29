@@ -12,6 +12,7 @@ import grooteogi.dto.HashtagDto;
 import grooteogi.dto.LikeDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.SearchResult;
+import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.enums.PostFilterEnum;
 import grooteogi.enums.RegionType;
@@ -19,6 +20,7 @@ import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.HashtagMapper;
 import grooteogi.mapper.PostMapper;
+import grooteogi.mapper.ReviewMapper;
 import grooteogi.repository.HashtagRepository;
 import grooteogi.repository.HeartRepository;
 import grooteogi.repository.PostHashtagRepository;
@@ -277,12 +279,12 @@ public class PostService {
     return responses;
   }
 
-  public List<PostDto.ReviewResponse> getReviewsResponse(Integer postId) {
-    List<PostDto.ReviewResponse> responses = new ArrayList<>();
+  public List<ReviewDto.Response> getReviewsResponse(Integer postId) {
+    List<ReviewDto.Response> responses = new ArrayList<>();
     reviewRepository.findByPostId(postId).forEach(review -> {
       User user = review.getUser();
       UserInfo userInfo = user.getUserInfo();
-      PostDto.ReviewResponse response = PostMapper.INSTANCE.toReviewResponse(review, user,
+      ReviewDto.Response response = ReviewMapper.INSTANCE.toReviewResponse(review, user,
           userInfo);
       responses.add(response);
     });

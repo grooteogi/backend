@@ -23,6 +23,7 @@ import grooteogi.dto.HashtagDto;
 import grooteogi.dto.LikeDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.PostDto.SearchResult;
+import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.dto.UserDto;
 import grooteogi.enums.CreditType;
@@ -274,9 +275,9 @@ public class PostDocumentationTests {
   @DisplayName("리뷰 조회")
   void getReview() throws Exception {
 
-    List<PostDto.ReviewResponse> responses = new ArrayList<>();
-    PostDto.ReviewResponse response =
-        PostDto.ReviewResponse.builder()
+    List<ReviewDto.Response> responses = new ArrayList<>();
+    ReviewDto.Response response =
+        ReviewDto.Response.builder()
             .reviewId(1)
             .createAt("2022-05-25")
             .imageUrl("포스트 이미지 url")
