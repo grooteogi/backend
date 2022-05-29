@@ -1,4 +1,6 @@
 spring:
+  interceptor:
+    excludes: /auth/**, /hashtag/search/**, /post/search/**, /docs/**
   origin:
     url: "http://localhost:3000"
   datasource:
