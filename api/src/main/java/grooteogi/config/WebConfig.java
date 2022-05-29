@@ -1,7 +1,6 @@
 package grooteogi.config;
 
 import grooteogi.utils.JwtProvider;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +9,11 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig {
 
   @Configuration
-  @Profile("local")
-  public class LocalConfig implements WebMvcConfigurer {
+  @Profile("test")
+  public static class TestConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -24,15 +22,15 @@ public class WebConfig implements WebMvcConfigurer {
   }
 
   @Configuration
-  @Profile("!local")
+  @Profile({"local", "dev", "prod"})
   @RequiredArgsConstructor
-  public class ServerConfig implements WebMvcConfigurer {
+  public static class BasicConfig implements WebMvcConfigurer {
 
     @Value("${spring.origin.url}")
     private String originUrl;
 
     @Value("${spring.interceptor.excludes}")
-    private List<String> interceptorExcludes;
+    private String[] interceptorExcludes;
 
     private final JwtProvider jwtProvider;
 

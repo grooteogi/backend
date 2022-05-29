@@ -2,8 +2,7 @@ spring:
   config:
     import: 'aws-parameterstore:'
   interceptor:
-    excludes:
-      - /docs/**
+    excludes: /auth/**, /hashtag/search/**, /post/search/**, /docs/**
   origin:
     url: "http://localhost:3000"
   datasource:
