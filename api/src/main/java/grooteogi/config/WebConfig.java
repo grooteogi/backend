@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig {
 
   @Configuration
-  @Profile("local")
+  @Profile("test")
   public class LocalConfig implements WebMvcConfigurer {
 
     @Override
@@ -24,7 +24,7 @@ public class WebConfig {
   }
 
   @Configuration
-  @Profile("!local")
+  @Profile({"local", "dev", "prod"})
   @RequiredArgsConstructor
   public class ServerConfig implements WebMvcConfigurer {
 
