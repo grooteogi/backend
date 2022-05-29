@@ -451,3 +451,14 @@ include::{snippets}/post-delete/http-response.adoc[]
 
 ==== Response Fields
 include::{snippets}/post-delete/response-fields.adoc[]
+
+=== Writer Post
+
+==== Request
+include::{snippets}/post-writer-get/http-request.adoc[]
+
+==== Response
+include::{snippets}/post-writer-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-writer-get/response-body.adoc[]
