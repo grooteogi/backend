@@ -2,27 +2,29 @@ package grooteogi;
 
 import static grooteogi.ApiDocumentUtils.getDocumentRequest;
 import static grooteogi.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import grooteogi.config.UserInterceptor;
 import grooteogi.controller.AuthController;
-import grooteogi.domain.User;
-import grooteogi.dto.auth.OauthDto;
-import grooteogi.enums.LoginType;
+import grooteogi.dto.AuthDto;
+import grooteogi.dto.auth.Token;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
+import grooteogi.utils.EmailClient;
+import grooteogi.utils.JwtProvider;
+import grooteogi.utils.OauthClient;
+import grooteogi.utils.RedisClient;
+import grooteogi.utils.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,19 +51,47 @@ import org.springframework.web.context.WebApplicationContext;
 public class AuthDocumentationTests {
 
   @Autowired
-  protected MockMvc mockMvc;
-
+  private MockMvc mockMvc;
   @MockBean
   private UserService userService;
-
   @MockBean
   private AuthService authService;
-
+  @MockBean
+  private OauthClient oauthClient;
+  @MockBean
+  private EmailClient emailClient;
+  @MockBean
+  private RedisClient redisClient;
+  @MockBean
+  private UserInterceptor userInterceptor;
+  @MockBean
+  private JwtProvider jwtProvider;
+  @MockBean
+  private PasswordEncoder passwordEncoder;
   @Autowired
   private ObjectMapper objectMapper;
+  @MockBean
+  private Session session;
+  @MockBean
+  private Authentication authentication;
+  @MockBean
+  private SecurityContext securityContext;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  private final AuthDto.Request request = AuthDto.Request.builder()
+      .email("groot@example.com")
+      .password("groot1234*")
+      .build();
+  private final AuthDto.Response response = AuthDto.Response.builder()
+      .imageUrl("이미지")
+      .nickname("groot")
+      .build();
+  private final AuthDto.SendEmailRequest sendEmailRequest = AuthDto.SendEmailRequest.builder()
+      .email("groot@example.com")
+      .build();
+  private final AuthDto.CheckEmailRequest checkEmailRequest = AuthDto.CheckEmailRequest.builder()
+      .code("1234*")
+      .email("groot@example.com")
+      .build();
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
@@ -69,69 +101,174 @@ public class AuthDocumentationTests {
             .withRequestDefaults(prettyPrint()).withResponseDefaults(prettyPrint())).build();
   }
 
-  public OauthDto getUserDto() {
-    OauthDto userDto = new OauthDto();
-    userDto.setType(LoginType.GENERAL);
-    userDto.setEmail("groot@example.com");
-    userDto.setPassword("groot1234*");
-    return userDto;
-  }
-
-  private User getTestUser() {
-    User user = new User();
-    user.setId(1);
-    user.setType(LoginType.GENERAL);
-    user.setEmail("groot@example.com");
-    user.setPassword(passwordEncoder.encode("groot1234*"));
-    user.setNickname("groot-1");
-    return user;
-  }
-
-  @DisplayName("회원가입")
   @Test
-  void register() throws Exception {
-    //given
-    OauthDto userDto = getUserDto(); // for  request
-    User testUser = getTestUser(); // for response
+  @DisplayName("로그인")
+  public void login() throws Exception {
 
-    // when
-    given(authService.register(any())).willReturn(any());
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    // then
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.post("/auth/register").characterEncoding("utf-8")
-            .content(objectMapper.writeValueAsString(userDto))
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("auth-register", getDocumentRequest(), getDocumentResponse(),
-            requestFields(fieldWithPath("type").description("로그인 타입"),
-                fieldWithPath("email").description("이메일"),
-                fieldWithPath("password").description("패스워드")),
-            responseFields(fieldWithPath("status").description("결과 코드"),
-                fieldWithPath("data.id").description("아이디"),
-                fieldWithPath("data.type").description("타입"),
-                fieldWithPath("data.nickname").description("닉네임"),
-                fieldWithPath("data.password").type(JsonFieldType.STRING).description("패스워드"),
-                fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
-                fieldWithPath("data.modified").type(JsonFieldType.STRING).description("수정날짜")
-                    .optional(),
-                fieldWithPath("data.registered").type(JsonFieldType.STRING).description("가입날짜")
-                    .optional(),
-                fieldWithPath("data.userHashtags").type(JsonFieldType.ARRAY).description("해시태그"),
-                fieldWithPath("data.posts").type(JsonFieldType.ARRAY).description("포스트"))));
-  }
+    grooteogi.domain.User user = grooteogi.domain.User.builder().build();
+    given(userService.getUserByEmail(request)).willReturn(
+        user
+    );
 
-  @DisplayName("회원탈퇴")
-  @Test
-  void withdrawal() throws Exception {
-    int userId = anyInt();
+    AuthDto.Response response = AuthDto.Response.builder()
+        .nickname("groot")
+        .imageUrl("image")
+        .build();
 
-    ResultActions result = mockMvc.perform(
-        RestDocumentationRequestBuilders.delete("/auth/withdrawal?user-id={userId}", userId)
+    given(authService.login(user, request)).willReturn(new Token("sss", "ssss"));
+    given(authService.getAuthResponse(user)).willReturn(response);
+
+    String json = objectMapper.writeValueAsString(request);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .post("/auth/login")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON));
 
-    result.andExpect(status().isOk()).andDo(print()).andDo(
-        document("auth-withdrawal", getDocumentRequest(), getDocumentResponse(),
-            requestParameters(parameterWithName("user-id").description("유저 아이디"))));
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("login", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("email").description("이메일"),
+                    fieldWithPath("password").description("비밀번호")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.nickname").description("닉네임"),
+                    fieldWithPath("data.imageUrl").description("이미지")
+                )));
+  }
+
+  @Test
+  @DisplayName("회원가입")
+  public void register() throws Exception {
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    given(authService.register(request)).willReturn(response);
+
+    String json = objectMapper.writeValueAsString(request);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .post("/auth/register")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
+
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("register", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("email").description("이메일"),
+                    fieldWithPath("password").description("비밀번호")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.nickname").description("닉네임"),
+                    fieldWithPath("data.imageUrl").description("이미지")
+                )));
+
+  }
+
+  @Test
+  @DisplayName("회원 삭제")
+  public void withdrawal() throws Exception {
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    authService.withdrawal(session.getId());
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .delete("/auth/withdrawal")
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON));
+
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("withdrawal", getDocumentRequest(), getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )));
+
+  }
+
+  @Test
+  @DisplayName("이메일 인증코드 전송")
+  public void sendVerifyEmail() throws Exception {
+    authService.sendVerifyEmail(sendEmailRequest.getEmail());
+
+    String json = objectMapper.writeValueAsString(sendEmailRequest);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .post("/auth/email/send")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
+
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("send-VerifyEmail", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("email").description("이메일")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )));
+
+  }
+
+  @Test
+  @DisplayName("이메일 인증 확인")
+  public void checkVerifyEmail() throws Exception {
+
+    authService.checkVerifyEmail(checkEmailRequest);
+
+    String json = objectMapper.writeValueAsString(checkEmailRequest);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .post("/auth/email/check")
+            .characterEncoding("utf-8")
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON));
+
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("check-VerifyEmail", getDocumentRequest(), getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("email").description("이메일"),
+                    fieldWithPath("code").description("인증코드")
+                ),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지")
+                )));
+
   }
 }

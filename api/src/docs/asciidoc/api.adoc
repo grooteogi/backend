@@ -48,27 +48,69 @@ include::{snippets}/password-modify/response-fields.adoc[]
 
 == Auth API
 
+=== Login
+
+==== Request
+include::{snippets}/login/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/login/request-fields.adoc[]
+
+==== Response
+include::{snippets}/login/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/login/response-fields.adoc[]
+
+
 === Register
 
 ==== Request
-include::{snippets}/auth-register/http-request.adoc[]
+include::{snippets}/register/http-request.adoc[]
 
 ==== Request Fields
-include::{snippets}/auth-register/request-fields.adoc[]
+include::{snippets}/register/request-fields.adoc[]
 
 ==== Response
-include::{snippets}/auth-register/http-createResponse.adoc[]
+include::{snippets}/register/http-response.adoc[]
 
 ==== Response Fields
-include::{snippets}/auth-register/createResponse-fields.adoc[]
+include::{snippets}/register/response-fields.adoc[]
 
 === Withdrawal
 
 ==== Request
-include::{snippets}/auth-withdrawal/http-request.adoc[]
+include::{snippets}/withdrawal/http-request.adoc[]
 
 ==== Response
-include::{snippets}/auth-withdrawal/http-createResponse.adoc[]
+include::{snippets}/withdrawal/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/withdrawal/response-fields.adoc[]
+
+=== Send Verify Email
+include::{snippets}/send-VerifyEmail/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/send-VerifyEmail/request-fields.adoc[]
+
+==== Response
+include::{snippets}/send-VerifyEmail/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/send-VerifyEmail/response-fields.adoc[]
+
+=== Check Verify Email
+include::{snippets}/check-VerifyEmail/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/check-VerifyEmail/request-fields.adoc[]
+
+==== Response
+include::{snippets}/check-VerifyEmail/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/check-VerifyEmail/response-fields.adoc[]
 
 == Reservation API
 
