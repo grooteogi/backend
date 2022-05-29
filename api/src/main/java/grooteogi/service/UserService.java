@@ -94,6 +94,6 @@ public class UserService {
   }
 
   public AuthDto.Response getAuthResponse(User user) {
-    return UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());;
+    return UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
   }
 }
