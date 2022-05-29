@@ -156,7 +156,7 @@ public class PostDocumentationTests {
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
             .get("/post/search?keyword=포&page=1&filter=LATEST&region=강서구")
-        );
+    );
     resultActions.andExpect(status().isOk())
         .andDo(print())
         .andDo(
@@ -184,9 +184,9 @@ public class PostDocumentationTests {
   @Test
   @DisplayName("포스트 조회")
   public void getPost() throws Exception {
-
+    int userId = 1;
     // when
-    given(postService.getPostResponse(postId)).willReturn(response);
+    given(postService.getPostResponse(postId, userId)).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
@@ -198,7 +198,7 @@ public class PostDocumentationTests {
         .andDo(
             document("post-get", getDocumentRequest(), getDocumentResponse(),
                 pathParameters(
-                  parameterWithName("postId").description("포스트 ID")
+                    parameterWithName("postId").description("포스트 ID")
                 ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
@@ -343,7 +343,7 @@ public class PostDocumentationTests {
   void getHashtags() throws Exception {
 
     List<HashtagDto.Response> responses = new ArrayList<>();
-    HashtagDto.Response response = 
+    HashtagDto.Response response =
         HashtagDto.Response.builder()
             .hashtagId(1)
             .name("개발자")

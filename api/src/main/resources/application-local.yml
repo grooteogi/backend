@@ -1,6 +1,8 @@
 spring:
+  interceptor:
+    excludes: /auth/**, /hashtag/search/**, /post/search/**, /docs/**
   origin:
-    url: "http://localhost:3000"
+    url: "*"
   datasource:
     url: jdbc:mysql://localhost:3305/test_db
     username: test

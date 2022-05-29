@@ -18,7 +18,7 @@ public class RedisConfig {
   private Integer redisPort;
 
   @Bean
-  @Profile("!local")
+  @Profile({"dev", "prod"})
   public RedisClusterConfiguration redisClusterConfiguration() {
     RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
     clusterConfiguration.clusterNode(redisHost, redisPort);

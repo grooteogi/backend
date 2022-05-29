@@ -2,10 +2,9 @@ spring:
   config:
     import: 'aws-parameterstore:'
   interceptor:
-    excludes:
-      - /docs/**
+    excludes: /auth/**, /hashtag/search/**, /post/search/**, /docs/**
   origin:
-    url: "http://localhost:3000"
+    url: "*"
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${RDS_URL}
