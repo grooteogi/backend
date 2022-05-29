@@ -50,7 +50,7 @@ public class AuthController {
     HttpHeaders responseHeaders = setHeader(token, true);
 
     return new ResponseEntity<>(BasicResponse.builder()
-        .message("login success").data(response).build(), responseHeaders,
+        .message("login success").data(authService.getAuthResponse(user)).build(), responseHeaders,
         HttpStatus.OK);
   }
 

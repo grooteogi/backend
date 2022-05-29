@@ -133,4 +133,8 @@ public class AuthService {
   private void session(String token, int id) {
     redisClient.setValue(token, Integer.toString(id), redisTokenExpirationTime);
   }
+
+  public AuthDto.Response getAuthResponse(User user) {
+    return UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
+  }
 }
