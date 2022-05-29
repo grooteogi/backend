@@ -17,7 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Value("${spring.origin.url}")
-  private String url;
+  private String originUrl;
 
   @Bean
   public PasswordEncoder getPasswordEncoder() {
@@ -29,10 +29,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     httpSecurity.cors().configurationSource(request -> {
       final CorsConfiguration configuration = new CorsConfiguration();
 
-      configuration.addAllowedOrigin(url);
+      configuration.addAllowedOriginPattern(originUrl);
       configuration.addAllowedHeader("*");
       configuration.addAllowedMethod("*");
-      configuration.setAllowCredentials(true);
 
       return configuration;
     });
