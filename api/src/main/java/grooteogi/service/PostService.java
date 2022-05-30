@@ -314,4 +314,20 @@ public class PostService {
       heartRepository.delete(heart.get());
     }
   }
+
+  public List<PostDto.SearchResult> writerPost(Integer userId) {
+
+    List<Post> posts = postRepository.findByUserId(userId);
+    List<PostDto.SearchResult> responses = new ArrayList<>();
+
+    if (!posts.isEmpty()) {
+      posts.forEach(post -> {
+        PostDto.SearchResult response = PostMapper.INSTANCE.toSearchResponseDto(post);
+        responses.add(response);
+      });
+    }
+    return responses;
+  }
+
+
 }

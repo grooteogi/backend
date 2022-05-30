@@ -118,6 +118,15 @@ public class PostDocumentationTests {
           .mentor(mentor)
           .build();
 
+  private final PostDto.SearchResult post =
+      PostDto.SearchResult.builder()
+          .postId(1)
+          .hashtags(List.of(hashtags))
+          .imageUrl("포스트 이미지 주소")
+          .content("포스트에 들어가는 내용입니다.")
+          .title("포스트 제목이랍니다.")
+          .build();
+
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
       RestDocumentationContextProvider restDocumentation) {
@@ -137,14 +146,7 @@ public class PostDocumentationTests {
     final String filter = "LATEST";
     final String region = "강서구";
     final List<SearchResult> posts = new ArrayList<>();
-    PostDto.SearchResult post =
-        PostDto.SearchResult.builder()
-            .postId(1)
-            .hashtags(List.of(hashtags))
-            .imageUrl("포스트 이미지 주소")
-            .content("포스트에 들어가는 내용입니다.")
-            .title("포스트 제목이랍니다.")
-            .build();
+
     posts.add(post);
     PostDto.SearchResponse response =
         PostDto.SearchResponse.builder()
@@ -525,6 +527,43 @@ public class PostDocumentationTests {
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지")
+                ))
+        );
+
+  }
+
+  @Test
+  @DisplayName("내가 작성한 포스트 목록 조회")
+  void writerPost() throws Exception {
+
+    List<PostDto.SearchResult> responses = new ArrayList<>();
+    responses.add(post);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
+
+    given(postService.writerPost(session.getId())).willReturn(responses);
+
+    ResultActions resultActions = mockMvc.perform(
+        RestDocumentationRequestBuilders
+            .get("/post/writer")
+            .characterEncoding("utf-8")
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    resultActions.andExpect(status().isOk())
+        .andDo(print())
+        .andDo(
+            document("post-writer-get", getDocumentRequest(), getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("status").description("결과 코드"),
+                    fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.[].postId").description("포스트 ID"),
+                    fieldWithPath("data.[].title").description("포스트 제목"),
+                    fieldWithPath("data.[].content").description("포스트 내용"),
+                    fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
+                    fieldWithPath("data.[].hashtags[]").description("포스트 해시태그")
                 ))
         );
 
