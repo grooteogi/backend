@@ -1,8 +1,8 @@
 package grooteogi.service;
 
-import grooteogi.domain.Post;
 import grooteogi.domain.PostHashtag;
 import grooteogi.domain.Reservation;
+import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
@@ -14,6 +14,7 @@ import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.ReservationMapper;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
+import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
@@ -35,6 +36,7 @@ public class ReservationService {
   private final ScheduleRepository scheduleRepository;
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+  private final ReviewRepository reviewRepository;
   private final RedisClient redisClient;
 
   private final String prefix = "sms_verify";
@@ -45,22 +47,29 @@ public class ReservationService {
     Optional<Reservation> reservation = reservationRepository.findById(reservationId);
     reservation
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
-    Schedule schedule = reservation.get().getSchedule();
-    Post post = schedule.getPost();
+    User participateUser = reservation.get().getParticipateUser();
 
     Optional<String> hostUserPhone = Optional.ofNullable(
         reservation.get().getHostUser().getUserInfo().getContact());
     Optional<String> participateUserPhone = Optional.ofNullable(
-        reservation.get().getParticipateUser().getUserInfo().getContact());
-    String participateUserNickname = reservation.get().getParticipateUser().getNickname();
+        participateUser.getUserInfo().getContact());
 
     hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
     participateUserPhone
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
+    Optional<Review> findReview = reviewRepository.findByReservationIdAndUserId(
+        reservation.get().getId(), participateUser.getId());
 
-    return ReservationMapper.INSTANCE.toDetailResponseDto(reservation.get(), post, schedule,
-        hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
+    Review review = findReview.get();
+    if (findReview.isEmpty()) {
+      review = Review.builder().build();
+    }
+
+    return ReservationMapper.INSTANCE.toDetailResponseDto(
+        reservation.get(), reservation.get().getSchedule().getPost(),
+        reservation.get().getSchedule(), review, hostUserPhone.get(),
+        participateUserPhone.get(), participateUser.getNickname());
   }
 
   public List<ReservationDto.DetailResponse> getReservation(boolean isHost, Integer userId,
@@ -112,9 +121,6 @@ public class ReservationService {
     List<ReservationDto.DetailResponse> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
-      Schedule schedule = reservation.getSchedule();
-      Post post = schedule.getPost();
-
       Optional<String> hostUserPhone = Optional.ofNullable(
           reservation.getHostUser().getUserInfo().getContact());
       Optional<String> participateUserPhone = Optional.ofNullable(
@@ -127,10 +133,19 @@ public class ReservationService {
 
       String participateUserNickname = reservation.getParticipateUser().getNickname();
 
+      Optional<Review> findReview = reviewRepository.findByReservationIdAndUserId(
+          reservation.getId(), reservation.getParticipateUser().getId());
+
+      Review review = findReview.get();
+      if (findReview.isEmpty()) {
+        review = Review.builder().build();
+      }
+
       ReservationDto.DetailResponse detailResponse =
-          ReservationMapper.INSTANCE.toDetailResponseDto(reservation, post, schedule,
-              hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
-      detailResponse.setHashtags(getTags(post.getPostHashtags()));
+          ReservationMapper.INSTANCE.toDetailResponseDto(
+              reservation, reservation.getSchedule().getPost(), reservation.getSchedule(),
+              review, hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
+      detailResponse.setHashtags(getTags(reservation.getSchedule().getPost().getPostHashtags()));
       responseList.add(detailResponse);
     });
     return responseList;

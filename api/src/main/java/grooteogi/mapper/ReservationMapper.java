@@ -2,6 +2,7 @@ package grooteogi.mapper;
 
 import grooteogi.domain.Post;
 import grooteogi.domain.Reservation;
+import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
@@ -34,6 +35,7 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
   ReservationDto.Response toResponseDto(Reservation reservation);
 
   @Mappings({
+      @Mapping(target = "reservationId", source = "reservation.id"),
       @Mapping(target = "date", dateFormat = "yyyy-MM-dd"),
       @Mapping(target = "startTime", dateFormat = "HH:mm:ss"),
       @Mapping(target = "endTime", dateFormat = "HH:mm:ss"),
@@ -42,10 +44,13 @@ public interface ReservationMapper extends BasicMapper<ReservationDto, Reservati
       @Mapping(target = "applyPhone", source = "applyPhone"),
       @Mapping(target = "isCanceled", source = "reservation.isCanceled"),
       @Mapping(target = "applyNickname", source = "applyNickname"),
-      @Mapping(target = "text", source = "reservation.message")
+      @Mapping(target = "text", source = "reservation.message"),
+      @Mapping(target = "review", source = "review.text", defaultValue = ""),
+      @Mapping(target = "score", source = "review.score", defaultValue = "0L")
   })
   ReservationDto.DetailResponse toDetailResponseDto(Reservation reservation,
-      Post post, Schedule schedule, String hostPhone, String applyPhone, String applyNickname);
+      Post post, Schedule schedule, Review review,
+      String hostPhone, String applyPhone, String applyNickname);
 
   @Mapping(source = "isCanceled", target = "isCanceled")
   Reservation toModifyIsCanceled(Reservation reservation, boolean isCanceled);

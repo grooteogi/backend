@@ -21,6 +21,7 @@ public class ReservationDto {
   @Builder
   public static class DetailResponse {
 
+    private int reservationId;
     private String title;
     private String date;
     private String startTime;
@@ -35,6 +36,8 @@ public class ReservationDto {
     private String applyPhone;
     private String applyNickname;
     private String text;
+    private String review;
+    private Long score;
   }
 
   @Data

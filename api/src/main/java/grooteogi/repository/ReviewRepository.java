@@ -2,6 +2,7 @@ package grooteogi.repository;
 
 import grooteogi.domain.Review;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +14,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
       nativeQuery = true
   )
   List<Review> findByPostId(@Param("id")Integer postId);
+
+  Optional<Review> findByReservationIdAndUserId(Integer reservationId, Integer userId);
 }

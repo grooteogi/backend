@@ -76,6 +76,7 @@ public class ReservationDocumentationTests {
   final String[] hashtags = new String[]{"개발자", "코딩"};
   private final ReservationDto.DetailResponse response =
       ReservationDto.DetailResponse.builder()
+          .reservationId(reservationId)
           .date("2022-05-25")
           .startTime("11:00:00")
           .endTime("12:00:00")
@@ -90,6 +91,8 @@ public class ReservationDocumentationTests {
           .hostPhone("01098765432")
           .text("잘부탁드려요.")
           .applyNickname("새내기")
+          .review("리뷰 쓰기 싫어요")
+          .score(2L)
           .build();
 
   private final ReservationDto.Response createResponse =
@@ -129,6 +132,7 @@ public class ReservationDocumentationTests {
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지"),
                     fieldWithPath("data.title").description("포스트 제목"),
+                    fieldWithPath("data.reservationId").description("예약 ID"),
                     fieldWithPath("data.date").description("약속 날짜"),
                     fieldWithPath("data.startTime").description("약속 시작 시간"),
                     fieldWithPath("data.endTime").description("약속 종료 시간"),
@@ -141,7 +145,9 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.applyNickname").description("멘티 닉네임"),
-                    fieldWithPath("data.text").description("호스트에게 남기는 말")
+                    fieldWithPath("data.text").description("호스트에게 남기는 말"),
+                    fieldWithPath("data.review").description("리뷰 내용"),
+                    fieldWithPath("data.score").description("리뷰 점수")
                 )
             )
         );
@@ -180,6 +186,7 @@ public class ReservationDocumentationTests {
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.[].reservationId").description("예약 ID"),
                     fieldWithPath("data.[].title").description("포스트 제목"),
                     fieldWithPath("data.[].date").description("약속 날짜"),
                     fieldWithPath("data.[].startTime").description("약속 시작 시간"),
@@ -193,7 +200,9 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
-                    fieldWithPath("data.[].text").description("호스트에게 남기는 말")
+                    fieldWithPath("data.[].text").description("호스트에게 남기는 말"),
+                    fieldWithPath("data.[].review").description("리뷰 내용"),
+                    fieldWithPath("data.[].score").description("리뷰 점수")
                 )
             )
         );
@@ -232,6 +241,7 @@ public class ReservationDocumentationTests {
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지"),
+                    fieldWithPath("data.[].reservationId").description("예약 ID"),
                     fieldWithPath("data.[].title").description("포스트 제목"),
                     fieldWithPath("data.[].date").description("약속 날짜"),
                     fieldWithPath("data.[].startTime").description("약속 시작 시간"),
@@ -245,7 +255,9 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
-                    fieldWithPath("data.[].text").description("호스트에게 남기는 말")
+                    fieldWithPath("data.[].text").description("호스트에게 남기는 말"),
+                    fieldWithPath("data.[].review").description("리뷰 내용"),
+                    fieldWithPath("data.[].score").description("리뷰 점수")
                 )
             )
         );

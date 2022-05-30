@@ -18,4 +18,6 @@ public interface HeartRepository extends JpaRepository<Heart, Integer> {
       @Param("userId") Integer userId);
 
   List<Heart> findByPost(Post post);
+
+  List<Heart> findByUserId(Integer userId);
 }

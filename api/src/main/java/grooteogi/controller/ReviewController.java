@@ -22,6 +22,13 @@ public class ReviewController {
 
   private final ReviewService reviewService;
 
+  public ResponseEntity<BasicResponse> getReview() {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    return ResponseEntity.ok(BasicResponse.builder().message("get review success").build());
+  }
+
   @PostMapping
   public ResponseEntity<BasicResponse> createReview(
       @RequestBody ReviewDto.Request request) {

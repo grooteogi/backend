@@ -2,6 +2,7 @@ package grooteogi.controller;
 
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
+import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
@@ -61,7 +62,7 @@ public class PostController {
 
   @GetMapping("/{postId}/reviews")
   public ResponseEntity<BasicResponse> getReviewsResponse(@PathVariable int postId) {
-    List<PostDto.ReviewResponse> reviewResponses = postService.getReviewsResponse(postId);
+    List<ReviewDto.Response> reviewResponses = postService.getReviewsResponse(postId);
     return ResponseEntity.ok(
         BasicResponse.builder().message("get reviews success").data(reviewResponses).build());
   }
@@ -81,6 +82,17 @@ public class PostController {
     List<HashtagDto.Response> hashtagsResponse = postService.getHashtagsResponse(postId);
     return ResponseEntity.ok(
         BasicResponse.builder().message("get postHashtags success").data(hashtagsResponse).build());
+  }
+
+  @GetMapping("/likes")
+  public ResponseEntity<BasicResponse> getLikePosts() {
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<PostDto.SearchResult> postResponse = postService.getLikePosts(session.getId());
+
+    return ResponseEntity.ok(
+        BasicResponse.builder().message("get likePosts success").data(postResponse).build());
   }
 
   @PostMapping

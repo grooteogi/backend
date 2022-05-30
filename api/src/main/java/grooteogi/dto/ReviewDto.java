@@ -26,6 +26,11 @@ public class ReviewDto {
   @Data
   @Builder
   public static class Response {
-
+    private int reviewId;
+    private int score;
+    private String nickname;
+    private String imageUrl;
+    private String createAt;
+    private String text;
   }
 }
