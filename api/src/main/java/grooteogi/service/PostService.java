@@ -29,6 +29,8 @@ import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
 import grooteogi.repository.UserRepository;
+import grooteogi.utils.JwtProvider;
+import grooteogi.utils.Session;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,7 +57,9 @@ public class PostService {
   private final ReservationRepository reservationRepository;
   private final HeartRepository heartRepository;
 
-  public PostDto.Response getPostResponse(Integer postId, Integer currentUser) {
+  private final JwtProvider jwtProvider;
+
+  public PostDto.Response getPostResponse(Integer postId, String jwt) {
     Optional<Post> post = postRepository.findById(postId);
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
@@ -71,17 +75,17 @@ public class PostService {
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
 
     List<Heart> hearts = heartRepository.findByPost(post.get());
-    hearts.forEach(heart -> {
-      int heartUser = heart.getUser().getId();
-      LikeDto.Response likes = LikeDto.Response.builder()
-          .liked(heartUser == currentUser).count(hearts.size()).build();
 
-      result.setLikes(likes);
-    });
+    if (jwt != null) {
+      jwtProvider.isUsable(jwt);
+      Session session = jwtProvider.extractAllClaims(jwt);
 
-    if (hearts.isEmpty()) {
-      LikeDto.Response likeRespones = LikeDto.Response.builder().liked(false).count(0).build();
-      result.setLikes(likeRespones);
+      Optional<Heart> heart = heartRepository.findByPostIdUserId(post.get().getId(), session.getId());
+      LikeDto.Response likeResponse = LikeDto.Response.builder().liked(!heart.isEmpty()).count(hearts.size()).build();
+      result.setLikes(likeResponse);
+    } else {
+      LikeDto.Response likeResponse = LikeDto.Response.builder().liked(false).count(hearts.size()).build();
+      result.setLikes(likeResponse);
     }
 
     return result;
