@@ -200,7 +200,8 @@ public class PostDocumentationTests {
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(postService.getPostResponse(postId, httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION))).willReturn(response);
+    given(postService.getPostResponse(postId,
+        httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION))).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
