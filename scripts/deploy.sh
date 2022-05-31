@@ -21,5 +21,5 @@ chmod +x $JAR_NAME
 
 echo "> Run $JAR_NAME"
 nohup java -jar \
-  -Dspring.profiles.active=dev \
+  -Dspring.profiles.active="$DEPLOYMENT_GROUP_NAME" \
   $JAR_NAME >$REPOSITORY/nohup.out 2>&1 &
