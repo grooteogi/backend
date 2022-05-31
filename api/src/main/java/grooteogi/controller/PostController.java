@@ -50,9 +50,8 @@ public class PostController {
   @GetMapping("/detail/{postId}")
   public ResponseEntity<BasicResponse> getPostResponse(
       HttpServletRequest request, @PathVariable int postId) {
-    String jwt = jwtProvider.extractToken(request.getHeader(HttpHeaders.AUTHORIZATION));
-
-    PostDto.Response post = postService.getPostResponse(postId, jwt);
+    PostDto.Response post = postService.getPostResponse(
+        postId, request.getHeader(HttpHeaders.AUTHORIZATION));
     return ResponseEntity.ok(
         BasicResponse.builder().message("get post success").data(post).build());
   }

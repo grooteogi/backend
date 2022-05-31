@@ -77,14 +77,18 @@ public class PostService {
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
     if (jwt != null) {
+      jwt = jwtProvider.extractToken(jwt);
       jwtProvider.isUsable(jwt);
       Session session = jwtProvider.extractAllClaims(jwt);
 
-      Optional<Heart> heart = heartRepository.findByPostIdUserId(post.get().getId(), session.getId());
-      LikeDto.Response likeResponse = LikeDto.Response.builder().liked(!heart.isEmpty()).count(hearts.size()).build();
+      Optional<Heart> heart =
+          heartRepository.findByPostIdUserId(post.get().getId(), session.getId());
+      LikeDto.Response likeResponse =
+          LikeDto.Response.builder().liked(!heart.isEmpty()).count(hearts.size()).build();
       result.setLikes(likeResponse);
     } else {
-      LikeDto.Response likeResponse = LikeDto.Response.builder().liked(false).count(hearts.size()).build();
+      LikeDto.Response likeResponse =
+          LikeDto.Response.builder().liked(false).count(hearts.size()).build();
       result.setLikes(likeResponse);
     }
 
