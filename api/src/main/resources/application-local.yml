@@ -1,6 +1,6 @@
 spring:
   interceptor:
-    excludes: /auth/**, /hashtag/search/**, /post/search/**, /post/detail/**, /docs/**
+    excludes: /auth/**, /oauth/**, /hashtag/search/**, /post/search/**, /post/detail/**, /docs/**
   origin:
     url: "*"
   datasource:
