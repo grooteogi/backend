@@ -1,0 +1,54 @@
+spring:
+  profiles:
+    default: local
+  jackson:
+    default-property-inclusion: non_null
+  mail:
+    host: smtp-mail.outlook.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  jwt:
+    secret: ${JWT_KEY}
+  session:
+    timeout: 300
+    store-type: redis
+    redis:
+      namespace: spring:session
+cloud:
+  aws:
+    region:
+      static: ${AWS_REGION_NAME}
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    stack:
+      auto: false
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+security:
+  oauth2:
+    client:
+      registration:
+        google:
+          client-id: ${GOOGLE_CLIENT_ID}
+          client-secret: ${GOOGLE_CLIENT_SECRET}
+          scope: profile,email
+custom:
+  oauth2:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID}
+      client-secret: ${KAKAO_CLIENT_SECRET}
+  sms:
+    api-key: ${SMS_API_KEY}
+    api-secret: ${SMS_API_SECRET}
+    source: ${SMS_SOURCE}

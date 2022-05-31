@@ -1,0 +1,20 @@
+spring:
+  interceptor:
+    excludes: /auth/**, /oauth/**, /hashtag/search/**, /post/search/**, /post/detail/**, /docs/**
+  origin:
+    url: "*"
+  datasource:
+    url: jdbc:mysql://localhost:3305/test_db
+    username: test
+    password: test_pw
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    host: localhost
+    port: 6378
+  jwt:
+    access_token_expiration_time: 60000
+    redis_token_expiration_time: 1
+    refresh_token_expiration_time: 604800000

@@ -1,0 +1,464 @@
+= Grooteogi API
+:toc: left
+:sectnums:
+:toclevels: 2
+:source-highlighter: highlightjs
+
+== User API
+
+=== Get User Profile
+
+==== Request
+include::{snippets}/profile-get/http-request.adoc[]
+
+==== Response
+include::{snippets}/profile-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/profile-get/response-fields.adoc[]
+
+=== Modify User Profile
+
+==== Request
+include::{snippets}/profile-modify/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/profile-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/profile-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/profile-modify/response-fields.adoc[]
+
+=== Modify User Password
+
+==== Request
+include::{snippets}/password-modify/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/password-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/password-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/password-modify/response-fields.adoc[]
+
+
+== Auth API
+
+=== Login
+
+==== Request
+include::{snippets}/login/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/login/request-fields.adoc[]
+
+==== Response
+include::{snippets}/login/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/login/response-fields.adoc[]
+
+
+=== Register
+
+==== Request
+include::{snippets}/register/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/register/request-fields.adoc[]
+
+==== Response
+include::{snippets}/register/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/register/response-fields.adoc[]
+
+=== Withdrawal
+
+==== Request
+include::{snippets}/withdrawal/http-request.adoc[]
+
+==== Response
+include::{snippets}/withdrawal/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/withdrawal/response-fields.adoc[]
+
+=== Send Verify Email
+include::{snippets}/send-VerifyEmail/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/send-VerifyEmail/request-fields.adoc[]
+
+==== Response
+include::{snippets}/send-VerifyEmail/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/send-VerifyEmail/response-fields.adoc[]
+
+=== Check Verify Email
+include::{snippets}/check-VerifyEmail/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/check-VerifyEmail/request-fields.adoc[]
+
+==== Response
+include::{snippets}/check-VerifyEmail/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/check-VerifyEmail/response-fields.adoc[]
+
+== Reservation API
+
+=== Get Reservation
+
+==== Request
+include::{snippets}/reservation-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/reservation-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-get/response-fields.adoc[]
+
+=== Get Host User Reservations
+
+==== Request
+include::{snippets}/reservation-get-host/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/reservation-get-host/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-get-host/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-get-host/response-fields.adoc[]
+
+=== Get Participate User Reservation
+
+==== Request
+include::{snippets}/reservation-get-apply/http-request.adoc[]
+
+==== Request parameters
+include::{snippets}/reservation-get-apply/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-get-apply/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-get-apply/response-fields.adoc[]
+
+=== Create Reservation
+
+==== Request
+include::{snippets}/reservation-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/reservation-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/reservation-create/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-create/response-fields.adoc[]
+
+=== Delete Reservation
+
+==== Request
+include::{snippets}/reservation-delete/http-request.adoc[]
+
+==== Request PathVariables
+include::{snippets}/reservation-delete/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-delete/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-delete/response-fields.adoc[]
+
+=== Modify Status about Reservation API
+
+==== Request
+include::{snippets}/reservation-modify/http-request.adoc[]
+
+==== Request PathVariables
+include::{snippets}/reservation-modify/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-modify/response-fields.adoc[]
+
+=== Send SMS API
+
+==== Request
+include::{snippets}/reservation-send-sms/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/reservation-send-sms/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/reservation-send-sms/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-send-sms/response-fields.adoc[]
+
+=== Check SMS API
+
+==== Request
+include::{snippets}/reservation-check-sms/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/reservation-check-sms/request-fields.adoc[]
+
+==== Response
+include::{snippets}/reservation-check-sms/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/reservation-check-sms/response-fields.adoc[]
+
+
+== Hashtag API
+
+=== Create Hashtag
+
+==== Request
+include::{snippets}/hashtag-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/hashtag-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/hashtag-create/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-create/response-fields.adoc[]
+
+=== Get Hashtag
+
+==== Request
+include::{snippets}/hashtag-get/http-request.adoc[]
+
+==== Response
+include::{snippets}/hashtag-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-get/response-fields.adoc[]
+
+=== Search Hashtag
+
+==== Request
+include::{snippets}/hashtag-search/http-request.adoc[]
+
+==== Request Parameter
+include::{snippets}/hashtag-search/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/hashtag-search/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtag-search/response-fields.adoc[]
+
+== Review API
+
+=== Create Review
+
+==== Request
+include::{snippets}/review-create/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/review-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/review-create/http-response.adoc[]
+
+=== Modify Review
+
+==== Request
+include::{snippets}/review-modify/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-modify/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/review-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/review-modify/http-response.adoc[]
+
+=== Delete Review
+
+==== Request
+include::{snippets}/review-delete/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-delete/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/review-delete/http-response.adoc[]
+
+== AwsS3 API
+
+=== Upload Image
+
+==== Request
+include::{snippets}/aws-s3-upload/http-request.adoc[]
+
+==== Response
+include::{snippets}/aws-s3-upload/http-response.adoc[]
+
+=== Delete Image
+
+==== Request
+include::{snippets}/aws-s3-delete/http-request.adoc[]
+
+==== Request parameters
+include::{snippets}/aws-s3-delete/request-parameters.adoc[]
+
+== Post API
+
+=== Search Post
+
+==== Request
+include::{snippets}/post-search/http-request.adoc[]
+
+==== Request Parameters
+include::{snippets}/post-search/request-parameters.adoc[]
+
+==== Response
+include::{snippets}/post-search/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-search/response-fields.adoc[]
+
+=== Get Post
+
+==== Request
+include::{snippets}/post-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/post-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/post-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-get/response-fields.adoc[]
+
+=== Get Schedules
+
+==== Request
+include::{snippets}/schedule-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/schedule-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/schedule-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/schedule-get/response-fields.adoc[]
+
+=== Get Reviews
+
+==== Request
+include::{snippets}/review-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/review-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/review-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/review-get/response-fields.adoc[]
+
+=== Get / Modify Like
+
+==== Request
+include::{snippets}/like-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/like-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/like-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/like-get/response-fields.adoc[]
+
+=== Get Hashtags
+
+==== Request
+include::{snippets}/hashtags-get/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/hashtags-get/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/hashtags-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/hashtags-get/response-fields.adoc[]
+
+=== Create Post
+
+==== Request
+include::{snippets}/post-create/http-request.adoc[]
+
+===== Request Fields
+include::{snippets}/post-create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/post-create/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-create/response-fields.adoc[]
+
+=== Modify Post
+
+==== Request
+include::{snippets}/post-modify/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/post-modify/request-fields.adoc[]
+
+==== Response
+include::{snippets}/post-modify/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-modify/response-fields.adoc[]
+
+=== Delete Post
+
+==== Request
+include::{snippets}/post-delete/http-request.adoc[]
+
+==== Request PathVariable
+include::{snippets}/post-delete/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/post-delete/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-delete/response-fields.adoc[]
+
+=== Writer Post
+
+==== Request
+include::{snippets}/post-writer-get/http-request.adoc[]
+
+==== Response
+include::{snippets}/post-writer-get/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/post-writer-get/response-body.adoc[]

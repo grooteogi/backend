@@ -1,0 +1,12 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### restdocs ###
+/src/main/resources/static/docs/
+
+### env ###
+/config/local.env

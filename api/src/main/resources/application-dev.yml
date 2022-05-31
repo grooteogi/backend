@@ -1,0 +1,30 @@
+spring:
+  config:
+    import: 'aws-parameterstore:'
+  interceptor:
+    excludes: /auth/**, /oauth/**, /hashtag/search/**, /post/search/**, /post/detail/**, /docs/**
+  origin:
+    url: "*"
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${RDS_URL}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    host: ${REDIS_URL}
+    port: 6379
+  data:
+    redis:
+      repositories:
+        enabled: false
+  jwt:
+    access_token_expiration_time: 1800000
+    redis_token_expiration_time: 30
+    refresh_token_expiration_time: 604800000
+aws:
+  paramstore:
+    name: grooteogi

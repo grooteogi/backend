@@ -1,0 +1,63 @@
+branches:
+  only:
+    - main
+    - develop
+cache:
+  directories:
+    - $HOME/.m2/repository
+    - $HOME/.gradle
+jdk:
+  - openjdk11
+language: java
+notifications:
+  email:
+    recipients:
+      - support@grooteogi.net
+script:
+  - cd api/
+  - ./gradlew clean build
+  - cd ../
+before_deploy:
+  - mkdir -p before-deploy
+  - cp scripts/deploy.sh before-deploy/
+  - cp appspec.yml before-deploy/
+  - cp api/build/libs/*.jar before-deploy/
+  - cd before-deploy && zip -r before-deploy *
+  - cd ../ && mkdir -p deploy
+  - mv before-deploy/before-deploy.zip deploy/Grooteogi.zip
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: deploy-grtg
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy
+    wait-until-deployed: true
+    on:
+      all_branches: true
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: deploy-grtg
+    region: ap-northeast-2
+    key: Grooteogi.zip
+    bundle_type: zip
+    application: prod-grtg-back
+    deployment-group: prod
+    wait-until-deployed: true
+    on:
+      branch: main
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: deploy-grtg
+    region: ap-northeast-2
+    key: Grooteogi.zip
+    bundle_type: zip
+    application: dev-grtg-back
+    deployment-group: dev
+    wait-until-deployed: true
+    on:
+      branch: develop

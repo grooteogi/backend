@@ -1,0 +1,93 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'checkstyle'
+}
+
+
+group = 'grooteogi'
+version = '0.6.0'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	asciidoctorExt
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'io.awspring.cloud:spring-cloud-aws-dependencies:2.4.1'
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-security:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.7'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.7'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.6.RELEASE'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.7'
+	implementation 'org.springframework.session:spring-session-data-redis:2.6.3'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
+    implementation 'mysql:mysql-connector-java:8.0.29'
+
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	testCompileOnly 'org.projectlombok:lombok:1.18.24'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'com.google.code.gson:gson:2.9.0'
+	implementation 'net.nurigo:javaSDK:2.2'
+
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config:2.4.1'
+}
+
+checkstyle {
+	maxWarnings = 0
+	toolVersion = "10.1"
+}
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+test {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	dependsOn test
+}
+
+asciidoctor.doFirst {
+	delete file('build/docs/asciidoc')
+	delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
+}
+
+build {
+	dependsOn copyDocument
+}
