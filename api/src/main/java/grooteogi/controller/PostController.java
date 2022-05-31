@@ -6,11 +6,14 @@ import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.PostService;
+import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
   private final PostService postService;
+  private final JwtProvider jwtProvider;
 
   @GetMapping("/search")
   public ResponseEntity<BasicResponse> search(
@@ -43,12 +47,11 @@ public class PostController {
         BasicResponse.builder().message("search post success").data(searchResponse).build());
   }
 
-  @GetMapping("/{postId}")
-  public ResponseEntity<BasicResponse> getPostResponse(@PathVariable int postId) {
-    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-
-    PostDto.Response post = postService.getPostResponse(postId, session.getId());
+  @GetMapping("/detail/{postId}")
+  public ResponseEntity<BasicResponse> getPostResponse(
+      HttpServletRequest request, @PathVariable int postId) {
+    PostDto.Response post = postService.getPostResponse(
+        postId, request.getHeader(HttpHeaders.AUTHORIZATION));
     return ResponseEntity.ok(
         BasicResponse.builder().message("get post success").data(post).build());
   }

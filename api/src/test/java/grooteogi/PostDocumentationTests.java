@@ -32,16 +32,19 @@ import grooteogi.utils.JwtProvider;
 import grooteogi.utils.Session;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -76,6 +79,8 @@ public class PostDocumentationTests {
   private ObjectMapper objectMapper;
   @MockBean
   private Session session;
+  @MockBean
+  private HttpServletRequest httpServletRequest;
   @MockBean
   private Authentication authentication;
   @MockBean
@@ -195,11 +200,12 @@ public class PostDocumentationTests {
     SecurityContextHolder.setContext(securityContext);
     when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    given(postService.getPostResponse(postId, session.getId())).willReturn(response);
+    given(postService.getPostResponse(postId,
+        httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION))).willReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/{postId}", postId)
+            .get("/post/detail/{postId}", postId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())

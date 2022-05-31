@@ -68,11 +68,11 @@ public class HashtagDocumentationTests {
   @MockBean
   private SecurityContext securityContext;
 
-  private HashtagDto.Request request = 
+  private HashtagDto.Request request =
       HashtagDto.Request.builder()
           .name("개발자")
           .build();
-  private HashtagDto.Response response = 
+  private HashtagDto.Response response =
       HashtagDto.Response.builder()
           .hashtagId(1)
           .name("개발자")

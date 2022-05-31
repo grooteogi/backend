@@ -89,7 +89,7 @@ class AwsS3DocumentationTests {
         "multipartFile".getBytes()
     );
 
-    String imageUrl =  "https://dev-grtg-bucket.s3.ap-northeast-2.amazonaws.com/e169bcdd-e8b6-4748-8eaa-2333762e013d.jpeg";
+    String imageUrl = "https://dev-grtg-bucket.s3.ap-northeast-2.amazonaws.com/e169bcdd-e8b6-4748-8eaa-2333762e013d.jpeg";
 
     given(awsS3Service.uploadImage(multipartFile)).willReturn(imageUrl);
 

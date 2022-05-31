@@ -115,7 +115,7 @@ public class ReviewDocumentationTests {
                     fieldWithPath("reservationId").description("예약 ID"),
                     fieldWithPath("text").description("리뷰 메세지"),
                     fieldWithPath("score").description("평점")
-                    ),
+                ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지")

@@ -128,6 +128,6 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
 
   @Mapping(source = "user.id", target = "userId")
   @Mapping(source = "user.nickname", target = "nickname")
-  @Mapping(source = "userInfo.imageUrl", target = "imageUrl")
+  @Mapping(source = "userInfo.imageUrl", target = "imageUrl", defaultValue = "")
   UserDto.Response toUserResponse(User user, UserInfo userInfo);
 }

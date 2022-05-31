@@ -78,17 +78,17 @@ public class UserDocumentationTests {
           .build();
   private final ProfileDto.Response response =
       ProfileDto.Response.builder()
-      .address("인천 계양구")
-      .email("groot@example.com")
-      .nickname("groot")
-      .name("김영희")
-      .imageUrl("이미지")
-      .phone("01012345678")
-      .build();
+          .address("인천 계양구")
+          .email("groot@example.com")
+          .nickname("groot")
+          .name("김영희")
+          .imageUrl("이미지")
+          .phone("01012345678")
+          .build();
   private final UserDto.PasswordRequest passwordRequest =
       UserDto.PasswordRequest.builder()
-      .password("groot1234*")
-      .build();
+          .password("groot1234*")
+          .build();
 
   @BeforeEach
   void setUp(WebApplicationContext webApplicationContext,
