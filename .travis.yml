@@ -45,7 +45,7 @@ deploy:
     key: Grooteogi.zip
     bundle_type: zip
     application: prod-grtg-back
-    deployment-group: prod-grtg-group
+    deployment-group: prod
     wait-until-deployed: true
     on:
       branch: main
@@ -57,7 +57,7 @@ deploy:
     key: Grooteogi.zip
     bundle_type: zip
     application: dev-grtg-back
-    deployment-group: dev-grtg-group
+    deployment-group: dev
     wait-until-deployed: true
     on:
       branch: develop
