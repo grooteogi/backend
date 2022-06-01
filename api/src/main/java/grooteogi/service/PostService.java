@@ -71,6 +71,8 @@ public class PostService {
 
     PostDto.Response result = PostMapper.INSTANCE.toDetailResponse(updatePost);
 
+    result.setHashtags(getPostHashtags(updatePost.getPostHashtags()));
+
     User user = post.get().getUser();
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
 
@@ -102,10 +104,10 @@ public class PostService {
     return schedules;
   }
 
-  private List<String> getPostHashtags(List<PostHashtag> postHashtags) {
+  private String[] getPostHashtags(List<PostHashtag> postHashtags) {
     List<String> response = new ArrayList<>();
     postHashtags.forEach(postHashtag -> response.add(postHashtag.getHashTag().getName()));
-    return response;
+    return response.toArray(new String[0]);
   }
 
   public List<PostDto.SearchResult> getLikePosts(Integer userId) {
