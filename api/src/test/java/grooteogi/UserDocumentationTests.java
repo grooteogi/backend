@@ -87,7 +87,8 @@ public class UserDocumentationTests {
           .build();
   private final UserDto.PasswordRequest passwordRequest =
       UserDto.PasswordRequest.builder()
-          .password("groot1234*")
+          .currentPassword("groot1234*")
+          .newPassword("abcd1234!")
           .build();
 
   @BeforeEach
@@ -183,7 +184,8 @@ public class UserDocumentationTests {
         .andDo(
             document("password-modify", getDocumentRequest(), getDocumentResponse(),
                 requestFields(
-                    fieldWithPath("password").description("비밀번호")
+                    fieldWithPath("currentPassword").description("현재 비밀번호"),
+                    fieldWithPath("newPassword").description("새 비밀번호")
                 ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),

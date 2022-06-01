@@ -84,12 +84,16 @@ public class UserService {
     Optional<User> user = userRepository.findById(userId);
     user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
-    if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
+    if (!passwordEncoder.matches(request.getCurrentPassword(), user.get().getPassword())) {
+      throw new ApiException(ApiExceptionEnum.PASSWORD_DISCORD_EXCEPTION);
+    }
+
+    if (request.getCurrentPassword().equals(request.getNewPassword())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
 
-    validator.confirmPasswordVerification(request.getPassword());
-    user.get().setPassword(passwordEncoder.encode(request.getPassword()));
+    validator.confirmPasswordVerification(request.getNewPassword());
+    user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user.get());
   }
 
