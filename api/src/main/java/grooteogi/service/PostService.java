@@ -75,6 +75,8 @@ public class PostService {
 
     User user = post.get().getUser();
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
+    result.setIsAuthor(false);
+
 
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
@@ -82,6 +84,10 @@ public class PostService {
       jwt = jwtProvider.extractToken(jwt);
       jwtProvider.isUsable(jwt);
       Session session = jwtProvider.extractAllClaims(jwt);
+
+      if (result.getMentor().getUserId() == (session.getId())) {
+        result.setIsAuthor(true);
+      }
 
       Optional<Heart> heart =
           heartRepository.findByPostIdUserId(post.get().getId(), session.getId());
