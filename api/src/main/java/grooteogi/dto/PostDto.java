@@ -64,6 +64,7 @@ public class PostDto {
     private CreditType creditType;
     private LikeDto.Response likes;
     private UserDto.Response mentor;
+    private Boolean isAuthor;
   }
 
   @Data
