@@ -77,7 +77,6 @@ public class PostService {
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
     result.setIsAuthor(false);
 
-
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
     if (jwt != null) {
@@ -134,6 +133,11 @@ public class PostService {
     List<PostHashtag> postHashtagList = new ArrayList<>();
     Arrays.stream(postHashtags).forEach(name -> {
       Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
+      if (hashtag.isEmpty()) {
+        Hashtag createdHashtag = Hashtag.builder().name(name).build();
+        hashtagRepository.save(createdHashtag);
+        hashtag = hashtagRepository.findByName(name);
+      }
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         PostHashtag createdPostHashtag = PostHashtag.builder().hashTag(tag).build();
