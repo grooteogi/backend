@@ -86,7 +86,7 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   ScheduleDto.Response toScheduleResponses(Schedule schedules);
 
   default String asStringRegion(RegionType type) {
-    return type != null ? type.toString() : null;
+    return type != null ? type.getLabel() : null;
   }
 
   default RegionType asRegionType(String region) {
