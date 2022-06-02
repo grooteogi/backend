@@ -201,12 +201,18 @@ public class PostService {
       PostHashtag modifiedPostHashtag = new PostHashtag();
       Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
 
+      if (hashtag.isEmpty()) {
+        Hashtag createdHashtag = Hashtag.builder().name(name).build();
+        hashtagRepository.save(createdHashtag);
+        hashtag = hashtagRepository.findByName(name);
+      }
+
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         modifiedPostHashtag.setHashTag(tag);
         modifiedPostHashtag.setPost(post.get());
 
-        post.get().getPostHashtags().add(modifiedPostHashtag);
+        postHashtagRepository.save(modifiedPostHashtag);
       });
     });
 
