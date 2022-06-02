@@ -66,7 +66,8 @@ public class AuthService {
 
     UserInfo userInfo = userInfoRepository.save(new UserInfo());
 
-    User modifiedUser = UserMapper.INSTANCE.toModify(registerUser, userInfo);
+    User modifiedUser = UserMapper.INSTANCE.toModify(registerUser,
+        registerUser.getNickname(), userInfo);
     userRepository.save(modifiedUser);
 
     return UserMapper.INSTANCE.toResponseDto(modifiedUser, modifiedUser.getUserInfo());
