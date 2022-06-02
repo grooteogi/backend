@@ -36,7 +36,7 @@ public enum RegionType {
     this.label = label;
   }
 
-  public String getLabel() {
+  public String toString() {
     return this.label;
   }
 
