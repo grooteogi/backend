@@ -75,7 +75,7 @@ public class UserService {
 
     UserInfo userInfo = userInfoRepository.save(UserInfoMapper.INSTANCE.toEntity(request));
 
-    User modifiedUser = UserMapper.INSTANCE.toModify(user.get(), userInfo);
+    User modifiedUser = UserMapper.INSTANCE.toModify(user.get(), request.getNickname(), userInfo);
 
     userRepository.save(modifiedUser);
   }
