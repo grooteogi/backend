@@ -102,7 +102,7 @@ public class AuthController {
 
   @GetMapping("/oauth/{type}")
   public ResponseEntity<BasicResponse> oauth(
-      @PathVariable String type, @RequestParam("code") String code) {
+      @PathVariable String type, @RequestParam("access_token") String code) {
 
     OauthDto oauthDto;
 
