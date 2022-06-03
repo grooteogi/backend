@@ -37,6 +37,8 @@ public class OauthClient {
   private String googleClientId;
   @Value("${security.oauth2.client.registration.google.client-secret}")
   private String googleClientSecret;
+  @Value("${custom.oauth2.redirect.url}")
+  private String redirectUrl;
 
   @Autowired
   public OauthClient(RestTemplateBuilder restTemplateBuilder,
@@ -55,7 +57,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", kakaoClientId);
     params.add("client_secret", kakaoClientSecret);
-    params.add("redirect_uri", "http://localhost:8080/user/oauth/kakao");
+    params.add("redirect_uri", redirectUrl + "/user/oauth/kakao");
     params.add("code", code);
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -110,7 +112,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", googleClientId);
     params.add("client_secret", googleClientSecret);
-    params.add("redirect_uri", "http://localhost:8080/user/oauth/google");
+    params.add("redirect_uri", redirectUrl + "/user/oauth/google");
     params.add("code", code);
     params.add("state", "url_parameter");
 
