@@ -116,6 +116,7 @@ public class AuthService {
   }
 
   public User oauth(OauthDto oauthDto) {
+    System.out.println(oauthDto.getType());
     Optional<User> userEmail = userRepository.findByEmail(oauthDto.getEmail());
     User user;
     if (userEmail.isEmpty()) {
@@ -123,6 +124,7 @@ public class AuthService {
     } else {
       user = userEmail.get();
     }
+    System.out.println(user.getType());
 
     if (!user.getType().equals(oauthDto.getType())) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);

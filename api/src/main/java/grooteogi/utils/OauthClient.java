@@ -57,7 +57,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", kakaoClientId);
     params.add("client_secret", kakaoClientSecret);
-    params.add("redirect_uri", redirectUrl + "/user/oauth/kakao");
+    params.add("redirect_uri", redirectUrl + "/oauth/kakao");
     params.add("code", code);
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -72,6 +72,7 @@ public class OauthClient {
       oauthDto.setType(LoginType.KAKAO);
       return oauthDto;
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
@@ -97,6 +98,7 @@ public class OauthClient {
       oauthDto.setNickname(properties.get("nickname").getAsString());
       oauthDto.setEmail(kakaoAccount.get("email").getAsString());
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
     return oauthDto;
@@ -112,7 +114,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", googleClientId);
     params.add("client_secret", googleClientSecret);
-    params.add("redirect_uri", redirectUrl + "/user/oauth/google");
+    params.add("redirect_uri", redirectUrl + "/oauth/google");
     params.add("code", code);
     params.add("state", "url_parameter");
 
@@ -128,6 +130,7 @@ public class OauthClient {
       oauth.setType(LoginType.GOOGLE);
       return oauth;
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
