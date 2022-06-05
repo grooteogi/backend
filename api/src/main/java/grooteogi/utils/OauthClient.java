@@ -41,7 +41,7 @@ public class OauthClient {
   private String googleClientId;
   @Value("${security.oauth2.client.registration.google.client-secret}")
   private String googleClientSecret;
-  @Value("${custom.oauth2.redirect.url}")
+  @Value("${custom.oauth2.redirect.back}")
   private String redirectUrl;
 
   @Autowired
