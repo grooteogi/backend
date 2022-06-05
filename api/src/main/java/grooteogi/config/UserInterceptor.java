@@ -54,8 +54,7 @@ public class UserInterceptor implements HandlerInterceptor {
           String result = mapper.writeValueAsString(refreshResponse);
           response.getWriter().write(result);
         } else {
-          System.out.println("refresh is Null");
-          throw new ApiException(ApiExceptionEnum.EXPIRED_TOKEN_EXCEPTION);
+          throw new ApiException(ApiExceptionEnum.EXPIRED_REFRESH_TOKEN_EXCEPTION);
         }
       }
       return flag;
