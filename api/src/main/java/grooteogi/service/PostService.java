@@ -122,6 +122,7 @@ public class PostService {
     if (hearts.size() > 0) {
       hearts.forEach(heart -> {
         PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(heart.getPost());
+        result.setHashtags(getPostHashtags(heart.getPost().getPostHashtags()));
         response.add(result);
       });
     }
@@ -260,7 +261,11 @@ public class PostService {
           .collect(Collectors.toList());
 
       filteredPostList.forEach(
-          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> {
+            PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+            result.setHashtags(getPostHashtags(post.getPostHashtags()));
+            searchResults.add(result);
+          });
 
 
     } else if (postFilterEnum == PostFilterEnum.POPULAR) {
@@ -270,13 +275,20 @@ public class PostService {
           .collect(Collectors.toList());
       Collections.reverse(filteredPostList);
 
-      filteredPostList.forEach(
-          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+      filteredPostList.forEach(post -> {
+        PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+        result.setHashtags(getPostHashtags(post.getPostHashtags()));
+        searchResults.add(result);
+      });
 
 
     } else {
 
-      postList.forEach(post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+      postList.forEach(post -> {
+        PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+        result.setHashtags(getPostHashtags(post.getPostHashtags()));
+        searchResults.add(result);
+      });
     }
 
     return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
@@ -365,6 +377,7 @@ public class PostService {
     if (!posts.isEmpty()) {
       posts.forEach(post -> {
         PostDto.SearchResult response = PostMapper.INSTANCE.toSearchResponseDto(post);
+        response.setHashtags(getPostHashtags(post.getPostHashtags()));
         responses.add(response);
       });
     }
