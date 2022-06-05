@@ -71,10 +71,7 @@ public class JwtProvider {
   }
 
   public String extractToken(String authorizationHeader) {
-    if (authorizationHeader.equals("")) {
-      return authorizationHeader;
-    } else {
-      return authorizationHeader.substring("Bearer ".length());
-    }
+    return authorizationHeader.equals("")
+        ? authorizationHeader : authorizationHeader.substring("Bearer ".length());
   }
 }
