@@ -7,14 +7,16 @@ import grooteogi.dto.auth.Token;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
-import grooteogi.mapper.UserMapper;
 import grooteogi.response.BasicResponse;
 import grooteogi.service.AuthService;
 import grooteogi.service.UserService;
 import grooteogi.utils.OauthClient;
 import grooteogi.utils.Session;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -38,6 +40,9 @@ public class AuthController {
   private final UserService userService;
   private final AuthService authService;
   private final OauthClient oauthClient;
+
+  @Value("${custom.oauth2.redirect.front}")
+  private String redirectUrl;
 
   @PostMapping("/auth/login")
   public ResponseEntity<BasicResponse> login(@RequestBody AuthDto.Request request) {
@@ -102,8 +107,7 @@ public class AuthController {
 
   @GetMapping("/oauth/{type}")
   public ResponseEntity<BasicResponse> oauth(
-      @PathVariable String type, @RequestParam("code") String code) {
-
+      @PathVariable String type, @RequestParam("code") String code) throws URISyntaxException {
     OauthDto oauthDto;
 
     if (type.equalsIgnoreCase(LoginType.GOOGLE.name())) {
@@ -117,13 +121,17 @@ public class AuthController {
     User user = authService.oauth(oauthDto);
     Token token = authService.generateToken(user.getId(), user.getEmail());
 
-    AuthDto.Response response = UserMapper.INSTANCE.toResponseDto(user, user.getUserInfo());
-
+    URI redirectUri = new URI(redirectUrl + "/oauth/auth?token=" + token.getAccessToken());
     HttpHeaders responseHeaders = setHeader(token, true);
-
+    responseHeaders.setLocation(redirectUri);
     return new ResponseEntity<>(BasicResponse.builder()
-        .message("oauth success").data(response).build(),
-        responseHeaders, HttpStatus.OK);
+        .message("oauth success").build(),
+        responseHeaders, HttpStatus.SEE_OTHER);
+  }
+
+  @GetMapping("/oauth/google/request")
+  public void oauthGoogleRequest() {
+    oauthClient.googleRequest();
   }
 
   private HttpHeaders setHeader(Token token, boolean isRefresh) {

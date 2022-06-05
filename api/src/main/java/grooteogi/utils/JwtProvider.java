@@ -42,6 +42,10 @@ public class JwtProvider {
   }
 
   public boolean isUsable(String token) {
+    if (token.equals("")) {
+      return false;
+    }
+
     try {
       Jwts.parser()
           .setSigningKey(secretKey)
@@ -67,6 +71,7 @@ public class JwtProvider {
   }
 
   public String extractToken(String authorizationHeader) {
-    return authorizationHeader.substring("Bearer ".length());
+    return authorizationHeader.equals("")
+        ? authorizationHeader : authorizationHeader.substring("Bearer ".length());
   }
 }
