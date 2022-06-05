@@ -71,8 +71,11 @@ public class PostService {
 
     PostDto.Response result = PostMapper.INSTANCE.toDetailResponse(updatePost);
 
+    result.setHashtags(getPostHashtags(updatePost.getPostHashtags()));
+
     User user = post.get().getUser();
     result.setMentor(PostMapper.INSTANCE.toUserResponse(user, user.getUserInfo()));
+    result.setIsAuthor(false);
 
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
@@ -80,6 +83,10 @@ public class PostService {
       jwt = jwtProvider.extractToken(jwt);
       jwtProvider.isUsable(jwt);
       Session session = jwtProvider.extractAllClaims(jwt);
+
+      if (result.getMentor().getUserId() == (session.getId())) {
+        result.setIsAuthor(true);
+      }
 
       Optional<Heart> heart =
           heartRepository.findByPostIdUserId(post.get().getId(), session.getId());
@@ -102,10 +109,10 @@ public class PostService {
     return schedules;
   }
 
-  private List<String> getPostHashtags(List<PostHashtag> postHashtags) {
+  private String[] getPostHashtags(List<PostHashtag> postHashtags) {
     List<String> response = new ArrayList<>();
     postHashtags.forEach(postHashtag -> response.add(postHashtag.getHashTag().getName()));
-    return response;
+    return response.toArray(new String[0]);
   }
 
   public List<PostDto.SearchResult> getLikePosts(Integer userId) {
@@ -126,6 +133,11 @@ public class PostService {
     List<PostHashtag> postHashtagList = new ArrayList<>();
     Arrays.stream(postHashtags).forEach(name -> {
       Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
+      if (hashtag.isEmpty()) {
+        Hashtag createdHashtag = Hashtag.builder().name(name).build();
+        hashtagRepository.save(createdHashtag);
+        hashtag = hashtagRepository.findByName(name);
+      }
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         PostHashtag createdPostHashtag = PostHashtag.builder().hashTag(tag).build();
@@ -189,12 +201,18 @@ public class PostService {
       PostHashtag modifiedPostHashtag = new PostHashtag();
       Optional<Hashtag> hashtag = hashtagRepository.findByName(name);
 
+      if (hashtag.isEmpty()) {
+        Hashtag createdHashtag = Hashtag.builder().name(name).build();
+        hashtagRepository.save(createdHashtag);
+        hashtag = hashtagRepository.findByName(name);
+      }
+
       hashtag.ifPresent(tag -> {
         tag.setCount(tag.getCount() + 1);
         modifiedPostHashtag.setHashTag(tag);
         modifiedPostHashtag.setPost(post.get());
 
-        post.get().getPostHashtags().add(modifiedPostHashtag);
+        postHashtagRepository.save(modifiedPostHashtag);
       });
     });
 

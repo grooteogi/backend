@@ -39,9 +39,9 @@ public interface UserMapper extends BasicMapper<AuthDto, User> {
   @Mappings({
       @Mapping(source = "user.id", target = "id"),
       @Mapping(source = "userInfo.id", target = "userInfo.id"),
-      @Mapping(source = "user.nickname", target = "nickname"),
+      @Mapping(source = "nickname", target = "nickname"),
       @Mapping(target = "createAt", ignore = true),
       @Mapping(target = "updateAt", ignore = true)
   })
-  User toModify(User user, UserInfo userInfo);
+  User toModify(User user, String nickname, UserInfo userInfo);
 }

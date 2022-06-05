@@ -48,6 +48,8 @@ custom:
     kakao:
       client-id: ${KAKAO_CLIENT_ID}
       client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect:
+      url: ${OAUTH_REDIRECT_URL}
   sms:
     api-key: ${SMS_API_KEY}
     api-secret: ${SMS_API_SECRET}

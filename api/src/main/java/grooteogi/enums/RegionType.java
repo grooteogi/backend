@@ -36,6 +36,11 @@ public enum RegionType {
     this.label = label;
   }
 
+  @Override
+  public String toString() {
+    return this.label;
+  }
+
   public static RegionType getEnum(String label) {
     return Arrays.stream(RegionType.values())
         .filter(regionType -> regionType.label.equals(label))
