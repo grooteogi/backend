@@ -7,6 +7,10 @@ import grooteogi.dto.auth.OauthDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,11 +101,32 @@ public class OauthClient {
 
       oauthDto.setNickname(properties.get("nickname").getAsString());
       oauthDto.setEmail(kakaoAccount.get("email").getAsString());
+      oauthDto.setPassword(token);
     } catch (RestClientException e) {
       e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
     return oauthDto;
+  }
+
+  public void googleRequest() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("scope", "profile https://www.googleapis.com/auth/userinfo.email");
+    params.put("response_type", "code");
+    params.put("client_id", googleClientId);
+    params.put("redirect_uri", redirectUrl + "/oauth/google");
+
+    String parameterString = params.entrySet().stream()
+        .map(x -> x.getKey() + "=" + x.getValue())
+        .collect(Collectors.joining("&"));
+
+    String url = "https://accounts.google.com/o/oauth2/v2/auth" + "?" + parameterString;
+
+    try {
+      httpServletResponse.sendRedirect(url);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public OauthDto googleToken(String code) {
