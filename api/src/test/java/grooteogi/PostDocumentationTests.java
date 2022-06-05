@@ -37,7 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -127,7 +126,7 @@ public class PostDocumentationTests {
   private final PostDto.SearchResult post =
       PostDto.SearchResult.builder()
           .postId(1)
-          .hashtags(List.of(hashtags))
+          .hashtags(hashtags)
           .imageUrl("포스트 이미지 주소")
           .content("포스트에 들어가는 내용입니다.")
           .title("포스트 제목이랍니다.")

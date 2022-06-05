@@ -40,7 +40,7 @@ public class PostDto {
     private String title;
     private String content;
     private String imageUrl;
-    private List<String> hashtags;
+    private String[] hashtags;
   }
 
   @Data
