@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -39,6 +40,9 @@ public class AuthController {
   private final UserService userService;
   private final AuthService authService;
   private final OauthClient oauthClient;
+
+  @Value("${custom.oauth2.redirect.front}")
+  private String redirectUrl;
 
   @PostMapping("/auth/login")
   public ResponseEntity<BasicResponse> login(@RequestBody AuthDto.Request request) {
@@ -117,7 +121,7 @@ public class AuthController {
     User user = authService.oauth(oauthDto);
     Token token = authService.generateToken(user.getId(), user.getEmail());
 
-    URI redirectUri = new URI("http://localhost:3000/oauth/auth?token=" + token.getAccessToken());
+    URI redirectUri = new URI(redirectUrl + "/oauth/auth?token=" + token.getAccessToken());
     HttpHeaders responseHeaders = setHeader(token, true);
     responseHeaders.setLocation(redirectUri);
     return new ResponseEntity<>(BasicResponse.builder()
