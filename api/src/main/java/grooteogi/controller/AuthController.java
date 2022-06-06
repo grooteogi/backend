@@ -121,7 +121,7 @@ public class AuthController {
     User user = authService.oauth(oauthDto);
     Token token = authService.generateToken(user.getId(), user.getEmail());
 
-    URI redirectUri = new URI(redirectUrl + "/oauth/auth?token=" + token.getAccessToken());
+    URI redirectUri = new URI(redirectUrl + "/auth/oauth?token=" + token.getAccessToken());
     HttpHeaders responseHeaders = setHeader(token, true);
     responseHeaders.setLocation(redirectUri);
     return new ResponseEntity<>(BasicResponse.builder()
