@@ -254,7 +254,7 @@ public class PostDocumentationTests {
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/{postId}/schedules", postId)
+            .get("/post/schedules/{postId}", postId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
@@ -298,7 +298,7 @@ public class PostDocumentationTests {
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/{postId}/reviews", postId)
+            .get("/post/reviews/{postId}", postId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
