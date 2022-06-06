@@ -89,7 +89,7 @@ public class UserService {
     }
 
     if (request.getCurrentPassword().equals(request.getNewPassword())) {
-      throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
+      throw new ApiException(ApiExceptionEnum.PASSWORD_DUPLICATE_EXCEPTION);
     }
 
     validator.confirmPasswordVerification(request.getNewPassword());
