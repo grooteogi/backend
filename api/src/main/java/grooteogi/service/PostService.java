@@ -222,7 +222,6 @@ public class PostService {
     List<Schedule> reservedSchedule = new ArrayList<>();
     reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
 
-
     post.get().getSchedules().stream()
         .filter(filter -> reservedSchedule.stream()
             .noneMatch(Predicate.isEqual(filter)))
@@ -262,8 +261,10 @@ public class PostService {
   public PostDto.SearchResponse search(String keyword, String filter,
       Pageable page, String region) {
 
-    return keyword == null ? searchAllPosts(page, filter, region)
-        : searchPosts(keyword, page, filter, region);
+    RegionType regionType = RegionType.getEnum(region);
+
+    return keyword == null ? searchAllPosts(page, filter, regionType)
+        : searchPosts(keyword, page, filter, regionType);
 
   }
 
@@ -312,31 +313,43 @@ public class PostService {
     return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
 
-  private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
-    RegionType regionType = RegionType.getEnum(region);
 
-    return schedules.stream().filter(schedule -> schedule.getRegion() == regionType)
-        .collect(Collectors.toList());
-  }
-
-  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
+  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, RegionType region) {
     Page<Post> posts = postRepository.findAll(page);
+
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
     );
 
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
-      String filter, String region) {
+      String filter, RegionType region) {
     Page<Post> posts =
         postRepository.findAllByTitleContainingOrContentContaining(keyword, keyword, page);
 
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
     );
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
@@ -389,22 +402,17 @@ public class PostService {
 
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
-    LikeDto.Response likeResponse;
-
 
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
-      likeResponse = LikeDto.Response.builder().liked(true)
+      return LikeDto.Response.builder().liked(true)
           .count(post.get().getHearts().size()).build();
     } else {
       heartRepository.delete(heart.get());
-      likeResponse = LikeDto.Response.builder().liked(false)
+      return LikeDto.Response.builder().liked(false)
           .count(post.get().getHearts().size()).build();
     }
 
-
-
-    return likeResponse;
   }
 
   public List<PostDto.SearchResult> writerPost(Integer userId) {
