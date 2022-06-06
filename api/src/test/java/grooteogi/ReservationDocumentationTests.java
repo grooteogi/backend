@@ -88,7 +88,6 @@ public class ReservationDocumentationTests {
           .isCanceled(true)
           .title("개발이 좋아?")
           .applyPhone("01012345678")
-          .hostPhone("01098765432")
           .text("잘부탁드려요.")
           .applyNickname("새내기")
           .review("리뷰 쓰기 싫어요")
@@ -142,7 +141,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.postId").description("포스트 ID"),
                     fieldWithPath("data.imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.text").description("호스트에게 남기는 말"),
@@ -197,7 +195,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].postId").description("포스트 ID"),
                     fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.[].text").description("호스트에게 남기는 말"),
@@ -252,7 +249,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].postId").description("포스트 ID"),
                     fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.[].text").description("호스트에게 남기는 말"),

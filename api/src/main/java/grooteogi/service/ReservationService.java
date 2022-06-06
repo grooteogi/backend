@@ -48,12 +48,9 @@ public class ReservationService {
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
     User participateUser = reservation.get().getParticipateUser();
 
-    Optional<String> hostUserPhone = Optional.ofNullable(
-        reservation.get().getHostUser().getUserInfo().getContact());
     Optional<String> participateUserPhone = Optional.ofNullable(
         participateUser.getUserInfo().getContact());
 
-    hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
     participateUserPhone
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
@@ -67,7 +64,7 @@ public class ReservationService {
 
     return ReservationMapper.INSTANCE.toDetailResponseDto(
         reservation.get(), reservation.get().getSchedule().getPost(),
-        reservation.get().getSchedule(), review, hostUserPhone.get(),
+        reservation.get().getSchedule(), review,
         participateUserPhone.get(), participateUser.getNickname());
   }
 
@@ -120,13 +117,9 @@ public class ReservationService {
     List<ReservationDto.DetailResponse> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
-      Optional<String> hostUserPhone = Optional.ofNullable(
-          reservation.getHostUser().getUserInfo().getContact());
       Optional<String> participateUserPhone = Optional.ofNullable(
           reservation.getParticipateUser().getUserInfo().getContact());
 
-      hostUserPhone
-          .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
       participateUserPhone
           .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
@@ -145,7 +138,7 @@ public class ReservationService {
       ReservationDto.DetailResponse detailResponse =
           ReservationMapper.INSTANCE.toDetailResponseDto(
               reservation, reservation.getSchedule().getPost(), reservation.getSchedule(),
-              review, hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
+              review, participateUserPhone.get(), participateUserNickname);
       detailResponse.setHashtags(getTags(reservation.getSchedule().getPost().getPostHashtags()));
       responseList.add(detailResponse);
     });
