@@ -3,6 +3,7 @@ package grooteogi.mapper;
 import grooteogi.domain.User;
 import grooteogi.domain.UserInfo;
 import grooteogi.dto.ProfileDto;
+import grooteogi.dto.ProfileDto.Request;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -29,8 +30,8 @@ public interface UserInfoMapper extends BasicMapper<ProfileDto, UserInfo> {
       @Mapping(source = "dto.imageUrl", target = "imageUrl"),
       @Mapping(source = "dto.address", target = "address"),
       @Mapping(source = "dto.phone", target = "contact"),
-      @Mapping(target = "id", ignore = true)
+      @Mapping(target = "id", source = "userInfo.id")
   })
-  UserInfo toEntity(ProfileDto.Request dto);
+  UserInfo toEntity(Request dto, UserInfo userInfo);
 
 }

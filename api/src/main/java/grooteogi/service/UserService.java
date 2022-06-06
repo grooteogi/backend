@@ -72,8 +72,10 @@ public class UserService {
         && userRepository.existsByNickname(request.getNickname())) {
       throw new ApiException(ApiExceptionEnum.DUPLICATION_VALUE_EXCEPTION);
     }
+    Optional<UserInfo> saved = userInfoRepository.findById(user.get().getUserInfo().getId());
 
-    UserInfo userInfo = userInfoRepository.save(UserInfoMapper.INSTANCE.toEntity(request));
+    UserInfo userInfo =
+        userInfoRepository.save(UserInfoMapper.INSTANCE.toEntity(request, saved.get()));
 
     User modifiedUser = UserMapper.INSTANCE.toModify(user.get(), request.getNickname(), userInfo);
 
