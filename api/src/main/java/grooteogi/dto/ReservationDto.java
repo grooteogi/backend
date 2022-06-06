@@ -32,7 +32,6 @@ public class ReservationDto {
     private int postId;
     private String imageUrl;
     private Boolean isCanceled;
-    private String hostPhone;
     private String applyPhone;
     private String applyNickname;
     private String text;
