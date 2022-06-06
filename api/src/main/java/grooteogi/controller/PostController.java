@@ -1,5 +1,7 @@
 package grooteogi.controller;
 
+import static org.yaml.snakeyaml.util.UriEncoder.decode;
+
 import grooteogi.dto.HashtagDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ReviewDto;
@@ -41,8 +43,8 @@ public class PostController {
       @RequestParam(name = "filter", required = false) String filter,
       @RequestParam(name = "region") String region) {
 
-    PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
-        PageRequest.of(page - 1, 12, Sort.by("id").descending()), region);
+    PostDto.SearchResponse searchResponse = postService.search(decode(keyword), filter,
+        PageRequest.of(page - 1, 12, Sort.by("id").descending()), decode(region));
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(searchResponse).build());
   }
