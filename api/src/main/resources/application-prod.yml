@@ -22,7 +22,7 @@ spring:
       repositories:
         enabled: false
   jwt:
-    access_token_expiration_time: 1800000
+    access_token_expiration_time: 3600000
     redis_token_expiration_time: 30
     refresh_token_expiration_time: 604800000
 aws:

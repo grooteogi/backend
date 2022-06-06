@@ -388,13 +388,8 @@ public class ReservationDocumentationTests {
   @DisplayName("연락처 문자 인증코드 전송")
   void sendSms() throws Exception {
 
-    final ReservationDto.SendSmsResponse response
-        = ReservationDto.SendSmsResponse.builder()
-        .code("ab12")
-        .build();
 
-    given(reservationService.sendSms(phoneNumber)).willReturn(response);
-
+    reservationService.sendSms(phoneNumber);
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
             .post("/reservation/sms/send?phoneNumber={phoneNumber}", phoneNumber)
@@ -413,8 +408,7 @@ public class ReservationDocumentationTests {
                 ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("message").description("응답 메세지"),
-                    fieldWithPath("data.code").description("인증코드")
+                    fieldWithPath("message").description("응답 메세지")
                 )
             )
         );

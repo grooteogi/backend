@@ -7,7 +7,6 @@ import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
 import grooteogi.dto.ReservationDto;
 import grooteogi.dto.ReservationDto.CheckSmsRequest;
-import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.enums.ReservationStatus;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
@@ -171,7 +170,7 @@ public class ReservationService {
     schedule.orElseThrow(() -> new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION));
     long miliseconds = System.currentTimeMillis();
     Date now = new Date(miliseconds);
-    if (now.before(schedule.get().getDate())) {
+    if (now.after(schedule.get().getDate())) {
       throw new ApiException(ApiExceptionEnum.SCHEDULE_APPLY_FAIL_EXCEPTION);
     }
 
@@ -179,8 +178,7 @@ public class ReservationService {
 
     user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
-    boolean isWriter = postRepository.existsByUser(user.get());
-    if (isWriter) {
+    if (user.get() == schedule.get().getPost().getUser()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_HOST_EXCEPTION);
     }
 
@@ -234,7 +232,7 @@ public class ReservationService {
     return ReservationMapper.INSTANCE.toResponseDto(modifiedReservation);
   }
 
-  public SendSmsResponse sendSms(String phoneNumber) {
+  public void sendSms(String phoneNumber) {
 
     Random rand = new Random();
     String numStr = String.format("%04d", rand.nextInt(10000));
@@ -242,8 +240,6 @@ public class ReservationService {
     smsClient.certifiedPhoneNumber(phoneNumber, numStr);
     String key = prefix + phoneNumber;
     redisClient.setValue(key, numStr, 3L);
-    return SendSmsResponse.builder()
-        .code(numStr).build();
   }
 
   public void checkSms(CheckSmsRequest request) {
