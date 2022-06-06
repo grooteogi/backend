@@ -132,7 +132,6 @@ public class HashtagDocumentationTests {
             responseFields(
                 fieldWithPath("status").description("결과 코드"),
                 fieldWithPath("message").description("응답 메세지"),
-                fieldWithPath("data.hashtagId").description("해시태그 ID"),
                 fieldWithPath("data.name").description("해시태그 이름")
             )
         ));
@@ -162,7 +161,6 @@ public class HashtagDocumentationTests {
             responseFields(
                 fieldWithPath("status").description("결과 코드"),
                 fieldWithPath("message").description("응답 메세지"),
-                fieldWithPath("data.hashtagId").description("해시태그 ID"),
                 fieldWithPath("data.name").description("해시태그 이름")
             )
         ));
