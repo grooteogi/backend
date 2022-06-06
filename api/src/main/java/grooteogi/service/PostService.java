@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -205,7 +206,7 @@ public class PostService {
       if (hashtag.isEmpty()) {
         Hashtag createdHashtag = Hashtag.builder().name(name).build();
         hashtagRepository.save(createdHashtag);
-        hashtag = hashtagRepository.findByName(name);
+        hashtag = Optional.of(createdHashtag);
       }
 
       hashtag.ifPresent(tag -> {
@@ -217,7 +218,24 @@ public class PostService {
       });
     });
 
-    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
+    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+    List<Schedule> reservedSchedule = new ArrayList<>();
+    reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
+
+
+    post.get().getSchedules().stream()
+        .filter(filter -> reservedSchedule.stream()
+            .noneMatch(Predicate.isEqual(filter)))
+        .collect(Collectors.toList())
+        .forEach(result -> scheduleRepository.delete(result));
+
+    List<Schedule> modifySchedule = createSchedule(request.getSchedules());
+    modifySchedule.forEach(schedule -> {
+      schedule.setPost(post.get());
+      scheduleRepository.save(schedule);
+    });
+
+    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request, modifySchedule);
     postRepository.save(modifiedPost);
     return PostMapper.INSTANCE.toCreateResponseDto(modifiedPost);
   }
@@ -322,11 +340,20 @@ public class PostService {
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
+    List<Reservation> reservations = reservationRepository.findByPostId(postId);
+    List<Schedule> reservedSchedule = new ArrayList<>();
+    reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
+
+    List<Schedule> postSchedules = scheduleRepository.findByPostId(postId);
     List<ScheduleDto.Response> responses = new ArrayList<>();
-    scheduleRepository.findByPostId(postId).forEach(schedule -> {
-      ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
-      responses.add(response);
-    });
+
+    reservedSchedule.stream()
+        .filter(filter -> postSchedules.stream()
+            .noneMatch(target -> filter.getId() == (target.getId())))
+        .forEach(schedule -> {
+          ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
+          responses.add(response);
+        });
 
     return responses;
   }
