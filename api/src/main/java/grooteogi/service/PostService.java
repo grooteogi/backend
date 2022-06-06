@@ -1,5 +1,7 @@
 package grooteogi.service;
 
+import static org.yaml.snakeyaml.util.UriEncoder.decode;
+
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
@@ -222,7 +224,6 @@ public class PostService {
     List<Schedule> reservedSchedule = new ArrayList<>();
     reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
 
-
     post.get().getSchedules().stream()
         .filter(filter -> reservedSchedule.stream()
             .noneMatch(Predicate.isEqual(filter)))
@@ -262,8 +263,10 @@ public class PostService {
   public PostDto.SearchResponse search(String keyword, String filter,
       Pageable page, String region) {
 
-    return keyword == null ? searchAllPosts(page, filter, region)
-        : searchPosts(keyword, page, filter, region);
+    RegionType regionType = RegionType.getEnum(region);
+
+    return keyword == "" ? searchAllPosts(page, filter, regionType)
+        : searchPosts(decode(keyword), page, filter, regionType);
 
   }
 
@@ -312,31 +315,43 @@ public class PostService {
     return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
 
-  private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
-    RegionType regionType = RegionType.getEnum(region);
 
-    return schedules.stream().filter(schedule -> schedule.getRegion() == regionType)
-        .collect(Collectors.toList());
-  }
-
-  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
+  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, RegionType region) {
     Page<Post> posts = postRepository.findAll(page);
+
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
     );
 
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
-      String filter, String region) {
+      String filter, RegionType region) {
     Page<Post> posts =
         postRepository.findAllByTitleContainingOrContentContaining(keyword, keyword, page);
 
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
     );
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {

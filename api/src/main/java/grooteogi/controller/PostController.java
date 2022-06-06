@@ -44,7 +44,7 @@ public class PostController {
       @RequestParam(name = "filter", required = false) String filter,
       @RequestParam(name = "region") String region) {
 
-    PostDto.SearchResponse searchResponse = postService.search(decode(keyword), filter,
+    PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
         PageRequest.of(page - 1, 12, Sort.by("id").descending()), decode(region));
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(searchResponse).build());
