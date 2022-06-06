@@ -43,7 +43,7 @@ public class JwtProvider {
 
   public boolean isUsable(String token) {
     if (token.equals("")) {
-      return false;
+      throw new ApiException(ApiExceptionEnum.NOT_FOUND_TOKEN_EXCEPTION);
     }
 
     try {
