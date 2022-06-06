@@ -321,11 +321,14 @@ public class PostService {
 
   public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
     Page<Post> posts = postRepository.findAll(page);
-    posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
-    );
 
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+    List<Post> postList = new ArrayList<>();
+
+    postList = posts.stream().filter(
+        post -> post.getSchedules().contains(filterRegion(post.getSchedules(), region))
+    ).collect(Collectors.toList());
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
@@ -389,22 +392,18 @@ public class PostService {
 
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
-    LikeDto.Response likeResponse;
 
 
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
-      likeResponse = LikeDto.Response.builder().liked(true)
+      return LikeDto.Response.builder().liked(true)
           .count(post.get().getHearts().size()).build();
     } else {
       heartRepository.delete(heart.get());
-      likeResponse = LikeDto.Response.builder().liked(false)
+      return LikeDto.Response.builder().liked(false)
           .count(post.get().getHearts().size()).build();
     }
 
-
-
-    return likeResponse;
   }
 
   public List<PostDto.SearchResult> writerPost(Integer userId) {
