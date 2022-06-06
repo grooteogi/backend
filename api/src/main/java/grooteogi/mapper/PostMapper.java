@@ -85,6 +85,19 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
   @Mapping(source = "schedules.place", target = "place")
   ScheduleDto.Response toScheduleResponses(Schedule schedules);
 
+  @Mapping(source = "dto.title", target = "title")
+  @Mapping(source = "dto.content", target = "content")
+  @Mapping(source = "dto.creditType", target = "credit")
+  @Mapping(source = "dto.imageUrl", target = "imageUrl")
+  @Mapping(source = "schedules", target = "schedules")
+  @Mapping(source = "post.id", target = "id")
+  Post toModify(Post post, PostDto.Request dto, List<Schedule> schedules);
+
+  @Mapping(source = "user.id", target = "userId")
+  @Mapping(source = "user.nickname", target = "nickname")
+  @Mapping(source = "userInfo.imageUrl", target = "imageUrl", defaultValue = "")
+  UserDto.Response toUserResponse(User user, UserInfo userInfo);
+
   default String asStringRegion(RegionType type) {
     return type != null ? type.toString() : null;
   }
@@ -119,15 +132,5 @@ public interface PostMapper extends BasicMapper<PostDto, Post> {
     }
   }
 
-  @Mapping(source = "dto.title", target = "title")
-  @Mapping(source = "dto.content", target = "content")
-  @Mapping(source = "dto.creditType", target = "credit")
-  @Mapping(source = "dto.imageUrl", target = "imageUrl")
-  @Mapping(source = "post.schedules", target = "schedules", ignore = true)
-  Post toModify(Post post, PostDto.Request dto);
 
-  @Mapping(source = "user.id", target = "userId")
-  @Mapping(source = "user.nickname", target = "nickname")
-  @Mapping(source = "userInfo.imageUrl", target = "imageUrl", defaultValue = "")
-  UserDto.Response toUserResponse(User user, UserInfo userInfo);
 }
