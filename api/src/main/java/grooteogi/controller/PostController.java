@@ -59,14 +59,14 @@ public class PostController {
         BasicResponse.builder().message("get post success").data(post).build());
   }
 
-  @GetMapping("/{postId}/schedules")
+  @GetMapping("/schedules/{postId}")
   public ResponseEntity<BasicResponse> getSchedulesResponse(@PathVariable int postId) {
     List<ScheduleDto.Response> schedulesResponse = postService.getSchedulesResponse(postId);
     return ResponseEntity.ok(
         BasicResponse.builder().message("get schedules success").data(schedulesResponse).build());
   }
 
-  @GetMapping("/{postId}/reviews")
+  @GetMapping("/reviews/{postId}")
   public ResponseEntity<BasicResponse> getReviewsResponse(@PathVariable int postId) {
     List<ReviewDto.Response> reviewResponses = postService.getReviewsResponse(postId);
     return ResponseEntity.ok(
