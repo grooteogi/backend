@@ -170,7 +170,7 @@ public class ReservationService {
     schedule.orElseThrow(() -> new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION));
     long miliseconds = System.currentTimeMillis();
     Date now = new Date(miliseconds);
-    if (now.before(schedule.get().getDate())) {
+    if (now.after(schedule.get().getDate())) {
       throw new ApiException(ApiExceptionEnum.SCHEDULE_APPLY_FAIL_EXCEPTION);
     }
 
@@ -178,8 +178,7 @@ public class ReservationService {
 
     user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
-    boolean isWriter = postRepository.existsByUser(user.get());
-    if (isWriter) {
+    if (user.get() == schedule.get().getPost().getUser()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_HOST_EXCEPTION);
     }
 
