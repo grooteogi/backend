@@ -57,9 +57,11 @@ public class ReservationService {
     Optional<Review> findReview = reviewRepository.findByReservationIdAndUserId(
         reservation.get().getId(), participateUser.getId());
 
-    Review review = findReview.get();
+    Review review;
     if (findReview.isEmpty()) {
       review = Review.builder().build();
+    } else {
+      review = findReview.get();
     }
 
     return ReservationMapper.INSTANCE.toDetailResponseDto(
