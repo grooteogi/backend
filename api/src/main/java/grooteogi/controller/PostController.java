@@ -3,6 +3,7 @@ package grooteogi.controller;
 import static org.yaml.snakeyaml.util.UriEncoder.decode;
 
 import grooteogi.dto.HashtagDto;
+import grooteogi.dto.LikeDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
@@ -77,9 +78,9 @@ public class PostController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    postService.modifyHeart(postId, session.getId());
+    LikeDto.Response response = postService.modifyHeart(postId, session.getId());
     return ResponseEntity.ok(
-        BasicResponse.builder().message("heart success").build());
+        BasicResponse.builder().message("heart success").data(response).build());
   }
 
   @GetMapping("/{postId}/hashtags")
