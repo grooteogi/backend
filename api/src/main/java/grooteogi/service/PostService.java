@@ -82,7 +82,7 @@ public class PostService {
 
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
-    if (jwt != null) {
+    if (jwt != null && !jwt.equals("")) {
       jwt = jwtProvider.extractToken(jwt);
       jwtProvider.isUsable(jwt);
       Session session = jwtProvider.extractAllClaims(jwt);
