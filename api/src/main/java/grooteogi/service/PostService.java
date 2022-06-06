@@ -347,9 +347,9 @@ public class PostService {
     List<Schedule> postSchedules = scheduleRepository.findByPostId(postId);
     List<ScheduleDto.Response> responses = new ArrayList<>();
 
-    reservedSchedule.stream()
-        .filter(filter -> postSchedules.stream()
-            .noneMatch(target -> filter.getId() == (target.getId())))
+    postSchedules.stream()
+        .filter(filter -> reservedSchedule.stream()
+            .noneMatch(Predicate.isEqual(filter)))
         .forEach(schedule -> {
           ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
           responses.add(response);
