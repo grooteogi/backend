@@ -405,6 +405,7 @@ public class PostService {
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
 
+
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
       return LikeDto.Response.builder().liked(true)
