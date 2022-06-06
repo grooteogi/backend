@@ -321,14 +321,11 @@ public class PostService {
 
   public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
     Page<Post> posts = postRepository.findAll(page);
+    posts.forEach(
+        post -> filterRegion(post.getSchedules(), region)
+    );
 
-    List<Post> postList = new ArrayList<>();
-
-    postList = posts.stream().filter(
-        post -> post.getSchedules().contains(filterRegion(post.getSchedules(), region))
-    ).collect(Collectors.toList());
-
-    return filter(postList, filter, posts.getTotalPages());
+    return filter(posts.getContent(), filter, posts.getTotalPages());
   }
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
