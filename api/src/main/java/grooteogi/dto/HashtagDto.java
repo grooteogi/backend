@@ -28,7 +28,11 @@ public class HashtagDto {
   @Builder
   public static class Response {
 
-    private int hashtagId;
     private String name;
+
+    @JsonCreator
+    public Response(String name) {
+      this.name = name;
+    }
   }
 }
