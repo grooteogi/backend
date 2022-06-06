@@ -1,5 +1,7 @@
 package grooteogi.service;
 
+import static org.yaml.snakeyaml.util.UriEncoder.decode;
+
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
@@ -263,8 +265,8 @@ public class PostService {
 
     RegionType regionType = RegionType.getEnum(region);
 
-    return keyword == null ? searchAllPosts(page, filter, regionType)
-        : searchPosts(keyword, page, filter, regionType);
+    return keyword == "" ? searchAllPosts(page, filter, regionType)
+        : searchPosts(decode(keyword), page, filter, regionType);
 
   }
 
