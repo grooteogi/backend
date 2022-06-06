@@ -19,13 +19,11 @@ public interface HashtagMapper extends BasicMapper<HashtagDto, Hashtag> {
   Hashtag toEntity(String name);
 
   @Mappings({
-      @Mapping(source = "hashtag.id", target = "hashtagId"),
       @Mapping(source = "hashtag.name", target = "name")
   })
   HashtagDto.Response toResponseDto(Hashtag hashtag);
 
   @Mappings({
-      @Mapping(source = "postHashtag.id", target = "hashtagId"),
       @Mapping(source = "hashtag.name", target = "name")
   })
   HashtagDto.Response toPostResponseDto(PostHashtag postHashtag, Hashtag hashtag);
