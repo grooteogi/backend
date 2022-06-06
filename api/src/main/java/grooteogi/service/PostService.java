@@ -380,8 +380,9 @@ public class PostService {
     return responses;
   }
 
-  public void modifyHeart(Integer postId, Integer userId) {
+  public LikeDto.Response modifyHeart(Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
+
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
@@ -389,11 +390,17 @@ public class PostService {
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
 
+
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
+      return LikeDto.Response.builder().liked(true)
+          .count(post.get().getHearts().size()).build();
     } else {
       heartRepository.delete(heart.get());
+      return LikeDto.Response.builder().liked(false)
+          .count(post.get().getHearts().size()).build();
     }
+
   }
 
   public List<PostDto.SearchResult> writerPost(Integer userId) {
