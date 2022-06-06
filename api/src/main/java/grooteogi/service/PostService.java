@@ -261,12 +261,25 @@ public class PostService {
   }
 
   public PostDto.SearchResponse search(String keyword, String filter,
+      Pageable page, String hashtag, String region) {
+
+    RegionType regionType = RegionType.getEnum(region);
+
+    if (hashtag.equals("")) {
+      return keyword.equals("") ? searchAllPosts(page, filter, regionType)
+          : searchPosts(decode(keyword), page, filter, regionType);
+    } else {
+      return searchHashtag(decode(hashtag), filter, page, region);
+    }
+
+  }
+
+  public PostDto.SearchResponse searchHashtag(String hashtag, String filter,
       Pageable page, String region) {
 
     RegionType regionType = RegionType.getEnum(region);
 
-    return keyword == "" ? searchAllPosts(page, filter, regionType)
-        : searchPosts(decode(keyword), page, filter, regionType);
+    return hashtagSearchAllPosts(hashtag, page, filter, regionType);
 
   }
 
@@ -313,6 +326,30 @@ public class PostService {
     }
 
     return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
+  }
+
+  public PostDto.SearchResponse hashtagSearchAllPosts(String hashtag, Pageable page, String filter,
+      RegionType region) {
+    Page<Post> posts = postRepository.findAll(page);
+
+    List<Post> postList = new ArrayList<>();
+
+    posts.forEach(
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    schedule.getPost().getPostHashtags().forEach(postHashtag -> {
+                      if (postHashtag.getHashTag().getName().equals(hashtag)) {
+                        postList.add(schedule.getPost());
+                      }
+                    });
+
+                  }
+                })
+    );
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
 
@@ -404,7 +441,6 @@ public class PostService {
 
     Optional<User> user = userRepository.findById(userId);
     Optional<Heart> heart = heartRepository.findByPostIdUserId(postId, userId);
-
 
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());

@@ -42,10 +42,11 @@ public class PostController {
       @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
       @RequestParam(name = "filter", required = false) String filter,
+      @RequestParam(name = "hashtag", required = false) String hashtag,
       @RequestParam(name = "region") String region) {
 
     PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
-        PageRequest.of(page - 1, 12, Sort.by("id").descending()), decode(region));
+        PageRequest.of(page - 1, 12, Sort.by("id").descending()), hashtag, decode(region));
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(searchResponse).build());
   }

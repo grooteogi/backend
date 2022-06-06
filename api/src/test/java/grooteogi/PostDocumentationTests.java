@@ -150,6 +150,7 @@ public class PostDocumentationTests {
     Pageable pages = PageRequest.of(page - 1, 12, Sort.by("id").descending());
     final String filter = "LATEST";
     final String region = "강서구";
+    final String hashtag = "대외활동";
     final List<SearchResult> posts = new ArrayList<>();
 
     posts.add(post);
@@ -160,11 +161,11 @@ public class PostDocumentationTests {
             .build();
 
     // when
-    when(postService.search(keyword, filter, pages, region)).thenReturn(response);
+    when(postService.search(keyword, filter, pages, hashtag, region)).thenReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/search?keyword=포&page=1&filter=LATEST&region=강서구")
+            .get("/post/search?keyword=포&page=1&filter=LATEST&hashtag=대외활동&region=강서구")
     );
     resultActions.andExpect(status().isOk())
         .andDo(print())
@@ -174,6 +175,7 @@ public class PostDocumentationTests {
                     parameterWithName("keyword").description("검색어"),
                     parameterWithName("page").description("페이지 번호"),
                     parameterWithName("filter").description("검색 조건"),
+                    parameterWithName("hashtag").description("해시태그"),
                     parameterWithName("region").description("지역 조건")
                 ),
                 responseFields(
