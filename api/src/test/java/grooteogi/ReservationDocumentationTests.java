@@ -420,8 +420,11 @@ public class ReservationDocumentationTests {
             .code("ab12")
             .phoneNumber(phoneNumber)
             .build();
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    reservationService.checkSms(request);
+    reservationService.checkSms(request, session.getId());
 
     String json = objectMapper.writeValueAsString(request);
 
