@@ -88,7 +88,10 @@ public class ReservationController {
   @PostMapping("/sms/check")
   public ResponseEntity<BasicResponse> checkSms(
       @RequestBody ReservationDto.CheckSmsRequest request) {
-    reservationService.checkSms(request);
+    Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    reservationService.checkSms(request, session.getId());
 
     return ResponseEntity.ok(
         BasicResponse.builder().message("check sms success").build());

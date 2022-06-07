@@ -5,16 +5,19 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
 import grooteogi.dto.ReservationDto;
 import grooteogi.dto.ReservationDto.CheckSmsRequest;
 import grooteogi.enums.ReservationStatus;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.ReservationMapper;
+import grooteogi.mapper.UserMapper;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
+import grooteogi.repository.UserInfoRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
 import grooteogi.utils.SmsClient;
@@ -36,6 +39,7 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
   private final ReviewRepository reviewRepository;
+  private final UserInfoRepository userInfoRepository;
   private final RedisClient redisClient;
 
   private final String prefix = "sms_verify";
@@ -239,11 +243,21 @@ public class ReservationService {
     redisClient.setValue(key, numStr, 3L);
   }
 
-  public void checkSms(CheckSmsRequest request) {
+  public void checkSms(CheckSmsRequest request, Integer userId) {
     String key = prefix + request.getPhoneNumber();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(request.getCode())) {
       throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
     }
+
+    Optional<User> user = userRepository.findById(userId);
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
+    Optional<UserInfo> userInfo = userInfoRepository.findById(user.get().getUserInfo().getId());
+
+    userInfo.get().setContact(request.getPhoneNumber());
+    userInfoRepository.save(userInfo.get());
+    User modify = UserMapper.INSTANCE.toModify(user.get(),
+        user.get().getNickname(), userInfo.get());
+    userRepository.save(modify);
   }
 }
