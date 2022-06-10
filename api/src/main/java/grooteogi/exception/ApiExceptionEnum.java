@@ -25,11 +25,13 @@ public enum ApiExceptionEnum {
   EMAIL_DUPLICATION_EXCEPTION(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
   PASSWORD_VALUE_EXCEPTION(HttpStatus.BAD_REQUEST, "비밀번호는 영문과 특수문자 숫자를 포함하며 8자 이상이어야 합니다."),
   PASSWORD_DISCORD_EXCEPTION(HttpStatus.NOT_FOUND, "현재 비밀번호가 일치하지 않습니다."),
+  PASSWORD_DUPLICATE_EXCEPTION(HttpStatus.CONFLICT, "같은 비밀번호는 사용할 수 없습니다."),
   // Token Exception
   EXPIRED_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
   EXPIRED_REFRESH_TOKEN_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다. 회원가입을 다시 시도하십시오."),
   NO_EXPIRED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "만료되지 않은 토큰입니다."),
   MALFORED_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST, "위조된 토큰입니다."),
+  NOT_FOUND_TOKEN_EXCEPTION(HttpStatus.NOT_FOUND, "비어있는 토큰입니다."),
   // S3 Exception
   S3_UPLOAD_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "파일 업로드에 실패했습니다."),
   INVALID_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 파일 형식입니다."),

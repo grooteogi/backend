@@ -2,7 +2,7 @@ spring:
   config:
     import: 'aws-parameterstore:'
   interceptor:
-    excludes: /auth/**, /oauth/**, /hashtag/search/**, /post/search/**, /post/detail/**
+    excludes: /auth/**, /oauth/**, /hashtag/**, /post/search/**, /post/detail/**, /post/schedules/**, /post/reviews/**
   origin:
     url: "*"
   datasource:
@@ -22,7 +22,7 @@ spring:
       repositories:
         enabled: false
   jwt:
-    access_token_expiration_time: 1800000
+    access_token_expiration_time: 3600000
     redis_token_expiration_time: 30
     refresh_token_expiration_time: 604800000
 aws:

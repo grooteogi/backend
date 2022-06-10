@@ -5,17 +5,19 @@ import grooteogi.domain.Reservation;
 import grooteogi.domain.Review;
 import grooteogi.domain.Schedule;
 import grooteogi.domain.User;
+import grooteogi.domain.UserInfo;
 import grooteogi.dto.ReservationDto;
 import grooteogi.dto.ReservationDto.CheckSmsRequest;
-import grooteogi.dto.ReservationDto.SendSmsResponse;
 import grooteogi.enums.ReservationStatus;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
 import grooteogi.mapper.ReservationMapper;
+import grooteogi.mapper.UserMapper;
 import grooteogi.repository.PostRepository;
 import grooteogi.repository.ReservationRepository;
 import grooteogi.repository.ReviewRepository;
 import grooteogi.repository.ScheduleRepository;
+import grooteogi.repository.UserInfoRepository;
 import grooteogi.repository.UserRepository;
 import grooteogi.utils.RedisClient;
 import grooteogi.utils.SmsClient;
@@ -37,6 +39,7 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final PostRepository postRepository;
   private final ReviewRepository reviewRepository;
+  private final UserInfoRepository userInfoRepository;
   private final RedisClient redisClient;
 
   private final String prefix = "sms_verify";
@@ -49,26 +52,25 @@ public class ReservationService {
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.RESERVATION_NOT_FOUND_EXCEPTION));
     User participateUser = reservation.get().getParticipateUser();
 
-    Optional<String> hostUserPhone = Optional.ofNullable(
-        reservation.get().getHostUser().getUserInfo().getContact());
     Optional<String> participateUserPhone = Optional.ofNullable(
         participateUser.getUserInfo().getContact());
 
-    hostUserPhone.orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
     participateUserPhone
         .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
     Optional<Review> findReview = reviewRepository.findByReservationIdAndUserId(
         reservation.get().getId(), participateUser.getId());
 
-    Review review = findReview.get();
+    Review review;
     if (findReview.isEmpty()) {
       review = Review.builder().build();
+    } else {
+      review = findReview.get();
     }
 
     return ReservationMapper.INSTANCE.toDetailResponseDto(
         reservation.get(), reservation.get().getSchedule().getPost(),
-        reservation.get().getSchedule(), review, hostUserPhone.get(),
+        reservation.get().getSchedule(), review,
         participateUserPhone.get(), participateUser.getNickname());
   }
 
@@ -121,13 +123,9 @@ public class ReservationService {
     List<ReservationDto.DetailResponse> responseList = new ArrayList<>();
     reservations.forEach(reservation -> {
 
-      Optional<String> hostUserPhone = Optional.ofNullable(
-          reservation.getHostUser().getUserInfo().getContact());
       Optional<String> participateUserPhone = Optional.ofNullable(
           reservation.getParticipateUser().getUserInfo().getContact());
 
-      hostUserPhone
-          .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
       participateUserPhone
           .orElseThrow(() -> new ApiException(ApiExceptionEnum.CONTACT_NOT_FOUND_EXCEPTION));
 
@@ -136,15 +134,17 @@ public class ReservationService {
       Optional<Review> findReview = reviewRepository.findByReservationIdAndUserId(
           reservation.getId(), reservation.getParticipateUser().getId());
 
-      Review review = findReview.get();
+      Review review;
       if (findReview.isEmpty()) {
         review = Review.builder().build();
+      } else {
+        review = findReview.get();
       }
 
       ReservationDto.DetailResponse detailResponse =
           ReservationMapper.INSTANCE.toDetailResponseDto(
               reservation, reservation.getSchedule().getPost(), reservation.getSchedule(),
-              review, hostUserPhone.get(), participateUserPhone.get(), participateUserNickname);
+              review, participateUserPhone.get(), participateUserNickname);
       detailResponse.setHashtags(getTags(reservation.getSchedule().getPost().getPostHashtags()));
       responseList.add(detailResponse);
     });
@@ -171,7 +171,7 @@ public class ReservationService {
     schedule.orElseThrow(() -> new ApiException(ApiExceptionEnum.SCHEDULE_NOT_FOUND_EXCEPTION));
     long miliseconds = System.currentTimeMillis();
     Date now = new Date(miliseconds);
-    if (now.before(schedule.get().getDate())) {
+    if (now.after(schedule.get().getDate())) {
       throw new ApiException(ApiExceptionEnum.SCHEDULE_APPLY_FAIL_EXCEPTION);
     }
 
@@ -179,8 +179,7 @@ public class ReservationService {
 
     user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
 
-    boolean isWriter = postRepository.existsByUser(user.get());
-    if (isWriter) {
+    if (user.get() == schedule.get().getPost().getUser()) {
       throw new ApiException(ApiExceptionEnum.RESERVATION_HOST_EXCEPTION);
     }
 
@@ -234,7 +233,7 @@ public class ReservationService {
     return ReservationMapper.INSTANCE.toResponseDto(modifiedReservation);
   }
 
-  public SendSmsResponse sendSms(String phoneNumber) {
+  public void sendSms(String phoneNumber) {
 
     Random rand = new Random();
     String numStr = String.format("%04d", rand.nextInt(10000));
@@ -242,15 +241,23 @@ public class ReservationService {
     smsClient.certifiedPhoneNumber(phoneNumber, numStr);
     String key = prefix + phoneNumber;
     redisClient.setValue(key, numStr, 3L);
-    return SendSmsResponse.builder()
-        .code(numStr).build();
   }
 
-  public void checkSms(CheckSmsRequest request) {
+  public void checkSms(CheckSmsRequest request, Integer userId) {
     String key = prefix + request.getPhoneNumber();
     String value = redisClient.getValue(key);
     if (value == null || !value.equals(request.getCode())) {
       throw new ApiException(ApiExceptionEnum.INVALID_CODE_EXCEPTION);
     }
+
+    Optional<User> user = userRepository.findById(userId);
+    user.orElseThrow(() -> new ApiException(ApiExceptionEnum.USER_NOT_FOUND_EXCEPTION));
+    Optional<UserInfo> userInfo = userInfoRepository.findById(user.get().getUserInfo().getId());
+
+    userInfo.get().setContact(request.getPhoneNumber());
+    userInfoRepository.save(userInfo.get());
+    User modify = UserMapper.INSTANCE.toModify(user.get(),
+        user.get().getNickname(), userInfo.get());
+    userRepository.save(modify);
   }
 }

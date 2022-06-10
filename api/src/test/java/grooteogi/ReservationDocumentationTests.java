@@ -88,7 +88,6 @@ public class ReservationDocumentationTests {
           .isCanceled(true)
           .title("개발이 좋아?")
           .applyPhone("01012345678")
-          .hostPhone("01098765432")
           .text("잘부탁드려요.")
           .applyNickname("새내기")
           .review("리뷰 쓰기 싫어요")
@@ -142,7 +141,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.postId").description("포스트 ID"),
                     fieldWithPath("data.imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.text").description("호스트에게 남기는 말"),
@@ -197,7 +195,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].postId").description("포스트 ID"),
                     fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.[].text").description("호스트에게 남기는 말"),
@@ -252,7 +249,6 @@ public class ReservationDocumentationTests {
                     fieldWithPath("data.[].postId").description("포스트 ID"),
                     fieldWithPath("data.[].imageUrl").description("포스트 이미지 url"),
                     fieldWithPath("data.[].isCanceled").description("약속 취소 여부"),
-                    fieldWithPath("data.[].hostPhone").description("멘토 연락처"),
                     fieldWithPath("data.[].applyPhone").description("멘티 연락처"),
                     fieldWithPath("data.[].applyNickname").description("멘티 닉네임"),
                     fieldWithPath("data.[].text").description("호스트에게 남기는 말"),
@@ -388,13 +384,8 @@ public class ReservationDocumentationTests {
   @DisplayName("연락처 문자 인증코드 전송")
   void sendSms() throws Exception {
 
-    final ReservationDto.SendSmsResponse response
-        = ReservationDto.SendSmsResponse.builder()
-        .code("ab12")
-        .build();
 
-    given(reservationService.sendSms(phoneNumber)).willReturn(response);
-
+    reservationService.sendSms(phoneNumber);
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
             .post("/reservation/sms/send?phoneNumber={phoneNumber}", phoneNumber)
@@ -413,8 +404,7 @@ public class ReservationDocumentationTests {
                 ),
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
-                    fieldWithPath("message").description("응답 메세지"),
-                    fieldWithPath("data.code").description("인증코드")
+                    fieldWithPath("message").description("응답 메세지")
                 )
             )
         );
@@ -430,8 +420,11 @@ public class ReservationDocumentationTests {
             .code("ab12")
             .phoneNumber(phoneNumber)
             .build();
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(session);
 
-    reservationService.checkSms(request);
+    reservationService.checkSms(request, session.getId());
 
     String json = objectMapper.writeValueAsString(request);
 

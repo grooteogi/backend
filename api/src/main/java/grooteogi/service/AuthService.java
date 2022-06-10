@@ -77,7 +77,13 @@ public class AuthService {
     User user = new User();
     BeanUtils.copyProperties(oauthDto, user);
 
-    return userRepository.save(user);
+    User registerUser = userRepository.save(user);
+    UserInfo userInfo = userInfoRepository.save(new UserInfo());
+
+    User modifiedUser = UserMapper.INSTANCE.toModify(registerUser,
+        registerUser.getNickname(), userInfo);
+
+    return userRepository.save(modifiedUser);
   }
 
   public void withdrawal(int userId) {
@@ -116,13 +122,9 @@ public class AuthService {
   }
 
   public User oauth(OauthDto oauthDto) {
-    Optional<User> userEmail = userRepository.findByEmail(oauthDto.getEmail());
-    User user;
-    if (userEmail.isEmpty()) {
-      user = registerDto(oauthDto);
-    } else {
-      user = userEmail.get();
-    }
+    Optional<User> filteredUser = userRepository.findByEmail(oauthDto.getEmail());
+    User user = filteredUser.isEmpty()
+        ? registerDto(oauthDto) : userRepository.save(filteredUser.get());
 
     if (!user.getType().equals(oauthDto.getType())) {
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);

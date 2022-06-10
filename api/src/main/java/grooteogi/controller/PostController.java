@@ -1,6 +1,9 @@
 package grooteogi.controller;
 
+import static org.yaml.snakeyaml.util.UriEncoder.decode;
+
 import grooteogi.dto.HashtagDto;
+import grooteogi.dto.LikeDto;
 import grooteogi.dto.PostDto;
 import grooteogi.dto.ReviewDto;
 import grooteogi.dto.ScheduleDto;
@@ -39,10 +42,11 @@ public class PostController {
       @RequestParam(name = "keyword", required = false) String keyword,
       @RequestParam(name = "page", defaultValue = "1") Integer page,
       @RequestParam(name = "filter", required = false) String filter,
+      @RequestParam(name = "hashtag", required = false) String hashtag,
       @RequestParam(name = "region") String region) {
 
     PostDto.SearchResponse searchResponse = postService.search(keyword, filter,
-        PageRequest.of(page - 1, 12, Sort.by("id").descending()), region);
+        PageRequest.of(page - 1, 12, Sort.by("id").descending()), hashtag, decode(region));
     return ResponseEntity.ok(
         BasicResponse.builder().message("search post success").data(searchResponse).build());
   }
@@ -56,14 +60,14 @@ public class PostController {
         BasicResponse.builder().message("get post success").data(post).build());
   }
 
-  @GetMapping("/{postId}/schedules")
+  @GetMapping("/schedules/{postId}")
   public ResponseEntity<BasicResponse> getSchedulesResponse(@PathVariable int postId) {
     List<ScheduleDto.Response> schedulesResponse = postService.getSchedulesResponse(postId);
     return ResponseEntity.ok(
         BasicResponse.builder().message("get schedules success").data(schedulesResponse).build());
   }
 
-  @GetMapping("/{postId}/reviews")
+  @GetMapping("/reviews/{postId}")
   public ResponseEntity<BasicResponse> getReviewsResponse(@PathVariable int postId) {
     List<ReviewDto.Response> reviewResponses = postService.getReviewsResponse(postId);
     return ResponseEntity.ok(
@@ -75,9 +79,9 @@ public class PostController {
     Session session = (Session) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
-    postService.modifyHeart(postId, session.getId());
+    LikeDto.Response response = postService.modifyHeart(postId, session.getId());
     return ResponseEntity.ok(
-        BasicResponse.builder().message("heart success").build());
+        BasicResponse.builder().message("heart success").data(response).build());
   }
 
   @GetMapping("/{postId}/hashtags")

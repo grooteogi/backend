@@ -7,6 +7,10 @@ import grooteogi.dto.auth.OauthDto;
 import grooteogi.enums.LoginType;
 import grooteogi.exception.ApiException;
 import grooteogi.exception.ApiExceptionEnum;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +41,7 @@ public class OauthClient {
   private String googleClientId;
   @Value("${security.oauth2.client.registration.google.client-secret}")
   private String googleClientSecret;
-  @Value("${custom.oauth2.redirect.url}")
+  @Value("${custom.oauth2.redirect.back}")
   private String redirectUrl;
 
   @Autowired
@@ -57,7 +61,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", kakaoClientId);
     params.add("client_secret", kakaoClientSecret);
-    params.add("redirect_uri", redirectUrl + "/user/oauth/kakao");
+    params.add("redirect_uri", redirectUrl + "/oauth/kakao");
     params.add("code", code);
 
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -72,6 +76,7 @@ public class OauthClient {
       oauthDto.setType(LoginType.KAKAO);
       return oauthDto;
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }
@@ -96,10 +101,32 @@ public class OauthClient {
 
       oauthDto.setNickname(properties.get("nickname").getAsString());
       oauthDto.setEmail(kakaoAccount.get("email").getAsString());
+      oauthDto.setPassword(token);
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.UNAUTHORIZED_EXCEPTION);
     }
     return oauthDto;
+  }
+
+  public void googleRequest() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("scope", "profile https://www.googleapis.com/auth/userinfo.email");
+    params.put("response_type", "code");
+    params.put("client_id", googleClientId);
+    params.put("redirect_uri", redirectUrl + "/oauth/google");
+
+    String parameterString = params.entrySet().stream()
+        .map(x -> x.getKey() + "=" + x.getValue())
+        .collect(Collectors.joining("&"));
+
+    String url = "https://accounts.google.com/o/oauth2/v2/auth" + "?" + parameterString;
+
+    try {
+      httpServletResponse.sendRedirect(url);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public OauthDto googleToken(String code) {
@@ -112,7 +139,7 @@ public class OauthClient {
     params.add("grant_type", "authorization_code");
     params.add("client_id", googleClientId);
     params.add("client_secret", googleClientSecret);
-    params.add("redirect_uri", redirectUrl + "/user/oauth/google");
+    params.add("redirect_uri", redirectUrl + "/oauth/google");
     params.add("code", code);
     params.add("state", "url_parameter");
 
@@ -128,6 +155,7 @@ public class OauthClient {
       oauth.setType(LoginType.GOOGLE);
       return oauth;
     } catch (RestClientException e) {
+      e.printStackTrace();
       throw new ApiException(ApiExceptionEnum.LOGIN_FAIL_EXCEPTION);
     }
   }

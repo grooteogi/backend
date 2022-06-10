@@ -37,7 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -127,7 +126,7 @@ public class PostDocumentationTests {
   private final PostDto.SearchResult post =
       PostDto.SearchResult.builder()
           .postId(1)
-          .hashtags(List.of(hashtags))
+          .hashtags(hashtags)
           .imageUrl("포스트 이미지 주소")
           .content("포스트에 들어가는 내용입니다.")
           .title("포스트 제목이랍니다.")
@@ -151,6 +150,7 @@ public class PostDocumentationTests {
     Pageable pages = PageRequest.of(page - 1, 12, Sort.by("id").descending());
     final String filter = "LATEST";
     final String region = "강서구";
+    final String hashtag = "대외활동";
     final List<SearchResult> posts = new ArrayList<>();
 
     posts.add(post);
@@ -161,11 +161,11 @@ public class PostDocumentationTests {
             .build();
 
     // when
-    when(postService.search(keyword, filter, pages, region)).thenReturn(response);
+    when(postService.search(keyword, filter, pages, hashtag, region)).thenReturn(response);
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/search?keyword=포&page=1&filter=LATEST&region=강서구")
+            .get("/post/search?keyword=포&page=1&filter=LATEST&hashtag=대외활동&region=강서구")
     );
     resultActions.andExpect(status().isOk())
         .andDo(print())
@@ -175,6 +175,7 @@ public class PostDocumentationTests {
                     parameterWithName("keyword").description("검색어"),
                     parameterWithName("page").description("페이지 번호"),
                     parameterWithName("filter").description("검색 조건"),
+                    parameterWithName("hashtag").description("해시태그"),
                     parameterWithName("region").description("지역 조건")
                 ),
                 responseFields(
@@ -255,7 +256,7 @@ public class PostDocumentationTests {
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/{postId}/schedules", postId)
+            .get("/post/schedules/{postId}", postId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
@@ -299,7 +300,7 @@ public class PostDocumentationTests {
 
     ResultActions resultActions = mockMvc.perform(
         RestDocumentationRequestBuilders
-            .get("/post/{postId}/reviews", postId)
+            .get("/post/reviews/{postId}", postId)
             .characterEncoding("utf-8")
             .accept(MediaType.APPLICATION_JSON));
     resultActions.andExpect(status().isOk())
@@ -360,7 +361,6 @@ public class PostDocumentationTests {
     List<HashtagDto.Response> responses = new ArrayList<>();
     HashtagDto.Response response =
         HashtagDto.Response.builder()
-            .hashtagId(1)
             .name("개발자")
             .build();
     responses.add(response);
@@ -382,7 +382,6 @@ public class PostDocumentationTests {
                 responseFields(
                     fieldWithPath("status").description("결과 코드"),
                     fieldWithPath("message").description("응답 메세지"),
-                    fieldWithPath("data.[].hashtagId").description("해시태그 ID"),
                     fieldWithPath("data.[].name").description("해시태그 이름")
                 ))
         );

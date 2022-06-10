@@ -1,5 +1,7 @@
 package grooteogi.service;
 
+import static org.yaml.snakeyaml.util.UriEncoder.decode;
+
 import grooteogi.domain.Hashtag;
 import grooteogi.domain.Heart;
 import grooteogi.domain.Post;
@@ -37,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +82,7 @@ public class PostService {
 
     List<Heart> hearts = heartRepository.findByPost(post.get());
 
-    if (jwt != null) {
+    if (jwt != null && !jwt.equals("")) {
       jwt = jwtProvider.extractToken(jwt);
       jwtProvider.isUsable(jwt);
       Session session = jwtProvider.extractAllClaims(jwt);
@@ -122,6 +125,7 @@ public class PostService {
     if (hearts.size() > 0) {
       hearts.forEach(heart -> {
         PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(heart.getPost());
+        result.setHashtags(getPostHashtags(heart.getPost().getPostHashtags()));
         response.add(result);
       });
     }
@@ -204,7 +208,7 @@ public class PostService {
       if (hashtag.isEmpty()) {
         Hashtag createdHashtag = Hashtag.builder().name(name).build();
         hashtagRepository.save(createdHashtag);
-        hashtag = hashtagRepository.findByName(name);
+        hashtag = Optional.of(createdHashtag);
       }
 
       hashtag.ifPresent(tag -> {
@@ -216,7 +220,23 @@ public class PostService {
       });
     });
 
-    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request);
+    List<Reservation> reservations = reservationRepository.findByPostId(post.get().getId());
+    List<Schedule> reservedSchedule = new ArrayList<>();
+    reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
+
+    post.get().getSchedules().stream()
+        .filter(filter -> reservedSchedule.stream()
+            .noneMatch(Predicate.isEqual(filter)))
+        .collect(Collectors.toList())
+        .forEach(result -> scheduleRepository.delete(result));
+
+    List<Schedule> modifySchedule = createSchedule(request.getSchedules());
+    modifySchedule.forEach(schedule -> {
+      schedule.setPost(post.get());
+      scheduleRepository.save(schedule);
+    });
+
+    Post modifiedPost = PostMapper.INSTANCE.toModify(post.get(), request, modifySchedule);
     postRepository.save(modifiedPost);
     return PostMapper.INSTANCE.toCreateResponseDto(modifiedPost);
   }
@@ -241,10 +261,25 @@ public class PostService {
   }
 
   public PostDto.SearchResponse search(String keyword, String filter,
+      Pageable page, String hashtag, String region) {
+
+    RegionType regionType = RegionType.getEnum(region);
+
+    if (hashtag.equals("")) {
+      return keyword.equals("") ? searchAllPosts(page, filter, regionType)
+          : searchPosts(decode(keyword), page, filter, regionType);
+    } else {
+      return searchHashtag(decode(hashtag), filter, page, region);
+    }
+
+  }
+
+  public PostDto.SearchResponse searchHashtag(String hashtag, String filter,
       Pageable page, String region) {
 
-    return keyword == null ? searchAllPosts(page, filter, region)
-        : searchPosts(keyword, page, filter, region);
+    RegionType regionType = RegionType.getEnum(region);
+
+    return hashtagSearchAllPosts(hashtag, page, filter, regionType);
 
   }
 
@@ -260,7 +295,11 @@ public class PostService {
           .collect(Collectors.toList());
 
       filteredPostList.forEach(
-          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+          post -> {
+            PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+            result.setHashtags(getPostHashtags(post.getPostHashtags()));
+            searchResults.add(result);
+          });
 
 
     } else if (postFilterEnum == PostFilterEnum.POPULAR) {
@@ -270,51 +309,103 @@ public class PostService {
           .collect(Collectors.toList());
       Collections.reverse(filteredPostList);
 
-      filteredPostList.forEach(
-          post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+      filteredPostList.forEach(post -> {
+        PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+        result.setHashtags(getPostHashtags(post.getPostHashtags()));
+        searchResults.add(result);
+      });
 
 
     } else {
 
-      postList.forEach(post -> searchResults.add(PostMapper.INSTANCE.toSearchResponseDto(post)));
+      postList.forEach(post -> {
+        PostDto.SearchResult result = PostMapper.INSTANCE.toSearchResponseDto(post);
+        result.setHashtags(getPostHashtags(post.getPostHashtags()));
+        searchResults.add(result);
+      });
     }
 
     return PostDto.SearchResponse.builder().posts(searchResults).pageCount(pageCount).build();
   }
 
-  private List<Schedule> filterRegion(List<Schedule> schedules, String region) {
-    RegionType regionType = RegionType.getEnum(region);
-
-    return schedules.stream().filter(schedule -> schedule.getRegion() == regionType)
-        .collect(Collectors.toList());
-  }
-
-  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, String region) {
+  public PostDto.SearchResponse hashtagSearchAllPosts(String hashtag, Pageable page, String filter,
+      RegionType region) {
     Page<Post> posts = postRepository.findAll(page);
+
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    schedule.getPost().getPostHashtags().forEach(postHashtag -> {
+                      if (postHashtag.getHashTag().getName().equals(hashtag)) {
+                        postList.add(schedule.getPost());
+                      }
+                    });
+
+                  }
+                })
     );
 
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+    return filter(postList, filter, posts.getTotalPages());
+  }
+
+
+  public PostDto.SearchResponse searchAllPosts(Pageable page, String filter, RegionType region) {
+    Page<Post> posts = postRepository.findAll(page);
+
+    List<Post> postList = new ArrayList<>();
+
+    posts.forEach(
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
+    );
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   private PostDto.SearchResponse searchPosts(String keyword, Pageable page,
-      String filter, String region) {
+      String filter, RegionType region) {
     Page<Post> posts =
         postRepository.findAllByTitleContainingOrContentContaining(keyword, keyword, page);
 
+    List<Post> postList = new ArrayList<>();
+
     posts.forEach(
-        post -> filterRegion(post.getSchedules(), region)
+        post -> post.getSchedules().stream()
+            .filter(s -> s.getRegion() == region).collect(
+                Collectors.toList()).forEach(schedule -> {
+                  if (!postList.contains(schedule.getPost())) {
+                    postList.add(schedule.getPost());
+                  }
+                })
     );
-    return filter(posts.getContent(), filter, posts.getTotalPages());
+
+    return filter(postList, filter, posts.getTotalPages());
   }
 
   public List<ScheduleDto.Response> getSchedulesResponse(Integer postId) {
+    List<Reservation> reservations = reservationRepository.findByPostId(postId);
+    List<Schedule> reservedSchedule = new ArrayList<>();
+    reservations.forEach(reservation -> reservedSchedule.add(reservation.getSchedule()));
+
+    List<Schedule> postSchedules = scheduleRepository.findByPostId(postId);
     List<ScheduleDto.Response> responses = new ArrayList<>();
-    scheduleRepository.findByPostId(postId).forEach(schedule -> {
-      ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
-      responses.add(response);
-    });
+
+    postSchedules.stream()
+        .filter(filter -> reservedSchedule.stream()
+            .noneMatch(Predicate.isEqual(filter)))
+        .forEach(schedule -> {
+          ScheduleDto.Response response = PostMapper.INSTANCE.toScheduleResponses(schedule);
+          responses.add(response);
+        });
 
     return responses;
   }
@@ -341,8 +432,9 @@ public class PostService {
     return responses;
   }
 
-  public void modifyHeart(Integer postId, Integer userId) {
+  public LikeDto.Response modifyHeart(Integer postId, Integer userId) {
     Optional<Post> post = postRepository.findById(postId);
+
     if (post.isEmpty()) {
       throw new ApiException(ApiExceptionEnum.POST_NOT_FOUND_EXCEPTION);
     }
@@ -352,9 +444,14 @@ public class PostService {
 
     if (heart.isEmpty()) {
       heartRepository.save(Heart.builder().post(post.get()).user(user.get()).build());
+      return LikeDto.Response.builder().liked(true)
+          .count(post.get().getHearts().size()).build();
     } else {
       heartRepository.delete(heart.get());
+      return LikeDto.Response.builder().liked(false)
+          .count(post.get().getHearts().size()).build();
     }
+
   }
 
   public List<PostDto.SearchResult> writerPost(Integer userId) {
@@ -365,6 +462,7 @@ public class PostService {
     if (!posts.isEmpty()) {
       posts.forEach(post -> {
         PostDto.SearchResult response = PostMapper.INSTANCE.toSearchResponseDto(post);
+        response.setHashtags(getPostHashtags(post.getPostHashtags()));
         responses.add(response);
       });
     }
